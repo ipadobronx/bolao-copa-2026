@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-bg-dark: #0a0e1a;
@@ -15,9 +15,9 @@
   --color-danger: #ef4444;
   --color-info: #3b82f6;
   --color-brasil: #009739;
-  --color-brasil-yellow: #FEDF00;
+  --color-brasil-yellow: #fedf00;
 
-  --font-display: var(--font-bebas), "Bebas Neue", sans-serif;
+  --font-display: var(--font-bebas), 'Bebas Neue', sans-serif;
   --font-body: var(--font-archivo), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 }

@@ -1,0 +1,9 @@
+.next
+node_modules
+pnpm-lock.yaml
+supabase/.temp
+supabase/.branches
+coverage
+out
+build
+dist

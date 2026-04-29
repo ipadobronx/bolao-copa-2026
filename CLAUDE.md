@@ -3,6 +3,7 @@
 > **Para o agente:** Este é o documento de contexto do projeto. Ele NÃO contém specs de implementação nem planos de sprint — esses serão gerados feature-a-feature via skill `brainstorming` do Superpowers, salvos em `docs/superpowers/specs/` e `docs/superpowers/plans/`.
 >
 > **Hierarquia de instruções (do mais alto pro mais baixo):**
+>
 > 1. Instruções diretas do usuário nesta sessão
 > 2. Este `CLAUDE.md`
 > 3. Skills do Superpowers
@@ -16,6 +17,7 @@
 Sistema web de bolão da Copa do Mundo 2026 (FIFA, 11/06/2026 a 19/07/2026, sediada em EUA, México e Canadá; 48 seleções, 104 jogos).
 
 **Modelo de negócio:**
+
 - R$ 20,00 por tabela (1 tabela = 1 conjunto de palpites)
 - Prêmio total R$ 10.000, dividido entre os 10 primeiros do ranking
 - Promoção cashback: comprou ≥ R$ 100 → escolhe 1 seleção; se ela for campeã, recebe 100% do valor pago de volta
@@ -34,6 +36,7 @@ Sistema web de bolão da Copa do Mundo 2026 (FIFA, 11/06/2026 a 19/07/2026, sedi
 Estas decisões estão consolidadas. Se o usuário pedir uma feature, assuma estas premissas e **não** abra brainstorming sobre elas a menos que o usuário levante explicitamente:
 
 ### Stack
+
 - **Frontend:** Next.js 14 (App Router, TypeScript estrito, Server Components por padrão), Tailwind CSS, Lucide Icons.
 - **Backend:** Supabase (Postgres + Auth + Realtime + Edge Functions + Storage). RLS habilitado em TODAS as tabelas. Auth via OTP por email (magic link).
 - **Pagamentos:** Asaas (PIX). Sandbox em dev, produção depois.
@@ -42,12 +45,14 @@ Estas decisões estão consolidadas. Se o usuário pedir uma feature, assuma est
 - **WhatsApp:** Evolution API self-hosted (escopo opcional, fase 2).
 
 ### Design system (mantém o do protótipo)
+
 - Tema dark com accent amarelo (`#facc15`).
 - Tipografia: Bebas Neue (display), Archivo (body), JetBrains Mono (números/datas).
 - CSS variables e config Tailwind no `app/globals.css` e `tailwind.config.ts`.
 - **Referência visual obrigatória:** `docs/prototype/bolao-copa-2026.html` — todo componente visual deve ser fiel a essa fonte.
 
 ### Arquitetura de rotas (Next.js App Router)
+
 ```
 app/
   (public)/        → landing, regras, FAQ
@@ -58,6 +63,7 @@ app/
 ```
 
 ### Decisões editoriais
+
 - **Mobile-first sempre.** ~85% dos apostadores vão usar celular.
 - **Auto-save em palpites** (sem botão "salvar" — debounce 1s).
 - **Toasts pra feedback** (lib `sonner`).
@@ -72,12 +78,14 @@ Estas regras devem virar testes automatizados sempre que tocadas. Qualquer featu
 ### 3.1 Pontuação dos palpites
 
 **Fase de grupos (multiplicador 1×):**
+
 - Placar exato → 10 pts
 - Vencedor + saldo de gols correto → 7 pts
 - Apenas vencedor (ou empate) → 5 pts
 - Acertou número de gols de UM dos times (sem acertar resultado) → +2 bônus
 
 **Multiplicadores por fase de mata-mata:**
+
 - 16avos → ×1.5
 - Oitavas → ×2
 - Quartas → ×2.5
@@ -88,6 +96,7 @@ Estas regras devem virar testes automatizados sempre que tocadas. Qualquer featu
 **Pontuação final aplicada:** `Math.round(pontosBase × multiplicador)`.
 
 **Bônus (preenchidos antes da Copa):**
+
 - Campeão: 50 pts
 - Vice: 30 pts
 - 3º lugar: 15 pts
@@ -98,6 +107,7 @@ Estas regras devem virar testes automatizados sempre que tocadas. Qualquer featu
 ### 3.2 Distribuição de prêmios
 
 Total: R$ 10.000.
+
 - 1º → R$ 5.000
 - 2º → R$ 2.500
 - 3º → R$ 1.500
@@ -156,10 +166,12 @@ ranking (bilhete_id, numero_bilhete, user_id, nome, pontos_totais,
 ```
 
 **Triggers obrigatórios:**
+
 - `handle_new_user`: cria profile auto ao criar user no auth
 - `prevent_palpite_after_start`: bloqueia palpite se `jogo.data_hora <= now()`
 
 **Enums:**
+
 - `fase_jogo`: 'grupos', '16avos', 'oitavas', 'quartas', 'semis', 'disputa_terceiro', 'final'
 - `status_pagamento`: 'pendente', 'confirmado', 'expirado', 'cancelado'
 - `tipo_bonus`: 'campeao', 'vice', 'terceiro', 'quarto', 'artilheiro', 'revelacao'
@@ -192,20 +204,24 @@ Esta é a ordem recomendada de construção. Cada item vira uma sessão separada
 ## 6. Pontos de atenção
 
 ### Segurança
+
 - **NUNCA** expor `SUPABASE_SERVICE_ROLE_KEY` no cliente. Apenas em Server Components, Route Handlers e Edge Functions.
 - Validar TODO input com Zod antes de tocar o banco.
 - Webhook Asaas: validar token de assinatura.
 - Rate limiting nas API routes que lidam com pagamento.
 
 ### Performance
+
 - View `ranking` pode ficar cara com >1k bilhetes. Se latência > 500ms em prod, transformar em materialized view com refresh a cada 5 min (durante jogos, 1 min).
 - Cache agressivo de seleções e jogos (mudam raramente).
 
 ### Risco regulatório
+
 - Bolão pago no Brasil está em zona cinzenta após a Lei 14.790/2023. Antes do lançamento público, **consultar advogado especializado em direito desportivo/gaming**.
 - Termos de uso devem caracterizar como "competição entre conhecidos" e não casa de apostas.
 
 ### Risco financeiro do cashback
+
 - Sem o limite de 20 vagas por seleção, o cashback pode consumir mais do que foi arrecadado. Isso é **bloqueador**: a feature de checkout não pode ir pra produção sem essa proteção testada.
 
 ---

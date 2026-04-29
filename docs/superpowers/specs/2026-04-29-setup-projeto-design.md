@@ -28,16 +28,16 @@ Esta feature **não** entrega:
 
 ## 2. Decisões consolidadas no brainstorming
 
-| # | Pergunta | Escolha | Motivação |
-|---|----------|---------|-----------|
-| Q1 | Gerenciador de pacotes | **pnpm** | Determinístico, rápido, store global; melhor durante TDD |
-| Q2 | Versão do Tailwind | **v4** | Config em CSS via `@theme` casa com tokens do protótipo (CSS-vars-first); elimina duplicação `:root` ↔ `tailwind.config.ts` |
-| Q3 | Stack Supabase em dev | **Híbrido (CLI + cloud, sem Docker)** | Migrations versionadas como arquivos; dev aponta direto pro projeto Supabase Cloud |
-| Q4 | UI primitives | **Radix puro pros 6 primitivos com a11y + custom Tailwind pros simples + sonner** | Mantém fidelidade ao protótipo; só importa biblioteca onde acessibilidade compensa |
-| Q5 | Projeto Supabase | **Existente: `rvprwtrcpdyoljlekxdx`** | URL e anon key fornecidas pelo usuário; service_role key será preenchida diretamente em `.env.local` |
-| Q6 | Hooks/CI/smoke test | **Setup mínimo viável** | Sem husky, sem lint-staged, sem GitHub Actions; um único smoke test pra validar Vitest. CI entra na feature 5 quando há regra crítica pra proteger |
-| — | Versão do Next.js | **14** | Mantém literalmente o que está no `CLAUDE.md`; sem upgrade unilateral |
-| — | Estratégia de execução | **B — commits temáticos sequenciais** | 6 commits revisáveis, cada um com critério de pronto independente |
+| #   | Pergunta               | Escolha                                                                           | Motivação                                                                                                                                          |
+| --- | ---------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Q1  | Gerenciador de pacotes | **pnpm**                                                                          | Determinístico, rápido, store global; melhor durante TDD                                                                                           |
+| Q2  | Versão do Tailwind     | **v4**                                                                            | Config em CSS via `@theme` casa com tokens do protótipo (CSS-vars-first); elimina duplicação `:root` ↔ `tailwind.config.ts`                        |
+| Q3  | Stack Supabase em dev  | **Híbrido (CLI + cloud, sem Docker)**                                             | Migrations versionadas como arquivos; dev aponta direto pro projeto Supabase Cloud                                                                 |
+| Q4  | UI primitives          | **Radix puro pros 6 primitivos com a11y + custom Tailwind pros simples + sonner** | Mantém fidelidade ao protótipo; só importa biblioteca onde acessibilidade compensa                                                                 |
+| Q5  | Projeto Supabase       | **Existente: `rvprwtrcpdyoljlekxdx`**                                             | URL e anon key fornecidas pelo usuário; service_role key será preenchida diretamente em `.env.local`                                               |
+| Q6  | Hooks/CI/smoke test    | **Setup mínimo viável**                                                           | Sem husky, sem lint-staged, sem GitHub Actions; um único smoke test pra validar Vitest. CI entra na feature 5 quando há regra crítica pra proteger |
+| —   | Versão do Next.js      | **14**                                                                            | Mantém literalmente o que está no `CLAUDE.md`; sem upgrade unilateral                                                                              |
+| —   | Estratégia de execução | **B — commits temáticos sequenciais**                                             | 6 commits revisáveis, cada um com critério de pronto independente                                                                                  |
 
 ---
 
@@ -185,9 +185,7 @@ export async function createSupabaseServerClient() {
         getAll: () => cookieStore.getAll(),
         setAll: (toSet) => {
           try {
-            toSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options),
-            );
+            toSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
           } catch {
             // chamado em RSC: middleware é quem renova a sessão
           }
@@ -209,11 +207,9 @@ import { env } from '@/lib/env';
 import type { Database } from '@/lib/supabase/types';
 
 export function createSupabaseAdminClient() {
-  return createClient<Database>(
-    env.NEXT_PUBLIC_SUPABASE_URL,
-    env.SUPABASE_SERVICE_ROLE_KEY,
-    { auth: { persistSession: false, autoRefreshToken: false } },
-  );
+  return createClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
 }
 ```
 
@@ -238,9 +234,7 @@ export async function updateSupabaseSession(request: NextRequest) {
         setAll: (toSet) => {
           toSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
-          toSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
-          );
+          toSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
         },
       },
     },
@@ -351,7 +345,7 @@ supabase/.branches
 #### `app/globals.css`
 
 ```css
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-bg-dark: #0a0e1a;
@@ -368,11 +362,11 @@ supabase/.branches
   --color-danger: #ef4444;
   --color-info: #3b82f6;
   --color-brasil: #009739;
-  --color-brasil-yellow: #FEDF00;
+  --color-brasil-yellow: #fedf00;
 
-  --font-display: "Bebas Neue", sans-serif;
-  --font-body: "Archivo", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'Archivo', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
 @layer base {
@@ -402,9 +396,7 @@ const nextConfig = {
     typedRoutes: true,
   },
   images: {
-    remotePatterns: [
-      { protocol: 'https', hostname: 'rvprwtrcpdyoljlekxdx.supabase.co' },
-    ],
+    remotePatterns: [{ protocol: 'https', hostname: 'rvprwtrcpdyoljlekxdx.supabase.co' }],
   },
 };
 
@@ -592,14 +584,14 @@ Sistema de bolão da Copa do Mundo FIFA 2026.
 
 ## 4. Plano de commits (sequência de execução)
 
-| # | Mensagem | Conteúdo | Critério de pronto |
-|---|---|---|---|
-| 1 | `chore: scaffold Next.js 14 with TypeScript and Tailwind v4` | `package.json`, `pnpm-lock.yaml`, `tsconfig.json`, `next.config.mjs`, `postcss.config.mjs`, `app/{layout,page,globals.css}`, `app/(public)/page.tsx` placeholder, fontes via `next/font`, tokens `@theme`, `.nvmrc`, `.gitignore` expandido | `pnpm dev` sobe; página inicial usa Bebas Neue/Archivo; `pnpm typecheck` passa |
-| 2 | `chore: configure linting, formatting, and Vitest` | `eslint.config.mjs`, `.prettierrc.json`, `.prettierignore`, `vitest.config.ts`, `vitest.setup.ts`, `lib/utils.ts`, `lib/__tests__/utils.test.ts` | `pnpm lint`, `pnpm format:check`, `pnpm test:run` passam |
-| 3 | `chore: scaffold Supabase clients and migrations workflow` | `lib/supabase/{browser,server,admin,types}.ts`, `lib/env.ts`, `.env.local.example`, `supabase/config.toml` (via `supabase init`) | `pnpm typecheck` passa com env preenchido; `lib/supabase/types.ts` é placeholder vazio (`export type Database = { public: { Tables: {} } }`) |
-| 4 | `chore: add Next.js middleware for auth session refresh` | `middleware.ts` (root), `lib/supabase/middleware.ts` | `pnpm dev` sobe sem erros; request a `/` retorna 200; cookie de sessão é setado no response (validação manual) |
-| 5 | `chore: scaffold app route groups and base layouts` | `app/(public)/layout.tsx`, `app/(auth)/{layout.tsx,login/page.tsx,auth/callback/route.ts}`, `app/(dashboard)/{layout.tsx,dashboard/page.tsx}`, `app/(admin)/{layout.tsx,admin/page.tsx}`, `app/{not-found,error}.tsx` | `pnpm build` produz todas as rotas; todas retornam 200 em dev |
-| 6 | `chore: add Radix primitives and sonner` | Instala 6 packages Radix + sonner, `<Toaster/>` em `app/layout.tsx`, README finalizado | `pnpm typecheck` + `pnpm lint` + `pnpm test:run` todos verdes |
+| #   | Mensagem                                                     | Conteúdo                                                                                                                                                                                                                                    | Critério de pronto                                                                                                                           |
+| --- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `chore: scaffold Next.js 14 with TypeScript and Tailwind v4` | `package.json`, `pnpm-lock.yaml`, `tsconfig.json`, `next.config.mjs`, `postcss.config.mjs`, `app/{layout,page,globals.css}`, `app/(public)/page.tsx` placeholder, fontes via `next/font`, tokens `@theme`, `.nvmrc`, `.gitignore` expandido | `pnpm dev` sobe; página inicial usa Bebas Neue/Archivo; `pnpm typecheck` passa                                                               |
+| 2   | `chore: configure linting, formatting, and Vitest`           | `eslint.config.mjs`, `.prettierrc.json`, `.prettierignore`, `vitest.config.ts`, `vitest.setup.ts`, `lib/utils.ts`, `lib/__tests__/utils.test.ts`                                                                                            | `pnpm lint`, `pnpm format:check`, `pnpm test:run` passam                                                                                     |
+| 3   | `chore: scaffold Supabase clients and migrations workflow`   | `lib/supabase/{browser,server,admin,types}.ts`, `lib/env.ts`, `.env.local.example`, `supabase/config.toml` (via `supabase init`)                                                                                                            | `pnpm typecheck` passa com env preenchido; `lib/supabase/types.ts` é placeholder vazio (`export type Database = { public: { Tables: {} } }`) |
+| 4   | `chore: add Next.js middleware for auth session refresh`     | `middleware.ts` (root), `lib/supabase/middleware.ts`                                                                                                                                                                                        | `pnpm dev` sobe sem erros; request a `/` retorna 200; cookie de sessão é setado no response (validação manual)                               |
+| 5   | `chore: scaffold app route groups and base layouts`          | `app/(public)/layout.tsx`, `app/(auth)/{layout.tsx,login/page.tsx,auth/callback/route.ts}`, `app/(dashboard)/{layout.tsx,dashboard/page.tsx}`, `app/(admin)/{layout.tsx,admin/page.tsx}`, `app/{not-found,error}.tsx`                       | `pnpm build` produz todas as rotas; todas retornam 200 em dev                                                                                |
+| 6   | `chore: add Radix primitives and sonner`                     | Instala 6 packages Radix + sonner, `<Toaster/>` em `app/layout.tsx`, README finalizado                                                                                                                                                      | `pnpm typecheck` + `pnpm lint` + `pnpm test:run` todos verdes                                                                                |
 
 **Nota sobre git init:** o repositório recebeu `git init` durante a fase de brainstorming (pra commitar este spec antes da implementação começar). Um `.gitignore` mínimo foi criado nesse ponto cobrindo apenas:
 
