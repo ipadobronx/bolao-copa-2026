@@ -1,0 +1,17 @@
+# Force LF line endings on all text files regardless of OS.
+# Without this, Windows checkouts get CRLF (via core.autocrlf) which makes
+# Prettier (configured with default endOfLine: 'lf') fail format:check on
+# every file.
+* text=auto eol=lf
+
+# Binary files (no transformation)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary

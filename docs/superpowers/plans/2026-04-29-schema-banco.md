@@ -1360,9 +1360,11 @@ To verify `handle_new_user` trigger works end-to-end:
    - Receive the magic link in the inbox; click it. The link redirects to `localhost:3000/auth/callback` which currently returns 501 (placeholder). Ignore the page response; the auth was already exchanged.
 
 4. Verify in Studio SQL editor:
+
    ```sql
    SELECT id, email, is_admin FROM profiles WHERE email = 'abn3t0@gmail.com';
    ```
+
    Expected: 1 row, with `is_admin = false`. If the row exists, the `handle_new_user` trigger fired correctly during the auth.users insert.
 
 5. Stop the dev server (Ctrl+C in the developer's terminal, or kill the orphan process per Feature 1's pattern).
@@ -1468,6 +1470,7 @@ git commit -m "chore: regenerate Supabase types from cloud dev"
 Run by the developer after all 7 tasks complete. The controller waits for the developer to confirm before proceeding to merge.
 
 - [ ] **B.1:** `git log --oneline 41df505..HEAD` shows exactly 7 commits in the order:
+
   ```
   <hash> chore: regenerate Supabase types from cloud dev
   <hash> chore(db): add seed data — 48 selecoes, 104 jogos, copa_resultados

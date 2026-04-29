@@ -35,15 +35,15 @@ Esta feature **não entrega:**
 
 ## 2. Decisões consolidadas no brainstorming
 
-| # | Pergunta | Escolha | Motivação |
-|---|----------|---------|-----------|
-| Q1 | Dados reais dos jogos | **C → Real (ajustado)** | Sorteio fechou em dez/2025 + repescagem em mar/2026; 48 selecoes e 12 grupos definidos. 104 jogos com datas/horários/cidades-sede do calendário oficial FIFA |
-| Q2 | Visibilidade de palpites alheios | **B — públicos a partir do início do jogo** | Engagement com integridade; pré-jogo só dono+admin, pós-início público entre autenticados |
-| Q3 | Estrutura de migration | **B — 1 migration DDL + supabase/seed.sql** | Padrão Supabase; separa contrato (schema) de dado de exemplo |
-| Q4 | Nomes das selecoes | **A → Real (ajustado pro user fornecer ground truth)** | Brasil grupo C com Marrocos/Escócia/Haiti — confirmado pelo user; restante derivado da lista oficial FIFA com `-- TODO confirmar` inline em casos de dúvida |
-| — | Defesa em profundidade | **C híbrido** | RLS em tudo + DB triggers SOMENTE pras 2 regras críticas mandadas pelo CLAUDE.md (cashback 20-slot, palpite window) + protections de colunas sensíveis (pagamento, pontuação) |
-| — | View ranking — security | **A → `WITH (security_invoker = false)` + GRANT pra anon/authenticated** | Ranking público por natureza; view só projeta `nome` (sem email/CPF) |
-| — | Tiebreaker do ranking | **pontos_totais → acertos_exatos → acertos_parciais → numero_bilhete ASC** | Ordem cronológica como último critério (numero_bilhete é serial, único) |
+| #   | Pergunta                         | Escolha                                                                    | Motivação                                                                                                                                                                     |
+| --- | -------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Q1  | Dados reais dos jogos            | **C → Real (ajustado)**                                                    | Sorteio fechou em dez/2025 + repescagem em mar/2026; 48 selecoes e 12 grupos definidos. 104 jogos com datas/horários/cidades-sede do calendário oficial FIFA                  |
+| Q2  | Visibilidade de palpites alheios | **B — públicos a partir do início do jogo**                                | Engagement com integridade; pré-jogo só dono+admin, pós-início público entre autenticados                                                                                     |
+| Q3  | Estrutura de migration           | **B — 1 migration DDL + supabase/seed.sql**                                | Padrão Supabase; separa contrato (schema) de dado de exemplo                                                                                                                  |
+| Q4  | Nomes das selecoes               | **A → Real (ajustado pro user fornecer ground truth)**                     | Brasil grupo C com Marrocos/Escócia/Haiti — confirmado pelo user; restante derivado da lista oficial FIFA com `-- TODO confirmar` inline em casos de dúvida                   |
+| —   | Defesa em profundidade           | **C híbrido**                                                              | RLS em tudo + DB triggers SOMENTE pras 2 regras críticas mandadas pelo CLAUDE.md (cashback 20-slot, palpite window) + protections de colunas sensíveis (pagamento, pontuação) |
+| —   | View ranking — security          | **A → `WITH (security_invoker = false)` + GRANT pra anon/authenticated**   | Ranking público por natureza; view só projeta `nome` (sem email/CPF)                                                                                                          |
+| —   | Tiebreaker do ranking            | **pontos_totais → acertos_exatos → acertos_parciais → numero_bilhete ASC** | Ordem cronológica como último critério (numero_bilhete é serial, único)                                                                                                       |
 
 ---
 
@@ -716,6 +716,7 @@ INSERT INTO jogos (numero_jogo, fase, data_hora, placeholder_casa, placeholder_f
 ```
 
 Convenções de placeholder:
+
 - Fase de grupos: `Grupo X - Time N` até admin substituir por seleção real
 - 16avos / oitavas / quartas: `1A`, `2B`, `V XX`, `P XX` (vencedor/perdedor de jogo X)
 - Semis: `V QF1` etc. (vencedor das quartas)
@@ -733,15 +734,15 @@ INSERT INTO copa_resultados (id, finalizada) VALUES (1, false);
 
 ## 4. Plano de commits (sequência reviewable)
 
-| # | Mensagem | Conteúdo |
-|---|---|---|
-| 1 | `chore: scaffold initial schema migration` | `supabase migration new initial_schema` (cria stub timestamped vazio) |
-| 2 | `feat(db): add enums, tables, indexes, updated_at trigger` | Enums (3) + 7 tabelas + indexes + CHECK constraints + função/triggers `set_updated_at` |
-| 3 | `feat(db): add business rule triggers` | `is_admin()`, `handle_new_user`, `prevent_palpite_after_start`, `prevent_bonus_when_unconfirmed`, `enforce_cashback_slot_limit` |
-| 4 | `feat(db): add RLS policies and column protection` | Policies pra todas 7 tabelas + `protect_bilhete_payment_columns` + `protect_score_column` |
-| 5 | `feat(db): add ranking view with public access` | View `ranking` com `WITH (security_invoker = false)` + GRANT pra anon/authenticated |
-| 6 | `chore(db): add seed data — 48 selecoes, 104 jogos, copa_resultados` | `supabase/seed.sql` com dados reais FIFA — `-- TODO confirmar` inline em casos de dúvida |
-| 7 | `chore: regenerate Supabase types from cloud dev` | `lib/supabase/types.ts` regenerado após `supabase db push` |
+| #   | Mensagem                                                             | Conteúdo                                                                                                                        |
+| --- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `chore: scaffold initial schema migration`                           | `supabase migration new initial_schema` (cria stub timestamped vazio)                                                           |
+| 2   | `feat(db): add enums, tables, indexes, updated_at trigger`           | Enums (3) + 7 tabelas + indexes + CHECK constraints + função/triggers `set_updated_at`                                          |
+| 3   | `feat(db): add business rule triggers`                               | `is_admin()`, `handle_new_user`, `prevent_palpite_after_start`, `prevent_bonus_when_unconfirmed`, `enforce_cashback_slot_limit` |
+| 4   | `feat(db): add RLS policies and column protection`                   | Policies pra todas 7 tabelas + `protect_bilhete_payment_columns` + `protect_score_column`                                       |
+| 5   | `feat(db): add ranking view with public access`                      | View `ranking` com `WITH (security_invoker = false)` + GRANT pra anon/authenticated                                             |
+| 6   | `chore(db): add seed data — 48 selecoes, 104 jogos, copa_resultados` | `supabase/seed.sql` com dados reais FIFA — `-- TODO confirmar` inline em casos de dúvida                                        |
+| 7   | `chore: regenerate Supabase types from cloud dev`                    | `lib/supabase/types.ts` regenerado após `supabase db push`                                                                      |
 
 ---
 
@@ -774,19 +775,23 @@ INSERT INTO copa_resultados (id, finalizada) VALUES (1, false);
 ## 6. Steps manuais que o desenvolvedor executa
 
 1. **Aplicar migration + seed na cloud dev:**
+
    ```bash
    supabase db push
    ```
+
    Se houver conflitos com schema existente, opções:
    - `supabase db reset --linked` (DESTRUTIVO — apaga schema public). Use só se cloud dev é descartável.
    - Aplicar DROP IF EXISTS adequados manualmente antes do push.
 
 2. **Regenerar types:**
+
    ```bash
    pnpm supabase:types
    ```
 
 3. **Promover primeiro admin** (após primeiro signin via magic link, no Supabase Studio SQL editor):
+
    ```sql
    UPDATE profiles SET is_admin = true WHERE email = 'abn3t0@gmail.com';
    ```
