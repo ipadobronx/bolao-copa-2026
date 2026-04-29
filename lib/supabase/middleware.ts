@@ -22,8 +22,15 @@ export async function updateSupabaseSession(request: NextRequest) {
     },
   );
 
-  // getUser() valida JWT no servidor (vs getSession que só lê cookie)
-  await supabase.auth.getUser();
+  // getUser() valida JWT no servidor (vs getSession que só lê cookie).
+  // Erros de rede / Auth indisponível não devem 500 a request: deixa
+  // passar com cookies não-renovados; redirecionamento de auth fica a
+  // cargo da Feature 4.
+  try {
+    await supabase.auth.getUser();
+  } catch {
+    // transient — segue com cookies atuais
+  }
 
   return response;
 }
