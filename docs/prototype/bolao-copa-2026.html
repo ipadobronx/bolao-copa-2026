@@ -1,0 +1,2185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bolão Copa 2026 — Protótipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark: #0a0e1a;
+    --bg-card: #111827;
+    --bg-elevated: #1a2234;
+    --border: #1f2937;
+    --border-strong: #374151;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent: #facc15;
+    --accent-hover: #fde047;
+    --success: #10b981;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    --brasil: #009739;
+    --brasil-yellow: #FEDF00;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Archivo', system-ui, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* NAVIGATION TABS */
+  .proto-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 14, 26, 0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .proto-nav-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-right: 12px;
+  }
+
+  .proto-nav button {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+
+  .proto-nav button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .proto-nav button.active {
+    background: var(--accent);
+    color: var(--bg-dark);
+    border-color: var(--accent);
+    font-weight: 700;
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeIn 0.4s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ========== LANDING PAGE ========== */
+  .landing {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .landing-hero {
+    position: relative;
+    padding: 80px 24px 120px;
+    background: 
+      radial-gradient(ellipse at top right, rgba(250, 204, 21, 0.15), transparent 50%),
+      radial-gradient(ellipse at bottom left, rgba(0, 151, 57, 0.12), transparent 50%),
+      var(--bg-dark);
+  }
+
+  .landing-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .landing-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 80px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 2px;
+  }
+
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    color: var(--bg-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: 900;
+    transform: rotate(-5deg);
+  }
+
+  .logo-text { color: var(--text-primary); }
+  .logo-text span { color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg-dark);
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'Archivo', sans-serif;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(250, 204, 21, 0.3);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    padding: 12px 24px;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'Archivo', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(250, 204, 21, 0.1);
+    border: 1px solid rgba(250, 204, 21, 0.3);
+    color: var(--accent);
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 8vw, 96px);
+    line-height: 0.9;
+    letter-spacing: -1px;
+    margin-bottom: 24px;
+  }
+
+  .hero-title .line-1 { color: var(--text-primary); display: block; }
+  .hero-title .line-2 { color: var(--accent); display: block; }
+  .hero-title .line-3 { 
+    display: block; 
+    color: var(--text-primary); 
+    font-size: 0.5em;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    letter-spacing: 0;
+    margin-top: 12px;
+    text-transform: uppercase;
+  }
+
+  .hero-desc {
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    max-width: 520px;
+    line-height: 1.6;
+  }
+
+  .hero-cta-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+  }
+
+  .btn-hero {
+    padding: 16px 28px;
+    font-size: 15px;
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .stat-item .stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-item .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Prize card */
+  .prize-card {
+    background: linear-gradient(145deg, #1a2234, #111827);
+    border: 1px solid var(--border-strong);
+    border-radius: 20px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .prize-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(250, 204, 21, 0.08), transparent 60%);
+  }
+
+  .prize-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .prize-header-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+  }
+
+  .prize-trophy {
+    width: 40px;
+    height: 40px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+
+  .prize-amount {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    color: var(--accent);
+    line-height: 1;
+    position: relative;
+    margin-bottom: 4px;
+  }
+
+  .prize-amount .currency {
+    font-size: 36px;
+    vertical-align: top;
+    margin-right: 4px;
+  }
+
+  .prize-label {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 32px;
+    position: relative;
+  }
+
+  .prize-distribution {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+  }
+
+  .prize-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    border-left: 3px solid var(--border-strong);
+  }
+
+  .prize-row:nth-child(1) { border-left-color: #FFD700; }
+  .prize-row:nth-child(2) { border-left-color: #C0C0C0; }
+  .prize-row:nth-child(3) { border-left-color: #CD7F32; }
+
+  .prize-pos {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .prize-pos-num {
+    width: 24px;
+    height: 24px;
+    background: var(--bg-elevated);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .prize-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* Features section */
+  .features {
+    padding: 100px 24px;
+    background: var(--bg-card);
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px;
+    text-align: center;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+
+  .section-title span { color: var(--accent); }
+
+  .section-subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 16px;
+    margin-bottom: 56px;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .feature-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.3s;
+  }
+
+  .feature-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+  }
+
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(250, 204, 21, 0.15);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  .feature-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .feature-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Promo banner */
+  .promo {
+    padding: 80px 24px;
+    background: 
+      linear-gradient(135deg, rgba(250, 204, 21, 0.08), rgba(0, 151, 57, 0.05)),
+      var(--bg-dark);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .promo-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .promo-tag {
+    display: inline-block;
+    background: var(--brasil);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .promo-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    line-height: 0.95;
+    margin-bottom: 16px;
+  }
+
+  .promo-title span { color: var(--accent); }
+
+  .promo-desc {
+    color: var(--text-secondary);
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .promo-visual {
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 16px;
+    padding: 32px;
+    position: relative;
+  }
+
+  .flag-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: var(--bg-elevated);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .flag-row.selected {
+    border-color: var(--accent);
+    background: rgba(250, 204, 21, 0.08);
+  }
+
+  .flag {
+    font-size: 32px;
+    line-height: 1;
+  }
+
+  .flag-info { flex: 1; }
+  .flag-name { font-weight: 700; font-size: 15px; }
+  .flag-meta { font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+
+  .flag-badge {
+    background: var(--accent);
+    color: var(--bg-dark);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ========== DASHBOARD ========== */
+  .dash {
+    min-height: 100vh;
+    background: var(--bg-dark);
+  }
+
+  .dash-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    background: var(--bg-card);
+    border-right: 1px solid var(--border);
+    padding: 24px 16px;
+  }
+
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 1.5px;
+    padding: 0 8px;
+    margin-bottom: 32px;
+  }
+
+  .sidebar-section {
+    margin-bottom: 24px;
+  }
+
+  .sidebar-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0 12px;
+    margin-bottom: 8px;
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+
+  .sidebar-item:hover { background: var(--bg-elevated); color: var(--text-primary); }
+  .sidebar-item.active { background: rgba(250, 204, 21, 0.1); color: var(--accent); }
+
+  .sidebar-icon { width: 18px; font-size: 16px; }
+
+  .dash-main {
+    padding: 32px 40px;
+    overflow-y: auto;
+  }
+
+  .dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .dash-greeting {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 38px;
+    letter-spacing: 0.5px;
+  }
+
+  .dash-greeting span { color: var(--accent); }
+
+  .dash-subtitle { color: var(--text-secondary); font-size: 14px; margin-top: 4px; }
+
+  .user-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    border-radius: 100px;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--bg-dark);
+  }
+
+  .user-info { font-size: 13px; }
+  .user-name { font-weight: 600; }
+  .user-handle { color: var(--text-muted); font-size: 11px; font-family: 'JetBrains Mono', monospace; }
+
+  /* Stats cards */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card.highlight {
+    background: linear-gradient(135deg, rgba(250, 204, 21, 0.15), rgba(250, 204, 21, 0.03));
+    border-color: rgba(250, 204, 21, 0.4);
+  }
+
+  .stat-card-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .stat-card-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    line-height: 1;
+    letter-spacing: 0.5px;
+  }
+
+  .stat-card.highlight .stat-card-value { color: var(--accent); }
+
+  .stat-card-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
+  .stat-card-meta.up { color: var(--success); }
+
+  /* Panel */
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .panel-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .panel-title {
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .panel-title .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--success);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  .panel-body { padding: 0; }
+
+  /* Next matches */
+  .match-row {
+    display: grid;
+    grid-template-columns: 120px 1fr auto 1fr 120px;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+  }
+
+  .match-row:last-child { border-bottom: none; }
+
+  .match-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .match-time .date { font-weight: 600; color: var(--text-primary); }
+  .match-time .hour { color: var(--text-muted); margin-top: 2px; }
+
+  .match-team {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+  }
+
+  .match-team.away { justify-content: flex-end; text-align: right; }
+
+  .team-flag { font-size: 28px; line-height: 1; }
+
+  .match-predict {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-elevated);
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .predict-score {
+    width: 36px;
+    height: 36px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+  }
+
+  .predict-x {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .match-action {
+    text-align: right;
+  }
+
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: 'Archivo', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm.saved { background: rgba(16, 185, 129, 0.1); border-color: var(--success); color: var(--success); }
+
+  /* Progress */
+  .progress-wrap {
+    padding: 24px;
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+
+  .progress-header .count { font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+
+  .progress-bar {
+    height: 8px;
+    background: var(--bg-elevated);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #fbbf24);
+    border-radius: 100px;
+    transition: width 0.4s;
+  }
+
+  /* ========== PALPITES SCREEN ========== */
+  .palpites-header {
+    margin-bottom: 24px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-card);
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    overflow-x: auto;
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .tab {
+    padding: 8px 16px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    transition: all 0.15s;
+    background: transparent;
+    border: none;
+    font-family: 'Archivo', sans-serif;
+  }
+
+  .tab:hover { color: var(--text-primary); }
+  .tab.active { background: var(--accent); color: var(--bg-dark); }
+
+  .group-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0 16px;
+  }
+
+  .group-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 1px;
+  }
+
+  .group-badge {
+    background: var(--bg-elevated);
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-secondary);
+  }
+
+  .palpite-match {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 12px;
+    display: grid;
+    grid-template-columns: 100px 1fr auto 1fr 100px;
+    align-items: center;
+    gap: 16px;
+    transition: border-color 0.2s;
+  }
+
+  .palpite-match:hover { border-color: var(--border-strong); }
+  .palpite-match.filled { border-color: rgba(16, 185, 129, 0.3); }
+
+  .match-info-left {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .match-info-right {
+    text-align: right;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .status-chip.saved {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--success);
+  }
+
+  .status-chip.pending {
+    background: rgba(250, 204, 21, 0.15);
+    color: var(--accent);
+  }
+
+  .score-input {
+    width: 48px;
+    height: 48px;
+    background: var(--bg-elevated);
+    border: 1.5px solid var(--border-strong);
+    border-radius: 10px;
+    color: var(--text-primary);
+    text-align: center;
+    font-size: 20px;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+    transition: all 0.15s;
+  }
+
+  .score-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(250, 204, 21, 0.05);
+  }
+
+  .score-divider {
+    color: var(--text-muted);
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 0 6px;
+  }
+
+  .team-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .team-box.away { justify-content: flex-end; text-align: right; }
+
+  /* ========== RANKING ========== */
+  .ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .ranking-table th {
+    text-align: left;
+    padding: 14px 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+  }
+
+  .ranking-table th:last-child { text-align: right; }
+
+  .ranking-table td {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .ranking-table td:last-child { text-align: right; }
+  .ranking-table tr:last-child td { border-bottom: none; }
+  .ranking-table tr:hover { background: rgba(255,255,255,0.02); }
+
+  .rank-pos {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--bg-elevated);
+  }
+
+  .rank-pos.gold { background: linear-gradient(135deg, #FFD700, #FFA500); color: var(--bg-dark); }
+  .rank-pos.silver { background: linear-gradient(135deg, #E5E7EB, #9CA3AF); color: var(--bg-dark); }
+  .rank-pos.bronze { background: linear-gradient(135deg, #CD7F32, #8B4513); color: white; }
+
+  .rank-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .rank-name { font-weight: 600; }
+  .rank-meta { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+
+  .rank-points {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--accent);
+  }
+
+  .rank-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+  }
+
+  .rank-trend.up { color: var(--success); }
+  .rank-trend.down { color: var(--danger); }
+  .rank-trend.same { color: var(--text-muted); }
+
+  .highlight-row { background: rgba(250, 204, 21, 0.05) !important; }
+  .highlight-row td { border-color: rgba(250, 204, 21, 0.2); }
+
+  /* ========== ADMIN ========== */
+  .admin-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .admin-stat {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .admin-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .admin-stat-icon.green { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+  .admin-stat-icon.yellow { background: rgba(250, 204, 21, 0.15); color: var(--accent); }
+  .admin-stat-icon.blue { background: rgba(59, 130, 246, 0.15); color: var(--info); }
+  .admin-stat-icon.red { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+  .admin-stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 4px;
+  }
+
+  .admin-stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    line-height: 1;
+    letter-spacing: 0.5px;
+  }
+
+  .admin-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .admin-table th {
+    text-align: left;
+    padding: 12px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    background: var(--bg-elevated);
+    font-weight: 600;
+  }
+
+  .admin-table td {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .admin-table tr:hover { background: rgba(255,255,255,0.02); }
+
+  .pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+  }
+
+  .pill.success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+  .pill.warning { background: rgba(250, 204, 21, 0.15); color: var(--accent); }
+  .pill.danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+  .pill.info { background: rgba(59, 130, 246, 0.15); color: var(--info); }
+
+  .chart-box {
+    padding: 24px;
+  }
+
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 180px;
+    margin-top: 20px;
+    gap: 8px;
+  }
+
+  .chart-bar {
+    flex: 1;
+    background: linear-gradient(to top, var(--accent), rgba(250, 204, 21, 0.4));
+    border-radius: 6px 6px 0 0;
+    position: relative;
+    min-height: 8px;
+    transition: all 0.3s;
+  }
+
+  .chart-bar:hover { filter: brightness(1.2); }
+
+  .chart-bar::before {
+    content: attr(data-value);
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-secondary);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .chart-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    gap: 8px;
+  }
+
+  .chart-label {
+    flex: 1;
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .legenda {
+    display: flex;
+    gap: 20px;
+    padding: 16px 24px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .legenda-item { display: flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace; }
+  .legenda-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .hero-grid, .promo-inner, .dash-layout, .admin-grid {
+      grid-template-columns: 1fr;
+    }
+    .sidebar { display: none; }
+    .dash-main { padding: 20px; }
+    .palpite-match, .match-row {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    .match-team.away, .team-box.away { justify-content: center; text-align: center; }
+    .landing-hero { padding: 40px 20px 80px; }
+    .landing-header { margin-bottom: 40px; }
+    .nav-links { display: none; }
+    .section-title { font-size: 40px; }
+    .promo-title { font-size: 44px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PROTOTYPE NAVIGATION -->
+<nav class="proto-nav">
+  <span class="proto-nav-label">▸ Protótipo · Telas</span>
+  <button class="active" onclick="showScreen('landing', this)">Landing</button>
+  <button onclick="showScreen('dashboard', this)">Dashboard</button>
+  <button onclick="showScreen('palpites', this)">Palpites</button>
+  <button onclick="showScreen('ranking', this)">Ranking</button>
+  <button onclick="showScreen('admin', this)">Admin</button>
+</nav>
+
+<!-- ========== LANDING PAGE ========== -->
+<div id="landing" class="screen active landing">
+  <section class="landing-hero">
+    <div class="container">
+      <header class="landing-header">
+        <div class="logo">
+          <div class="logo-mark">B</div>
+          <div class="logo-text">BOLÃO<span>26</span></div>
+        </div>
+        <nav class="nav-links">
+          <a href="#">Como funciona</a>
+          <a href="#">Regras</a>
+          <a href="#">Ranking</a>
+          <a href="#">FAQ</a>
+          <a href="#" class="btn-primary">Entrar</a>
+        </nav>
+      </header>
+
+      <div class="hero-grid">
+        <div>
+          <div class="hero-badge">Copa do Mundo · EUA · México · Canadá</div>
+          <h1 class="hero-title">
+            <span class="line-1">Palpite.</span>
+            <span class="line-2">Pontue.</span>
+            <span class="line-3">Leve R$ 10 mil pra casa.</span>
+          </h1>
+          <p class="hero-desc">
+            O bolão mais justo da Copa 2026. 104 jogos, pontuação ao vivo, ranking em tempo real. 
+            R$ 20 a tabela. Comprou 5, escolhe uma seleção — se ela for campeã, você leva 100% de volta.
+          </p>
+          <div class="hero-cta-group">
+            <a href="#" class="btn-primary btn-hero">Comprar minha tabela →</a>
+            <a href="#" class="btn-secondary btn-hero">Ver regras</a>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-item">
+              <div class="stat-value">R$ 10K</div>
+              <div class="stat-label">Prêmio total</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">104</div>
+              <div class="stat-label">Jogos</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">48</div>
+              <div class="stat-label">Seleções</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prize-card">
+          <div class="prize-header">
+            <span class="prize-header-label">Distribuição do Prêmio</span>
+            <div class="prize-trophy">🏆</div>
+          </div>
+          <div class="prize-amount"><span class="currency">R$</span>10.000</div>
+          <div class="prize-label">dividido entre os 10 primeiros colocados</div>
+          <div class="prize-distribution">
+            <div class="prize-row">
+              <div class="prize-pos">
+                <div class="prize-pos-num">1º</div>
+                <span>Campeão</span>
+              </div>
+              <div class="prize-val">R$ 5.000</div>
+            </div>
+            <div class="prize-row">
+              <div class="prize-pos">
+                <div class="prize-pos-num">2º</div>
+                <span>Vice</span>
+              </div>
+              <div class="prize-val">R$ 2.500</div>
+            </div>
+            <div class="prize-row">
+              <div class="prize-pos">
+                <div class="prize-pos-num">3º</div>
+                <span>Terceiro</span>
+              </div>
+              <div class="prize-val">R$ 1.500</div>
+            </div>
+            <div class="prize-row">
+              <div class="prize-pos">
+                <div class="prize-pos-num">4-10</div>
+                <span>Top 10</span>
+              </div>
+              <div class="prize-val">R$ 1.000</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="container">
+      <h2 class="section-title">Como <span>funciona</span></h2>
+      <p class="section-subtitle">Simples, transparente e ao vivo. Você palpita, o sistema calcula, o placar sobe.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">💳</div>
+          <div class="feature-title">Compre sua tabela</div>
+          <div class="feature-desc">R$ 20 por tabela via PIX. Quanto mais tabelas, mais chances. Confirmação na hora no WhatsApp.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚽</div>
+          <div class="feature-title">Palpite nos 104 jogos</div>
+          <div class="feature-desc">Fase de grupos e mata-mata. Escolha campeão, vice, artilheiro e mais bônus especiais.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <div class="feature-title">Pontue em tempo real</div>
+          <div class="feature-desc">Placar exato vale 10 pts. Vencedor vale 5. Mata-mata multiplica. Ranking atualiza automático.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💰</div>
+          <div class="feature-title">Receba no PIX</div>
+          <div class="feature-desc">Terminou a Copa? Top 10 recebe o prêmio direto na conta em até 48h após a final.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="promo">
+    <div class="container promo-inner">
+      <div>
+        <span class="promo-tag">🎁 Promoção Cashback</span>
+        <h2 class="promo-title">Comprou <span>R$ 100+</span><br>Escolheu campeão?<br><span>Dinheiro de volta.</span></h2>
+        <p class="promo-desc">
+          Compre 5 tabelas ou mais (R$ 100+) e escolha uma seleção. Se ela for campeã da Copa, 
+          você recebe 100% do valor pago de volta no PIX. Limite de 20 apostadores por seleção — 
+          primeiro chegou, levou.
+        </p>
+        <a href="#" class="btn-primary btn-hero">Garantir meu cashback →</a>
+      </div>
+      <div class="promo-visual">
+        <div class="flag-row selected">
+          <div class="flag">🇧🇷</div>
+          <div class="flag-info">
+            <div class="flag-name">Brasil</div>
+            <div class="flag-meta">12/20 vagas restantes</div>
+          </div>
+          <div class="flag-badge">SUA ESCOLHA</div>
+        </div>
+        <div class="flag-row">
+          <div class="flag">🇦🇷</div>
+          <div class="flag-info">
+            <div class="flag-name">Argentina</div>
+            <div class="flag-meta">8/20 vagas restantes</div>
+          </div>
+        </div>
+        <div class="flag-row">
+          <div class="flag">🇫🇷</div>
+          <div class="flag-info">
+            <div class="flag-name">França</div>
+            <div class="flag-meta">15/20 vagas restantes</div>
+          </div>
+        </div>
+        <div class="flag-row">
+          <div class="flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div>
+          <div class="flag-info">
+            <div class="flag-name">Inglaterra</div>
+            <div class="flag-meta">19/20 vagas restantes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ========== DASHBOARD ========== -->
+<div id="dashboard" class="screen dash">
+  <div class="dash-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-mark">B</div>
+        <span>BOLÃO<span style="color:var(--accent)">26</span></span>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Principal</div>
+        <div class="sidebar-item active"><span class="sidebar-icon">🏠</span>Dashboard</div>
+        <div class="sidebar-item"><span class="sidebar-icon">⚽</span>Meus Palpites</div>
+        <div class="sidebar-item"><span class="sidebar-icon">🏆</span>Ranking</div>
+        <div class="sidebar-item"><span class="sidebar-icon">🎯</span>Bônus</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Conta</div>
+        <div class="sidebar-item"><span class="sidebar-icon">🎫</span>Minhas Tabelas</div>
+        <div class="sidebar-item"><span class="sidebar-icon">💰</span>Cashback</div>
+        <div class="sidebar-item"><span class="sidebar-icon">⚙️</span>Configurações</div>
+      </div>
+    </aside>
+
+    <main class="dash-main">
+      <header class="dash-header">
+        <div>
+          <h1 class="dash-greeting">Salve, <span>Jonatas</span> 👋</h1>
+          <p class="dash-subtitle">Faltam 23 palpites pra fechar a fase de grupos.</p>
+        </div>
+        <div class="user-badge">
+          <div class="avatar">JP</div>
+          <div class="user-info">
+            <div class="user-name">Jonatas Pereira</div>
+            <div class="user-handle">@jonatas · 3 tabelas</div>
+          </div>
+        </div>
+      </header>
+
+      <div class="stats-grid">
+        <div class="stat-card highlight">
+          <div class="stat-card-label">Posição atual</div>
+          <div class="stat-card-value">#47</div>
+          <div class="stat-card-meta up">▲ 12 posições esta rodada</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Pontos totais</div>
+          <div class="stat-card-value">187</div>
+          <div class="stat-card-meta">+32 hoje</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Acertos exatos</div>
+          <div class="stat-card-value">4</div>
+          <div class="stat-card-meta">de 18 jogos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Cashback</div>
+          <div class="stat-card-value">🇧🇷</div>
+          <div class="stat-card-meta">Brasil · R$ 100</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span class="dot"></span>Próximos jogos · palpites abertos</div>
+          <button class="btn-sm">Ver todos</button>
+        </div>
+        <div class="panel-body">
+          <div class="match-row">
+            <div class="match-time">
+              <div class="date">Hoje</div>
+              <div class="hour">16:00</div>
+            </div>
+            <div class="match-team">
+              <div class="team-flag">🇧🇷</div>
+              <span>Brasil</span>
+            </div>
+            <div class="match-predict">
+              <div class="predict-score">2</div>
+              <span class="predict-x">×</span>
+              <div class="predict-score">0</div>
+            </div>
+            <div class="match-team away">
+              <span>Sérvia</span>
+              <div class="team-flag">🇷🇸</div>
+            </div>
+            <div class="match-action">
+              <button class="btn-sm saved">✓ Salvo</button>
+            </div>
+          </div>
+          <div class="match-row">
+            <div class="match-time">
+              <div class="date">Amanhã</div>
+              <div class="hour">13:00</div>
+            </div>
+            <div class="match-team">
+              <div class="team-flag">🇦🇷</div>
+              <span>Argentina</span>
+            </div>
+            <div class="match-predict">
+              <div class="predict-score">—</div>
+              <span class="predict-x">×</span>
+              <div class="predict-score">—</div>
+            </div>
+            <div class="match-team away">
+              <span>México</span>
+              <div class="team-flag">🇲🇽</div>
+            </div>
+            <div class="match-action">
+              <button class="btn-sm">Palpitar</button>
+            </div>
+          </div>
+          <div class="match-row">
+            <div class="match-time">
+              <div class="date">Qua, 18/06</div>
+              <div class="hour">19:00</div>
+            </div>
+            <div class="match-team">
+              <div class="team-flag">🇫🇷</div>
+              <span>França</span>
+            </div>
+            <div class="match-predict">
+              <div class="predict-score">—</div>
+              <span class="predict-x">×</span>
+              <div class="predict-score">—</div>
+            </div>
+            <div class="match-team away">
+              <span>Canadá</span>
+              <div class="team-flag">🇨🇦</div>
+            </div>
+            <div class="match-action">
+              <button class="btn-sm">Palpitar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Progresso dos palpites</div>
+          <span style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:12px">Fase de Grupos</span>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-header">
+            <span>Jogos preenchidos</span>
+            <span class="count">49 / 72</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width: 68%"></div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ========== PALPITES SCREEN ========== -->
+<div id="palpites" class="screen dash">
+  <div class="dash-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-mark">B</div>
+        <span>BOLÃO<span style="color:var(--accent)">26</span></span>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Principal</div>
+        <div class="sidebar-item"><span class="sidebar-icon">🏠</span>Dashboard</div>
+        <div class="sidebar-item active"><span class="sidebar-icon">⚽</span>Meus Palpites</div>
+        <div class="sidebar-item"><span class="sidebar-icon">🏆</span>Ranking</div>
+        <div class="sidebar-item"><span class="sidebar-icon">🎯</span>Bônus</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Conta</div>
+        <div class="sidebar-item"><span class="sidebar-icon">🎫</span>Minhas Tabelas</div>
+        <div class="sidebar-item"><span class="sidebar-icon">💰</span>Cashback</div>
+        <div class="sidebar-item"><span class="sidebar-icon">⚙️</span>Configurações</div>
+      </div>
+    </aside>
+
+    <main class="dash-main">
+      <header class="dash-header">
+        <div>
+          <h1 class="dash-greeting">Meus <span>palpites</span></h1>
+          <p class="dash-subtitle">Tabela #3 · Prazo até 11/06 às 15:59</p>
+        </div>
+        <button class="btn-primary">💾 Salvar tudo</button>
+      </header>
+
+      <div class="palpites-header">
+        <div class="tabs">
+          <button class="tab active">Grupos</button>
+          <button class="tab">16avos</button>
+          <button class="tab">Oitavas</button>
+          <button class="tab">Quartas</button>
+          <button class="tab">Semis</button>
+          <button class="tab">Final</button>
+          <button class="tab">🏆 Bônus</button>
+        </div>
+      </div>
+
+      <div class="group-header">
+        <h3 class="group-title">Grupo A</h3>
+        <span class="group-badge">6 jogos</span>
+      </div>
+
+      <div class="palpite-match filled">
+        <div class="match-info-left">
+          Jogo 1<br>
+          11/06 · 16:00
+        </div>
+        <div class="team-box">
+          <div class="team-flag">🇲🇽</div>
+          <span>México</span>
+        </div>
+        <div style="display:flex;align-items:center">
+          <input type="text" class="score-input" value="2">
+          <span class="score-divider">×</span>
+          <input type="text" class="score-input" value="1">
+        </div>
+        <div class="team-box away">
+          <span>Canadá</span>
+          <div class="team-flag">🇨🇦</div>
+        </div>
+        <div class="match-info-right">
+          <span class="status-chip saved">✓ Salvo</span>
+        </div>
+      </div>
+
+      <div class="palpite-match filled">
+        <div class="match-info-left">
+          Jogo 2<br>
+          12/06 · 13:00
+        </div>
+        <div class="team-box">
+          <div class="team-flag">🇺🇸</div>
+          <span>EUA</span>
+        </div>
+        <div style="display:flex;align-items:center">
+          <input type="text" class="score-input" value="1">
+          <span class="score-divider">×</span>
+          <input type="text" class="score-input" value="1">
+        </div>
+        <div class="team-box away">
+          <span>Jamaica</span>
+          <div class="team-flag">🇯🇲</div>
+        </div>
+        <div class="match-info-right">
+          <span class="status-chip saved">✓ Salvo</span>
+        </div>
+      </div>
+
+      <div class="palpite-match">
+        <div class="match-info-left">
+          Jogo 3<br>
+          15/06 · 16:00
+        </div>
+        <div class="team-box">
+          <div class="team-flag">🇲🇽</div>
+          <span>México</span>
+        </div>
+        <div style="display:flex;align-items:center">
+          <input type="text" class="score-input" placeholder="?">
+          <span class="score-divider">×</span>
+          <input type="text" class="score-input" placeholder="?">
+        </div>
+        <div class="team-box away">
+          <span>Jamaica</span>
+          <div class="team-flag">🇯🇲</div>
+        </div>
+        <div class="match-info-right">
+          <span class="status-chip pending">● Pendente</span>
+        </div>
+      </div>
+
+      <div class="group-header">
+        <h3 class="group-title">Grupo B</h3>
+        <span class="group-badge">6 jogos</span>
+      </div>
+
+      <div class="palpite-match filled">
+        <div class="match-info-left">
+          Jogo 7<br>
+          13/06 · 19:00
+        </div>
+        <div class="team-box">
+          <div class="team-flag">🇧🇷</div>
+          <span>Brasil</span>
+        </div>
+        <div style="display:flex;align-items:center">
+          <input type="text" class="score-input" value="3">
+          <span class="score-divider">×</span>
+          <input type="text" class="score-input" value="0">
+        </div>
+        <div class="team-box away">
+          <span>Equador</span>
+          <div class="team-flag">🇪🇨</div>
+        </div>
+        <div class="match-info-right">
+          <span class="status-chip saved">✓ Salvo</span>
+        </div>
+      </div>
+
+      <div class="palpite-match">
+        <div class="match-info-left">
+          Jogo 8<br>
+          14/06 · 16:00
+        </div>
+        <div class="team-box">
+          <div class="team-flag">🇨🇴</div>
+          <span>Colômbia</span>
+        </div>
+        <div style="display:flex;align-items:center">
+          <input type="text" class="score-input" placeholder="?">
+          <span class="score-divider">×</span>
+          <input type="text" class="score-input" placeholder="?">
+        </div>
+        <div class="team-box away">
+          <span>Senegal</span>
+          <div class="team-flag">🇸🇳</div>
+        </div>
+        <div class="match-info-right">
+          <span class="status-chip pending">● Pendente</span>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ========== RANKING ========== -->
+<div id="ranking" class="screen dash">
+  <div class="dash-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-mark">B</div>
+        <span>BOLÃO<span style="color:var(--accent)">26</span></span>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Principal</div>
+        <div class="sidebar-item"><span class="sidebar-icon">🏠</span>Dashboard</div>
+        <div class="sidebar-item"><span class="sidebar-icon">⚽</span>Meus Palpites</div>
+        <div class="sidebar-item active"><span class="sidebar-icon">🏆</span>Ranking</div>
+        <div class="sidebar-item"><span class="sidebar-icon">🎯</span>Bônus</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Conta</div>
+        <div class="sidebar-item"><span class="sidebar-icon">🎫</span>Minhas Tabelas</div>
+        <div class="sidebar-item"><span class="sidebar-icon">💰</span>Cashback</div>
+        <div class="sidebar-item"><span class="sidebar-icon">⚙️</span>Configurações</div>
+      </div>
+    </aside>
+
+    <main class="dash-main">
+      <header class="dash-header">
+        <div>
+          <h1 class="dash-greeting">Ranking <span>geral</span></h1>
+          <p class="dash-subtitle">Atualizado em tempo real · Última atualização 3 min atrás</p>
+        </div>
+        <div class="tabs">
+          <button class="tab active">Geral</button>
+          <button class="tab">Rodada</button>
+          <button class="tab">Amigos</button>
+        </div>
+      </header>
+
+      <div class="panel">
+        <table class="ranking-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Apostador</th>
+              <th>Acertos</th>
+              <th>Tendência</th>
+              <th>Pontos</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="rank-pos gold">1</div></td>
+              <td>
+                <div class="rank-user">
+                  <div class="avatar" style="background:linear-gradient(135deg,#22d3ee,#0ea5e9)">MC</div>
+                  <div>
+                    <div class="rank-name">Marco Cardoso</div>
+                    <div class="rank-meta">@marco_cdz · 5 tabelas</div>
+                  </div>
+                </div>
+              </td>
+              <td>18 exatos · 34 parciais</td>
+              <td><span class="rank-trend same">━ 0</span></td>
+              <td><span class="rank-points">472 pts</span></td>
+            </tr>
+            <tr>
+              <td><div class="rank-pos silver">2</div></td>
+              <td>
+                <div class="rank-user">
+                  <div class="avatar" style="background:linear-gradient(135deg,#f472b6,#ec4899)">AB</div>
+                  <div>
+                    <div class="rank-name">Ana Beatriz Lima</div>
+                    <div class="rank-meta">@ana_bia · 2 tabelas</div>
+                  </div>
+                </div>
+              </td>
+              <td>15 exatos · 38 parciais</td>
+              <td><span class="rank-trend up">▲ 1</span></td>
+              <td><span class="rank-points">458 pts</span></td>
+            </tr>
+            <tr>
+              <td><div class="rank-pos bronze">3</div></td>
+              <td>
+                <div class="rank-user">
+                  <div class="avatar" style="background:linear-gradient(135deg,#a78bfa,#8b5cf6)">RS</div>
+                  <div>
+                    <div class="rank-name">Rafael Santos</div>
+                    <div class="rank-meta">@rafa_santos · 8 tabelas</div>
+                  </div>
+                </div>
+              </td>
+              <td>16 exatos · 31 parciais</td>
+              <td><span class="rank-trend down">▼ 1</span></td>
+              <td><span class="rank-points">445 pts</span></td>
+            </tr>
+            <tr>
+              <td><div class="rank-pos">4</div></td>
+              <td>
+                <div class="rank-user">
+                  <div class="avatar" style="background:linear-gradient(135deg,#34d399,#10b981)">CL</div>
+                  <div>
+                    <div class="rank-name">Carla Lopes</div>
+                    <div class="rank-meta">@carlinha · 1 tabela</div>
+                  </div>
+                </div>
+              </td>
+              <td>12 exatos · 40 parciais</td>
+              <td><span class="rank-trend up">▲ 3</span></td>
+              <td><span class="rank-points">418 pts</span></td>
+            </tr>
+            <tr>
+              <td><div class="rank-pos">5</div></td>
+              <td>
+                <div class="rank-user">
+                  <div class="avatar" style="background:linear-gradient(135deg,#fb923c,#f97316)">JA</div>
+                  <div>
+                    <div class="rank-name">José Anaíde</div>
+                    <div class="rank-meta">@zeanaide · 4 tabelas</div>
+                  </div>
+                </div>
+              </td>
+              <td>13 exatos · 35 parciais</td>
+              <td><span class="rank-trend same">━ 0</span></td>
+              <td><span class="rank-points">401 pts</span></td>
+            </tr>
+            <tr>
+              <td><div class="rank-pos">6</div></td>
+              <td>
+                <div class="rank-user">
+                  <div class="avatar" style="background:linear-gradient(135deg,#60a5fa,#3b82f6)">PM</div>
+                  <div>
+                    <div class="rank-name">Paulo Menezes</div>
+                    <div class="rank-meta">@paulinho · 3 tabelas</div>
+                  </div>
+                </div>
+              </td>
+              <td>11 exatos · 38 parciais</td>
+              <td><span class="rank-trend up">▲ 2</span></td>
+              <td><span class="rank-points">389 pts</span></td>
+            </tr>
+            <tr class="highlight-row">
+              <td><div class="rank-pos" style="background:var(--accent);color:var(--bg-dark)">47</div></td>
+              <td>
+                <div class="rank-user">
+                  <div class="avatar">JP</div>
+                  <div>
+                    <div class="rank-name">Jonatas Pereira <span style="color:var(--accent);font-size:11px">· VOCÊ</span></div>
+                    <div class="rank-meta">@jonatas · 3 tabelas</div>
+                  </div>
+                </div>
+              </td>
+              <td>4 exatos · 22 parciais</td>
+              <td><span class="rank-trend up">▲ 12</span></td>
+              <td><span class="rank-points">187 pts</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="legenda">
+          <div class="legenda-item"><span class="legenda-dot" style="background:#FFD700"></span>1º-3º · Pódio</div>
+          <div class="legenda-item"><span class="legenda-dot" style="background:var(--accent)"></span>4º-10º · Top prêmio</div>
+          <div class="legenda-item"><span class="legenda-dot" style="background:var(--text-muted)"></span>Demais posições</div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ========== ADMIN ========== -->
+<div id="admin" class="screen dash">
+  <div class="dash-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-mark" style="background:var(--danger);color:white">A</div>
+        <span>ADMIN<span style="color:var(--accent)">26</span></span>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Gestão</div>
+        <div class="sidebar-item active"><span class="sidebar-icon">📊</span>Overview</div>
+        <div class="sidebar-item"><span class="sidebar-icon">👥</span>Apostadores</div>
+        <div class="sidebar-item"><span class="sidebar-icon">💳</span>Pagamentos</div>
+        <div class="sidebar-item"><span class="sidebar-icon">⚽</span>Jogos</div>
+        <div class="sidebar-item"><span class="sidebar-icon">🎁</span>Cashbacks</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Sistema</div>
+        <div class="sidebar-item"><span class="sidebar-icon">📱</span>WhatsApp Bot</div>
+        <div class="sidebar-item"><span class="sidebar-icon">📧</span>Notificações</div>
+        <div class="sidebar-item"><span class="sidebar-icon">⚙️</span>Configurações</div>
+      </div>
+    </aside>
+
+    <main class="dash-main">
+      <header class="dash-header">
+        <div>
+          <h1 class="dash-greeting">Painel <span>Admin</span></h1>
+          <p class="dash-subtitle">Copa 2026 · 18 dias até o apito inicial</p>
+        </div>
+        <button class="btn-primary">📤 Exportar relatório</button>
+      </header>
+
+      <div class="admin-stats">
+        <div class="admin-stat">
+          <div class="admin-stat-icon green">💰</div>
+          <div>
+            <div class="admin-stat-label">Arrecadado</div>
+            <div class="admin-stat-value">R$ 34.480</div>
+          </div>
+        </div>
+        <div class="admin-stat">
+          <div class="admin-stat-icon yellow">🎫</div>
+          <div>
+            <div class="admin-stat-label">Tabelas vendidas</div>
+            <div class="admin-stat-value">1.724</div>
+          </div>
+        </div>
+        <div class="admin-stat">
+          <div class="admin-stat-icon blue">👥</div>
+          <div>
+            <div class="admin-stat-label">Apostadores</div>
+            <div class="admin-stat-value">642</div>
+          </div>
+        </div>
+        <div class="admin-stat">
+          <div class="admin-stat-icon red">⏳</div>
+          <div>
+            <div class="admin-stat-label">Pagamentos pendentes</div>
+            <div class="admin-stat-value">23</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Últimos pagamentos</div>
+            <button class="btn-sm">Ver todos →</button>
+          </div>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Apostador</th>
+                <th>Valor</th>
+                <th>Método</th>
+                <th>Status</th>
+                <th>Quando</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Jonatas Pereira</strong><br><span style="color:var(--text-muted);font-size:11px;font-family:'JetBrains Mono',monospace">3 tabelas</span></td>
+                <td><strong>R$ 60,00</strong></td>
+                <td>PIX</td>
+                <td><span class="pill success">Confirmado</span></td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:11px">2 min</td>
+              </tr>
+              <tr>
+                <td><strong>Maria Fernanda</strong><br><span style="color:var(--text-muted);font-size:11px;font-family:'JetBrains Mono',monospace">5 tabelas + cashback 🇧🇷</span></td>
+                <td><strong>R$ 100,00</strong></td>
+                <td>PIX</td>
+                <td><span class="pill success">Confirmado</span></td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:11px">8 min</td>
+              </tr>
+              <tr>
+                <td><strong>Carlos Eduardo</strong><br><span style="color:var(--text-muted);font-size:11px;font-family:'JetBrains Mono',monospace">10 tabelas + cashback 🇦🇷</span></td>
+                <td><strong>R$ 200,00</strong></td>
+                <td>PIX</td>
+                <td><span class="pill warning">Aguardando</span></td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:11px">15 min</td>
+              </tr>
+              <tr>
+                <td><strong>Lucas Oliveira</strong><br><span style="color:var(--text-muted);font-size:11px;font-family:'JetBrains Mono',monospace">1 tabela</span></td>
+                <td><strong>R$ 20,00</strong></td>
+                <td>PIX</td>
+                <td><span class="pill success">Confirmado</span></td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:11px">22 min</td>
+              </tr>
+              <tr>
+                <td><strong>Rafael Souza</strong><br><span style="color:var(--text-muted);font-size:11px;font-family:'JetBrains Mono',monospace">2 tabelas</span></td>
+                <td><strong>R$ 40,00</strong></td>
+                <td>PIX</td>
+                <td><span class="pill danger">Expirado</span></td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:11px">1h</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Vendas por dia</div>
+            <span style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:12px">Últimos 7 dias</span>
+          </div>
+          <div class="chart-box">
+            <div class="chart-bars">
+              <div class="chart-bar" data-value="42" style="height:35%"></div>
+              <div class="chart-bar" data-value="68" style="height:55%"></div>
+              <div class="chart-bar" data-value="89" style="height:72%"></div>
+              <div class="chart-bar" data-value="76" style="height:62%"></div>
+              <div class="chart-bar" data-value="124" style="height:100%"></div>
+              <div class="chart-bar" data-value="98" style="height:80%"></div>
+              <div class="chart-bar" data-value="112" style="height:91%"></div>
+            </div>
+            <div class="chart-labels">
+              <div class="chart-label">SEG</div>
+              <div class="chart-label">TER</div>
+              <div class="chart-label">QUA</div>
+              <div class="chart-label">QUI</div>
+              <div class="chart-label">SEX</div>
+              <div class="chart-label">SÁB</div>
+              <div class="chart-label">DOM</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Vagas de cashback (seleções)</div>
+          <span style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:12px">Limite: 20 apostadores por seleção</span>
+        </div>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Seleção</th>
+              <th>Vagas preenchidas</th>
+              <th>Expectativa pagamento</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>🇧🇷 Brasil</strong></td>
+              <td>8 / 20 <span style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px">(40%)</span></td>
+              <td>R$ 800 se campeão</td>
+              <td><span class="pill warning">Demanda alta</span></td>
+            </tr>
+            <tr>
+              <td><strong>🇦🇷 Argentina</strong></td>
+              <td>12 / 20 <span style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px">(60%)</span></td>
+              <td>R$ 1.200 se campeã</td>
+              <td><span class="pill warning">Demanda alta</span></td>
+            </tr>
+            <tr>
+              <td><strong>🇫🇷 França</strong></td>
+              <td>5 / 20 <span style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px">(25%)</span></td>
+              <td>R$ 500 se campeã</td>
+              <td><span class="pill info">Disponível</span></td>
+            </tr>
+            <tr>
+              <td><strong>🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra</strong></td>
+              <td>1 / 20 <span style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px">(5%)</span></td>
+              <td>R$ 100 se campeã</td>
+              <td><span class="pill info">Disponível</span></td>
+            </tr>
+            <tr>
+              <td><strong>🇪🇸 Espanha</strong></td>
+              <td>3 / 20 <span style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px">(15%)</span></td>
+              <td>R$ 300 se campeã</td>
+              <td><span class="pill info">Disponível</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+  function showScreen(id, btn) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.proto-nav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>

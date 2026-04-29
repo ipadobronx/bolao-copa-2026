@@ -1,0 +1,19 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Env (essencial — service_role key não pode vazar)
+.env
+.env.local
+.env.*.local
+
+# Supabase CLI artifacts
+.supabase/
+supabase/.temp/
+supabase/.branches/
