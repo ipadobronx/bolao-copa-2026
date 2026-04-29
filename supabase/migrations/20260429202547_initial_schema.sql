@@ -343,3 +343,211 @@ $$;
 CREATE TRIGGER bilhetes_cashback_slot_trigger
 BEFORE INSERT OR UPDATE OF selecao_cashback_id ON bilhetes
 FOR EACH ROW EXECUTE FUNCTION public.enforce_cashback_slot_limit();
+
+-- ============================================================================
+-- 5. COLUMN PROTECTION TRIGGERS
+-- ============================================================================
+
+-- 5.1 protect_bilhete_payment_columns ----------------------------------------
+
+CREATE OR REPLACE FUNCTION public.protect_bilhete_payment_columns() RETURNS trigger
+LANGUAGE plpgsql AS $$
+BEGIN
+  IF auth.role() <> 'service_role' THEN
+    IF NEW.user_id          IS DISTINCT FROM OLD.user_id
+       OR NEW.numero_bilhete    IS DISTINCT FROM OLD.numero_bilhete
+       OR NEW.status_pagamento  IS DISTINCT FROM OLD.status_pagamento
+       OR NEW.asaas_payment_id  IS DISTINCT FROM OLD.asaas_payment_id
+       OR NEW.valor_pago        IS DISTINCT FROM OLD.valor_pago
+       OR NEW.cashback_pago     IS DISTINCT FROM OLD.cashback_pago
+       OR NEW.pago_em           IS DISTINCT FROM OLD.pago_em
+       OR NEW.expira_em         IS DISTINCT FROM OLD.expira_em
+    THEN
+      RAISE EXCEPTION 'Colunas de pagamento somente alteráveis via service_role'
+        USING ERRCODE = 'insufficient_privilege';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER bilhetes_protect_payment_columns
+BEFORE UPDATE ON bilhetes
+FOR EACH ROW EXECUTE FUNCTION public.protect_bilhete_payment_columns();
+
+-- 5.2 protect_score_column (palpites + palpites_bonus) -----------------------
+
+CREATE OR REPLACE FUNCTION public.protect_score_column() RETURNS trigger
+LANGUAGE plpgsql AS $$
+BEGIN
+  IF auth.role() <> 'service_role'
+     AND NEW.pontos_calculados IS DISTINCT FROM OLD.pontos_calculados
+  THEN
+    RAISE EXCEPTION 'pontos_calculados somente alterável via service_role'
+      USING ERRCODE = 'insufficient_privilege';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER palpites_protect_score
+BEFORE UPDATE ON palpites
+FOR EACH ROW EXECUTE FUNCTION public.protect_score_column();
+
+CREATE TRIGGER palpites_bonus_protect_score
+BEFORE UPDATE ON palpites_bonus
+FOR EACH ROW EXECUTE FUNCTION public.protect_score_column();
+
+-- ============================================================================
+-- 6. ROW LEVEL SECURITY
+-- ============================================================================
+
+-- 6.1 profiles ---------------------------------------------------------------
+
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY profiles_select ON profiles
+  FOR SELECT TO authenticated
+  USING (id = auth.uid() OR public.is_admin());
+
+CREATE POLICY profiles_update_own ON profiles
+  FOR UPDATE TO authenticated
+  USING (id = auth.uid() OR public.is_admin())
+  WITH CHECK (id = auth.uid() OR public.is_admin());
+
+REVOKE UPDATE (is_admin) ON profiles FROM authenticated;
+
+-- 6.2 selecoes ---------------------------------------------------------------
+
+ALTER TABLE selecoes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY selecoes_select_all ON selecoes
+  FOR SELECT TO anon, authenticated USING (true);
+
+CREATE POLICY selecoes_admin_write ON selecoes
+  FOR ALL TO authenticated
+  USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+-- 6.3 jogos ------------------------------------------------------------------
+
+ALTER TABLE jogos ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY jogos_select_all ON jogos
+  FOR SELECT TO anon, authenticated USING (true);
+
+CREATE POLICY jogos_admin_write ON jogos
+  FOR ALL TO authenticated
+  USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+-- 6.4 copa_resultados --------------------------------------------------------
+
+ALTER TABLE copa_resultados ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY copa_resultados_select_all ON copa_resultados
+  FOR SELECT TO anon, authenticated USING (true);
+
+CREATE POLICY copa_resultados_admin_update ON copa_resultados
+  FOR UPDATE TO authenticated
+  USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+-- 6.5 bilhetes ---------------------------------------------------------------
+
+ALTER TABLE bilhetes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY bilhetes_select_own_or_admin ON bilhetes
+  FOR SELECT TO authenticated
+  USING (user_id = auth.uid() OR public.is_admin());
+
+CREATE POLICY bilhetes_insert_own ON bilhetes
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    user_id = auth.uid()
+    AND status_pagamento = 'pendente'
+    AND cashback_pago = false
+  );
+
+CREATE POLICY bilhetes_update_own_or_admin ON bilhetes
+  FOR UPDATE TO authenticated
+  USING (user_id = auth.uid() OR public.is_admin())
+  WITH CHECK (user_id = auth.uid() OR public.is_admin());
+
+-- 6.6 palpites ---------------------------------------------------------------
+
+ALTER TABLE palpites ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY palpites_select_own_or_started ON palpites
+  FOR SELECT TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM bilhetes b
+      WHERE b.id = palpites.bilhete_id AND b.user_id = auth.uid()
+    )
+    OR public.is_admin()
+    OR EXISTS (
+      SELECT 1 FROM jogos j
+      WHERE j.id = palpites.jogo_id AND j.data_hora <= now()
+    )
+  );
+
+CREATE POLICY palpites_insert_own ON palpites
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM bilhetes b
+      WHERE b.id = bilhete_id AND b.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY palpites_update_own ON palpites
+  FOR UPDATE TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM bilhetes b
+      WHERE b.id = palpites.bilhete_id AND b.user_id = auth.uid()
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM bilhetes b
+      WHERE b.id = bilhete_id AND b.user_id = auth.uid()
+    )
+  );
+
+-- 6.7 palpites_bonus ---------------------------------------------------------
+
+ALTER TABLE palpites_bonus ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY palpites_bonus_select_own_or_copa_started ON palpites_bonus
+  FOR SELECT TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM bilhetes b
+      WHERE b.id = palpites_bonus.bilhete_id AND b.user_id = auth.uid()
+    )
+    OR public.is_admin()
+    OR (SELECT MIN(data_hora) FROM jogos) <= now()
+  );
+
+CREATE POLICY palpites_bonus_insert_own ON palpites_bonus
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM bilhetes b
+      WHERE b.id = bilhete_id AND b.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY palpites_bonus_update_own ON palpites_bonus
+  FOR UPDATE TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM bilhetes b
+      WHERE b.id = palpites_bonus.bilhete_id AND b.user_id = auth.uid()
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM bilhetes b
+      WHERE b.id = bilhete_id AND b.user_id = auth.uid()
+    )
+  );
