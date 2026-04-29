@@ -1,0 +1,20 @@
+-- ============================================================================
+-- Bolão Copa 2026 — Initial Schema
+-- ============================================================================
+-- Feature 2 of the Bolão Copa 2026 project.
+-- Spec: docs/superpowers/specs/2026-04-29-schema-banco-design.md
+--
+-- Builds the complete data layer:
+--   - 3 enums (fase_jogo, status_pagamento, tipo_bonus)
+--   - 7 tables (profiles, selecoes, jogos, bilhetes, palpites,
+--              palpites_bonus, copa_resultados)
+--   - 1 view (ranking) with public read access
+--   - 8 functions and 13 triggers (set_updated_at, is_admin,
+--     handle_new_user, prevent_palpite_after_start,
+--     prevent_bonus_when_unconfirmed, enforce_cashback_slot_limit,
+--     protect_bilhete_payment_columns, protect_score_column)
+--   - RLS policies on all 7 tables
+--
+-- Apply via:  supabase db push
+-- Seed via:   supabase/seed.sql (auto-runs after migrations on `db reset`)
+-- ============================================================================
