@@ -551,3 +551,57 @@ CREATE POLICY palpites_bonus_update_own ON palpites_bonus
       WHERE b.id = bilhete_id AND b.user_id = auth.uid()
     )
   );
+
+-- ============================================================================
+-- 7. VIEW: ranking
+-- ============================================================================
+
+CREATE OR REPLACE VIEW public.ranking
+WITH (security_invoker = false) AS
+WITH palpite_aggregates AS (
+  SELECT
+    p.bilhete_id,
+    COALESCE(SUM(p.pontos_calculados), 0)::int AS pontos_palpites,
+    COUNT(*) FILTER (
+      WHERE j.finalizado = true
+        AND p.gols_casa = j.gols_casa
+        AND p.gols_fora = j.gols_fora
+    )::int AS acertos_exatos,
+    COUNT(*) FILTER (
+      WHERE j.finalizado = true
+        AND COALESCE(p.pontos_calculados, 0) > 0
+        AND NOT (p.gols_casa = j.gols_casa AND p.gols_fora = j.gols_fora)
+    )::int AS acertos_parciais
+  FROM palpites p
+  JOIN jogos j ON j.id = p.jogo_id
+  GROUP BY p.bilhete_id
+),
+bonus_aggregates AS (
+  SELECT
+    bilhete_id,
+    COALESCE(SUM(pontos_calculados), 0)::int AS pontos_bonus
+  FROM palpites_bonus
+  GROUP BY bilhete_id
+)
+SELECT
+  b.id AS bilhete_id,
+  b.numero_bilhete,
+  b.user_id,
+  COALESCE(pr.nome, '') AS nome,
+  COALESCE(pa.pontos_palpites, 0) + COALESCE(ba.pontos_bonus, 0) AS pontos_totais,
+  COALESCE(pa.acertos_exatos, 0) AS acertos_exatos,
+  COALESCE(pa.acertos_parciais, 0) AS acertos_parciais,
+  ROW_NUMBER() OVER (
+    ORDER BY
+      COALESCE(pa.pontos_palpites, 0) + COALESCE(ba.pontos_bonus, 0) DESC,
+      COALESCE(pa.acertos_exatos, 0) DESC,
+      COALESCE(pa.acertos_parciais, 0) DESC,
+      b.numero_bilhete ASC
+  )::int AS posicao
+FROM bilhetes b
+LEFT JOIN palpite_aggregates pa ON pa.bilhete_id = b.id
+LEFT JOIN bonus_aggregates ba ON ba.bilhete_id = b.id
+LEFT JOIN profiles pr ON pr.id = b.user_id
+WHERE b.status_pagamento = 'confirmado';
+
+GRANT SELECT ON public.ranking TO anon, authenticated;
