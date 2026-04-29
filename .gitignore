@@ -17,3 +17,6 @@ desktop.ini
 .supabase/
 supabase/.temp/
 supabase/.branches/
+
+# Git worktrees (project-local isolation)
+.worktrees/
