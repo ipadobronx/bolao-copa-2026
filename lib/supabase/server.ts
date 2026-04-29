@@ -1,10 +1,10 @@
 import 'server-only';
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient, type SetAllCookies } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { env } from '@/lib/env';
 import type { Database } from '@/lib/supabase/types';
 
-type CookieToSet = { name: string; value: string; options: CookieOptions };
+type CookieToSet = Parameters<SetAllCookies>[0][number];
 
 export async function createSupabaseServerClient() {
   const cookieStore = await cookies();

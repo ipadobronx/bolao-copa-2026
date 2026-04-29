@@ -15,8 +15,11 @@ const parsed = schema.safeParse({
 });
 
 if (!parsed.success) {
-  console.error('❌ Invalid environment variables:', parsed.error.flatten().fieldErrors);
-  throw new Error('Invalid environment variables');
+  const fieldErrors = parsed.error.flatten().fieldErrors;
+  console.error('❌ Invalid environment variables:', fieldErrors);
+  throw new Error(
+    `Invalid environment variables: ${JSON.stringify(fieldErrors)}. Check .env.local against .env.local.example.`,
+  );
 }
 
 export const env = parsed.data;
