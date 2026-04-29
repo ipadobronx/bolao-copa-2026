@@ -33,16 +33,16 @@ Esta feature **não** entrega:
 
 ## 2. Decisões consolidadas no brainstorming
 
-| #   | Pergunta                              | Escolha                                                                   | Motivação                                                                                                                            |
-| --- | ------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Q1  | Escopo da landing                     | **Single page com 3 seções, nav âncora, sem rotas auxiliares**            | Entrega o que o protótipo mostra; sem expandir escopo pra `/regras`/`/faq`                                                           |
-| Q2  | Conteúdo dinâmico vs estático         | **Hardcoded direto no JSX**                                               | Sem retrabalho desnecessário; Feature 6 refatora `<PromoSection/>` quando houver dados reais                                         |
-| Q3  | Destino dos CTAs principais           | **Todos → `/login`**                                                      | Destino semântico claro (precisa logar antes de comprar); coerente com nav "Entrar"                                                  |
-| Q4  | Footer                                | **Mínimo + disclaimer regulatório**                                       | Lei 14.790/2023 deixa bolão pago em zona cinzenta; disclaimer barato e útil; Termos/Privacidade ficam pra Feature 14                 |
-| Q5  | Localização e granularidade           | **`components/` no root, subpastas `layout/` e `landing/`, 1 arquivo por seção** | Convenção padrão Next/React; sub-bits repetidos (`FeatureCard`, `FlagRow`) ficam inline na seção pai                                |
-| Q6  | Estratégia de nav no mobile           | **Esconder âncoras, manter logo + Entrar**                                | 3 seções é scroll natural curto; sem hambúrguer (overkill); zero JS extra                                                            |
-| Q7  | Estratégia de testes                  | **Smoke test único Vitest + RTL**                                         | Landing é apresentação pura; smoke test catches regressão de markup sem ditar forma interna                                          |
-| Q8  | Mapeamento CSS → Tailwind v4          | **`@utility` para padrões repetidos ≥3×, utilities puras no resto**       | Fidelidade ao protótipo (já pensa em componentes); JSX limpo; superfície CSS mínima e localizada em `globals.css`                    |
+| #   | Pergunta                      | Escolha                                                                          | Motivação                                                                                                            |
+| --- | ----------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Q1  | Escopo da landing             | **Single page com 3 seções, nav âncora, sem rotas auxiliares**                   | Entrega o que o protótipo mostra; sem expandir escopo pra `/regras`/`/faq`                                           |
+| Q2  | Conteúdo dinâmico vs estático | **Hardcoded direto no JSX**                                                      | Sem retrabalho desnecessário; Feature 6 refatora `<PromoSection/>` quando houver dados reais                         |
+| Q3  | Destino dos CTAs principais   | **Todos → `/login`**                                                             | Destino semântico claro (precisa logar antes de comprar); coerente com nav "Entrar"                                  |
+| Q4  | Footer                        | **Mínimo + disclaimer regulatório**                                              | Lei 14.790/2023 deixa bolão pago em zona cinzenta; disclaimer barato e útil; Termos/Privacidade ficam pra Feature 14 |
+| Q5  | Localização e granularidade   | **`components/` no root, subpastas `layout/` e `landing/`, 1 arquivo por seção** | Convenção padrão Next/React; sub-bits repetidos (`FeatureCard`, `FlagRow`) ficam inline na seção pai                 |
+| Q6  | Estratégia de nav no mobile   | **Esconder âncoras, manter logo + Entrar**                                       | 3 seções é scroll natural curto; sem hambúrguer (overkill); zero JS extra                                            |
+| Q7  | Estratégia de testes          | **Smoke test único Vitest + RTL**                                                | Landing é apresentação pura; smoke test catches regressão de markup sem ditar forma interna                          |
+| Q8  | Mapeamento CSS → Tailwind v4  | **`@utility` para padrões repetidos ≥3×, utilities puras no resto**              | Fidelidade ao protótipo (já pensa em componentes); JSX limpo; superfície CSS mínima e localizada em `globals.css`    |
 
 ---
 
@@ -94,15 +94,15 @@ app/
 
 Verificado antes do design ser finalizado:
 
-| Item                                    | Estado          | Observação                                                                       |
-| --------------------------------------- | --------------- | -------------------------------------------------------------------------------- |
-| `vitest.setup.ts`                       | ✅ existe        | Já importa `@testing-library/jest-dom/vitest` — `toBeInTheDocument()` funciona  |
-| `vitest.config.mts`                     | ✅ existe        | `environment: 'jsdom'`, `globals: true`, `tsconfigPaths` plugin                  |
-| `tsconfig.json#paths`                   | ✅ `@/* → ./*`  | Imports `@/components/layout/...` resolvem em código e em testes                 |
-| `next.config.mjs#typedRoutes`           | ✅ `true`        | `<Link href="/login">` é type-checked; `/login` existe                           |
-| `postcss.config.mjs`                    | ✅ Tailwind v4   | Suporta `@utility` e `@theme`                                                    |
-| `app/globals.css#@theme`                | ✅ tokens prontos| Cores, fontes, todos os tokens do protótipo já registrados — não preciso editar |
-| `@testing-library/react`, `@testing-library/jest-dom`, `jsdom` | ✅ em devDeps | Sem instalação extra |
+| Item                                                           | Estado            | Observação                                                                      |
+| -------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------- |
+| `vitest.setup.ts`                                              | ✅ existe         | Já importa `@testing-library/jest-dom/vitest` — `toBeInTheDocument()` funciona  |
+| `vitest.config.mts`                                            | ✅ existe         | `environment: 'jsdom'`, `globals: true`, `tsconfigPaths` plugin                 |
+| `tsconfig.json#paths`                                          | ✅ `@/* → ./*`    | Imports `@/components/layout/...` resolvem em código e em testes                |
+| `next.config.mjs#typedRoutes`                                  | ✅ `true`         | `<Link href="/login">` é type-checked; `/login` existe                          |
+| `postcss.config.mjs`                                           | ✅ Tailwind v4    | Suporta `@utility` e `@theme`                                                   |
+| `app/globals.css#@theme`                                       | ✅ tokens prontos | Cores, fontes, todos os tokens do protótipo já registrados — não preciso editar |
+| `@testing-library/react`, `@testing-library/jest-dom`, `jsdom` | ✅ em devDeps     | Sem instalação extra                                                            |
 
 ---
 
@@ -190,12 +190,12 @@ Card escuro com gradiente `linear-gradient(145deg, var(--color-bg-elevated), var
 - Subtítulo: "Simples, transparente e ao vivo. Você palpita, o sistema calcula, o placar sobe."
 - Grid responsivo `auto-fit, minmax(280px, 1fr)` com 4 cards inline (`<div class="feature-card">`):
 
-| Ícone | Título                       | Descrição                                                                                |
-| ----- | ---------------------------- | ---------------------------------------------------------------------------------------- |
-| 💳    | Compre sua tabela            | R$ 20 por tabela via PIX. Quanto mais tabelas, mais chances. Confirmação na hora no WhatsApp. |
-| ⚽    | Palpite nos 104 jogos        | Fase de grupos e mata-mata. Escolha campeão, vice, artilheiro e mais bônus especiais.   |
-| 📊    | Pontue em tempo real         | Placar exato vale 10 pts. Vencedor vale 5. Mata-mata multiplica. Ranking atualiza automático. |
-| 💰    | Receba no PIX                | Terminou a Copa? Top 10 recebe o prêmio direto na conta em até 48h após a final.        |
+| Ícone | Título                | Descrição                                                                                     |
+| ----- | --------------------- | --------------------------------------------------------------------------------------------- |
+| 💳    | Compre sua tabela     | R$ 20 por tabela via PIX. Quanto mais tabelas, mais chances. Confirmação na hora no WhatsApp. |
+| ⚽    | Palpite nos 104 jogos | Fase de grupos e mata-mata. Escolha campeão, vice, artilheiro e mais bônus especiais.         |
+| 📊    | Pontue em tempo real  | Placar exato vale 10 pts. Vencedor vale 5. Mata-mata multiplica. Ranking atualiza automático. |
+| 💰    | Receba no PIX         | Terminou a Copa? Top 10 recebe o prêmio direto na conta em até 48h após a final.              |
 
 Cada card tem o emoji em `<span aria-hidden="true">` dentro de uma caixa amarela translúcida 48×48; título em `<h3>` peso 700 18px; descrição em `text-text-secondary` 14px. Hover sobe 4px e troca borda para accent — via custom utility `feature-card`.
 
@@ -222,12 +222,12 @@ Grid 2-col em desktop, 1-col mobile.
 
 Card externo: `<div class="bg-bg-card border border-border-strong rounded-2xl p-8">` (32px de padding, borda forte, raio 16px). Logo dentro, comentário JSX deixa claro que dados são demonstrativos até a Feature 6. Conteúdo em `<div class="space-y-3">` com 4 `flag-row`:
 
-| Bandeira (emoji) | Nome        | Texto vagas             | Classe na div                    | Notas                              |
-| ---------------- | ----------- | ----------------------- | -------------------------------- | ---------------------------------- |
-| 🇧🇷               | Brasil      | 12/20 vagas restantes   | `flag-row flag-row-selected`     | Inclui badge "SUA ESCOLHA" à direita |
-| 🇦🇷               | Argentina   | 8/20 vagas restantes    | `flag-row`                       | —                                  |
-| 🇫🇷               | França      | 15/20 vagas restantes   | `flag-row`                       | —                                  |
-| 🏴󠁧󠁢󠁥󠁮󠁧󠁿               | Inglaterra  | 19/20 vagas restantes   | `flag-row`                       | —                                  |
+| Bandeira (emoji) | Nome       | Texto vagas           | Classe na div                | Notas                                |
+| ---------------- | ---------- | --------------------- | ---------------------------- | ------------------------------------ |
+| 🇧🇷               | Brasil     | 12/20 vagas restantes | `flag-row flag-row-selected` | Inclui badge "SUA ESCOLHA" à direita |
+| 🇦🇷               | Argentina  | 8/20 vagas restantes  | `flag-row`                   | —                                    |
+| 🇫🇷               | França     | 15/20 vagas restantes | `flag-row`                   | —                                    |
+| 🏴󠁧󠁢󠁥󠁮󠁧󠁿               | Inglaterra | 19/20 vagas restantes | `flag-row`                   | —                                    |
 
 Bandeiras emoji em `<span aria-hidden="true">` (decoração). Nome em peso 700 15px; metadado em font-mono 12px text-muted. Badge "SUA ESCOLHA" usa `bg-accent text-bg-dark px-2.5 py-1 rounded font-mono text-[11px] font-bold`.
 
@@ -293,7 +293,9 @@ Tokens completos. **Nenhum token novo precisa ser adicionado.**
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
+  html {
+    scroll-behavior: auto;
+  }
 }
 ```
 
@@ -303,18 +305,11 @@ Apenas padrões que aparecem ≥3× no protótipo. JSX usa cada utility como cla
 
 ```css
 @utility btn-primary {
-  @apply inline-flex items-center justify-center bg-accent text-bg-dark
-         px-6 py-3 rounded-lg font-bold text-sm transition
-         hover:bg-accent-hover hover:-translate-y-px
-         hover:shadow-[0_8px_24px_rgba(250,204,21,0.3)]
-         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark;
+  @apply bg-accent text-bg-dark hover:bg-accent-hover focus-visible:ring-accent focus-visible:ring-offset-bg-dark inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-bold transition hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(250,204,21,0.3)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none;
 }
 
 @utility btn-secondary {
-  @apply inline-flex items-center justify-center bg-transparent text-text-primary
-         px-6 py-3 rounded-lg border border-border-strong font-semibold text-sm transition
-         hover:border-accent hover:text-accent
-         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark;
+  @apply text-text-primary border-border-strong hover:border-accent hover:text-accent focus-visible:ring-accent focus-visible:ring-offset-bg-dark inline-flex items-center justify-center rounded-lg border bg-transparent px-6 py-3 text-sm font-semibold transition focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none;
 }
 
 @utility btn-hero {
@@ -322,12 +317,11 @@ Apenas padrões que aparecem ≥3× no protótipo. JSX usa cada utility como cla
 }
 
 @utility feature-card {
-  @apply bg-bg-elevated border border-border rounded-2xl p-7 transition
-         hover:border-accent hover:-translate-y-1;
+  @apply bg-bg-elevated border-border hover:border-accent rounded-2xl border p-7 transition hover:-translate-y-1;
 }
 
 @utility flag-row {
-  @apply flex items-center gap-4 p-4 bg-bg-elevated rounded-xl border border-border;
+  @apply bg-bg-elevated border-border flex items-center gap-4 rounded-xl border p-4;
 }
 
 @utility flag-row-selected {
@@ -339,8 +333,13 @@ Apenas padrões que aparecem ≥3× no protótipo. JSX usa cada utility como cla
 
 ```css
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
 }
 
 @utility animate-pulse-dot {
@@ -348,7 +347,9 @@ Apenas padrões que aparecem ≥3× no protótipo. JSX usa cada utility como cla
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-pulse-dot { animation: none; }
+  .animate-pulse-dot {
+    animation: none;
+  }
 }
 ```
 
@@ -364,15 +365,15 @@ Padrões que aparecem só 1× (`prize-card`, `hero-grid`, `promo-grid`, `landing
 
 ### 6.1 Mapa completo de links
 
-| Texto                       | Componente / tag | Destino     | Atributos especiais                          |
-| --------------------------- | ---------------- | ----------- | -------------------------------------------- |
-| Logo `BOLÃO 26`             | `next/link`      | `/`         | `aria-label="Bolão Copa 2026 — início"`     |
-| Nav: `Como funciona`        | `<a>`            | `#features` | `hidden md:inline-flex`                      |
-| Nav: `Cashback`             | `<a>`            | `#cashback` | `hidden md:inline-flex`                      |
-| Nav: `Entrar`               | `next/link`      | `/login`    | `class="btn-primary"`, sempre visível       |
-| Hero CTA primário           | `next/link`      | `/login`    | `class="btn-primary btn-hero"`               |
-| Hero CTA secundário         | `<a>`            | `#features` | `class="btn-secondary btn-hero"`             |
-| Promo CTA                   | `next/link`      | `/login`    | `class="btn-primary btn-hero"`               |
+| Texto                | Componente / tag | Destino     | Atributos especiais                     |
+| -------------------- | ---------------- | ----------- | --------------------------------------- |
+| Logo `BOLÃO 26`      | `next/link`      | `/`         | `aria-label="Bolão Copa 2026 — início"` |
+| Nav: `Como funciona` | `<a>`            | `#features` | `hidden md:inline-flex`                 |
+| Nav: `Cashback`      | `<a>`            | `#cashback` | `hidden md:inline-flex`                 |
+| Nav: `Entrar`        | `next/link`      | `/login`    | `class="btn-primary"`, sempre visível   |
+| Hero CTA primário    | `next/link`      | `/login`    | `class="btn-primary btn-hero"`          |
+| Hero CTA secundário  | `<a>`            | `#features` | `class="btn-secondary btn-hero"`        |
+| Promo CTA            | `next/link`      | `/login`    | `class="btn-primary btn-hero"`          |
 
 ### 6.2 Convenção `<Link>` vs `<a>`
 
@@ -411,13 +412,13 @@ A landing tem 3 seções com `id` deterministicamente atribuídos:
 
 Landing é apresentacional puro: nenhum `await`, nenhum I/O, nenhum estado. Mapa explícito do que pode falhar:
 
-| Cenário                                          | Tratamento                                                                                     |
-| ------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| Cenário                                          | Tratamento                                                                                                 |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
 | Fonte do Google falha (`next/font`)              | Fallback automático na chain `var(--font-bebas), 'Bebas Neue', sans-serif` em `globals.css`. Nada a fazer. |
-| Erro de hidratação React                         | `app/error.tsx` (já existe, autocontido) captura. Sem mudança.                                 |
-| URL desconhecida (`/qualquer-coisa`)             | `app/not-found.tsx` (já existe, autocontido) responde 404. Sem mudança.                        |
-| Âncora `#features` ou `#cashback` quebrada       | Smoke test (§8) garante que os IDs existem.                                                    |
-| Emoji de bandeira não renderiza no OS do usuário | Aceito — degradação graciosa para texto/quadrado branco. SVG fica pra Feature 14.              |
+| Erro de hidratação React                         | `app/error.tsx` (já existe, autocontido) captura. Sem mudança.                                             |
+| URL desconhecida (`/qualquer-coisa`)             | `app/not-found.tsx` (já existe, autocontido) responde 404. Sem mudança.                                    |
+| Âncora `#features` ou `#cashback` quebrada       | Smoke test (§8) garante que os IDs existem.                                                                |
+| Emoji de bandeira não renderiza no OS do usuário | Aceito — degradação graciosa para texto/quadrado branco. SVG fica pra Feature 14.                          |
 
 ### 7.2 Estado atual de `app/error.tsx` (não vai mudar)
 
@@ -491,7 +492,8 @@ export const metadata: Metadata = {
 ```ts
 export const metadata: Metadata = {
   title: 'Bolão Copa 2026',
-  description: 'Bolão da Copa do Mundo FIFA 2026. R$ 20 a tabela, R$ 10 mil em prêmios, ranking ao vivo.',
+  description:
+    'Bolão da Copa do Mundo FIFA 2026. R$ 20 a tabela, R$ 10 mil em prêmios, ranking ao vivo.',
 };
 ```
 
@@ -536,7 +538,10 @@ describe('Landing page', () => {
   it('hero exibe título e CTA principal apontando pra /login', () => {
     renderLanding();
     expect(
-      screen.getByRole('heading', { level: 1, name: /Palpite\.\s*Pontue\.\s*Leve R\$ 10 mil pra casa\./i }),
+      screen.getByRole('heading', {
+        level: 1,
+        name: /Palpite\.\s*Pontue\.\s*Leve R\$ 10 mil pra casa\./i,
+      }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Comprar minha tabela/i })).toHaveAttribute(
       'href',
@@ -547,9 +552,7 @@ describe('Landing page', () => {
   it('seção features tem id correto e renderiza 4 cards', () => {
     const { container } = renderLanding();
     expect(container.querySelector('#features')).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { level: 2, name: /Como funciona/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /Como funciona/i })).toBeInTheDocument();
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(4);
   });
 
@@ -567,7 +570,10 @@ describe('Landing page', () => {
     // Regex ancoradas pra desambiguar: "Cashback" sem ^$ casaria também o
     // "Garantir meu cashback" do promo; "Entrar" sem ^$ casaria "Comprar..."
     // se a regex fosse fuzzy.
-    expect(screen.getByRole('link', { name: /^Como funciona$/i })).toHaveAttribute('href', '#features');
+    expect(screen.getByRole('link', { name: /^Como funciona$/i })).toHaveAttribute(
+      'href',
+      '#features',
+    );
     expect(screen.getByRole('link', { name: /^Cashback$/i })).toHaveAttribute('href', '#cashback');
     expect(screen.getByRole('link', { name: /^Entrar$/i })).toHaveAttribute('href', '/login');
   });
@@ -575,7 +581,9 @@ describe('Landing page', () => {
   it('footer mostra copyright e disclaimer', () => {
     renderLanding();
     expect(screen.getByText(/©\s*2026 Bolão Copa 2026/)).toBeInTheDocument();
-    expect(screen.getByText(/Não afiliado à FIFA\. Competição entre conhecidos\./i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Não afiliado à FIFA\. Competição entre conhecidos\./i),
+    ).toBeInTheDocument();
   });
 });
 ```

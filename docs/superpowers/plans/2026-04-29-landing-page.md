@@ -87,20 +87,11 @@
 }
 
 @utility btn-primary {
-  @apply inline-flex items-center justify-center bg-accent text-bg-dark
-         px-6 py-3 rounded-lg font-bold text-sm transition
-         hover:bg-accent-hover hover:-translate-y-px
-         hover:shadow-[0_8px_24px_rgba(250,204,21,0.3)]
-         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent
-         focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark;
+  @apply bg-accent text-bg-dark hover:bg-accent-hover focus-visible:ring-accent focus-visible:ring-offset-bg-dark inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-bold transition hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(250,204,21,0.3)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none;
 }
 
 @utility btn-secondary {
-  @apply inline-flex items-center justify-center bg-transparent text-text-primary
-         px-6 py-3 rounded-lg border border-border-strong font-semibold text-sm transition
-         hover:border-accent hover:text-accent
-         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent
-         focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark;
+  @apply text-text-primary border-border-strong hover:border-accent hover:text-accent focus-visible:ring-accent focus-visible:ring-offset-bg-dark inline-flex items-center justify-center rounded-lg border bg-transparent px-6 py-3 text-sm font-semibold transition focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none;
 }
 
 @utility btn-hero {
@@ -108,12 +99,11 @@
 }
 
 @utility feature-card {
-  @apply bg-bg-elevated border border-border rounded-2xl p-7 transition
-         hover:border-accent hover:-translate-y-1;
+  @apply bg-bg-elevated border-border hover:border-accent rounded-2xl border p-7 transition hover:-translate-y-1;
 }
 
 @utility flag-row {
-  @apply flex items-center gap-4 p-4 bg-bg-elevated rounded-xl border border-border;
+  @apply bg-bg-elevated border-border flex items-center gap-4 rounded-xl border p-4;
 }
 
 @utility flag-row-selected {
@@ -181,7 +171,7 @@ Foundation for upcoming SiteHeader/Footer and landing section components."
 ```tsx
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border py-8 text-center">
+    <footer className="border-border border-t py-8 text-center">
       <p className="text-text-secondary font-body text-sm">© 2026 Bolão Copa 2026</p>
       <p className="text-text-muted mt-2 font-mono text-xs">
         Não afiliado à FIFA. Competição entre conhecidos.
@@ -378,11 +368,7 @@ const prizeCardOverlay = {
 
 export function HeroSection() {
   return (
-    <section
-      id="hero"
-      className="relative overflow-hidden pt-20 pb-30"
-      style={heroBackground}
-    >
+    <section id="hero" className="relative overflow-hidden pt-20 pb-30" style={heroBackground}>
       <div
         className="pointer-events-none absolute inset-0"
         style={gridOverlay}
@@ -391,7 +377,7 @@ export function HeroSection() {
       <div className="relative z-10 mx-auto max-w-[1200px] px-6">
         <div className="grid grid-cols-1 items-center gap-20 md:grid-cols-[1.3fr_1fr]">
           <div>
-            <div className="border-accent/30 bg-accent/10 text-accent mb-6 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 font-mono text-xs font-semibold uppercase tracking-[1px]">
+            <div className="border-accent/30 bg-accent/10 text-accent mb-6 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 font-mono text-xs font-semibold tracking-[1px] uppercase">
               <span
                 aria-hidden="true"
                 className="bg-accent animate-pulse-dot h-1.5 w-1.5 rounded-full"
@@ -401,7 +387,7 @@ export function HeroSection() {
             <h1 className="font-display mb-6 text-[clamp(48px,8vw,96px)] leading-[0.9] tracking-[-1px]">
               <span className="text-text-primary block">Palpite.</span>
               <span className="text-accent block">Pontue.</span>
-              <span className="font-body text-text-primary mt-3 block text-[0.5em] font-extrabold uppercase tracking-normal">
+              <span className="font-body text-text-primary mt-3 block text-[0.5em] font-extrabold tracking-normal uppercase">
                 Leve R$ 10 mil pra casa.
               </span>
             </h1>
@@ -421,19 +407,19 @@ export function HeroSection() {
             <div className="border-border grid grid-cols-3 gap-6 border-t pt-8">
               <div>
                 <div className="font-display text-accent text-4xl leading-none">R$ 10K</div>
-                <div className="text-text-muted mt-1 font-mono text-xs uppercase tracking-[1px]">
+                <div className="text-text-muted mt-1 font-mono text-xs tracking-[1px] uppercase">
                   Prêmio total
                 </div>
               </div>
               <div>
                 <div className="font-display text-accent text-4xl leading-none">104</div>
-                <div className="text-text-muted mt-1 font-mono text-xs uppercase tracking-[1px]">
+                <div className="text-text-muted mt-1 font-mono text-xs tracking-[1px] uppercase">
                   Jogos
                 </div>
               </div>
               <div>
                 <div className="font-display text-accent text-4xl leading-none">48</div>
-                <div className="text-text-muted mt-1 font-mono text-xs uppercase tracking-[1px]">
+                <div className="text-text-muted mt-1 font-mono text-xs tracking-[1px] uppercase">
                   Seleções
                 </div>
               </div>
@@ -450,7 +436,7 @@ export function HeroSection() {
               aria-hidden="true"
             />
             <div className="relative mb-6 flex items-center justify-between">
-              <span className="text-text-muted font-mono text-[11px] uppercase tracking-[1px]">
+              <span className="text-text-muted font-mono text-[11px] tracking-[1px] uppercase">
                 Distribuição do Prêmio
               </span>
               <span
@@ -565,8 +551,7 @@ const FEATURES: Feature[] = [
   {
     emoji: '💰',
     title: 'Receba no PIX',
-    description:
-      'Terminou a Copa? Top 10 recebe o prêmio direto na conta em até 48h após a final.',
+    description: 'Terminou a Copa? Top 10 recebe o prêmio direto na conta em até 48h após a final.',
   },
 ];
 
@@ -652,14 +637,10 @@ const promoBackground = {
 
 export function PromoSection() {
   return (
-    <section
-      id="cashback"
-      className="border-border border-y py-20"
-      style={promoBackground}
-    >
+    <section id="cashback" className="border-border border-y py-20" style={promoBackground}>
       <div className="mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-16 px-6 md:grid-cols-2">
         <div>
-          <span className="bg-brasil mb-4 inline-block rounded px-3 py-1 font-mono text-[11px] font-bold uppercase tracking-[1px] text-white">
+          <span className="bg-brasil mb-4 inline-block rounded px-3 py-1 font-mono text-[11px] font-bold tracking-[1px] text-white uppercase">
             🎁 Promoção Cashback
           </span>
           <h2 className="font-display mb-4 text-[64px] leading-[0.95]">
@@ -872,9 +853,7 @@ describe('Landing page', () => {
   it('seção features tem id correto e renderiza 4 cards', () => {
     const { container } = renderLanding();
     expect(container.querySelector('#features')).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { level: 2, name: /Como funciona/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /Como funciona/i })).toBeInTheDocument();
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(4);
   });
 
