@@ -669,3 +669,26 @@ Não dá pra automatizar via tool de agente:
 - GitHub Actions CI → feature 5 (quando houver regra crítica)
 - shadcn/ui → escolha Q4
 - Wrappers UI sobre Radix (`components/ui/`) → entram feature-a-feature, conforme cada feature precise
+
+---
+
+## 9. Amendments durante a execução
+
+Quando o spec foi escrito, certas decisões técnicas só puderam ser validadas em tempo de execução. Estas amendments foram autorizadas inline pelo usuário e estão registradas pra evitar confusão entre o que o spec descreveu e o que o código entrega:
+
+1. **ESLint v9 → ESLint v8 + legacy `.eslintrc.json`** (seção 3.4) — `eslint-config-next@14.2.18` peer-depende de v8.
+2. **`vitest.config.ts` → `vitest.config.mts`** (seção 3.4) — `vite-tsconfig-paths@5.x` é ESM-only e Vitest carrega `.ts` como CJS sem `"type": "module"` no package.json.
+3. **Cookie callback typing** (seção 3.3) — `setAll` em `server.ts` e `middleware.ts` agora usa `Parameters<SetAllCookies>[0][number]` importado de `@supabase/ssr`. O spec mostrava o callback como `(toSet) => ...` que não infere sob `strict + noImplicitAny`.
+4. **Middleware resiliência + matcher** (seção 3.3) — `getUser()` envolto em try/catch; matcher exclui `/api/` (audiência mobile-first com conectividade variável; webhooks autenticam por token).
+5. **Public layout `<main>` landmark** (não-spec) — consistência a11y entre os 4 layouts de grupo.
+6. **Toaster `position="top-center"`** (não-spec) — mobile-first: Sonner 1.x não auto-stretch `top-right` em viewports 375px.
+7. **`lib/env.ts` mensagem de erro** (seção 3.5) — agora inclui field errors + ponteiro pra `.env.local.example`.
+8. **`<Database>` generic em middleware** (seção 3.3) — simetria com os outros 3 clients.
+
+Todas as amendments estão detalhadas no plano correspondente, com referências aos commits que as implementam.
+
+---
+
+## 10. CLAUDE.md atualizado
+
+Esta feature aplicou uma correção pequena na seção 2 do `CLAUDE.md`: a referência a "config Tailwind no `tailwind.config.ts`" foi substituída por "config Tailwind direto em `app/globals.css` via diretiva `@theme` (Tailwind v4 — não há `tailwind.config.ts`)". Tailwind v4 dispensa o config JS clássico.

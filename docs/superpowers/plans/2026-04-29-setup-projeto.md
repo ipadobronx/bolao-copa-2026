@@ -1540,4 +1540,85 @@ Após o último commit, confirmar a feature inteira:
 - **`app/api/`** está vazio. Webhooks (Asaas — Feature 6) e cron (API-Football — Feature 12) entram aqui.
 - **`supabase/migrations/`** está vazio. Feature 2 popula com a primeira migration (`001_initial_schema.sql`).
 - **CI ainda não existe.** Feature 5 (lógica de pontuação) é a primeira que justifica adicionar GitHub Actions, conforme decisão Q6.
-- **Atualização do CLAUDE.md sobre Tailwind:** o charter menciona "config Tailwind no `tailwind.config.ts`", mas a v4 dispensa esse arquivo. Sugestão: Feature 2 (ou 3) atualiza a seção 2 do `CLAUDE.md` em commit `docs:` separado.
+- **Atualização do CLAUDE.md sobre Tailwind:** ✅ resolvido (esta feature já corrigiu §2 do `CLAUDE.md`).
+
+---
+
+## Amendments aplicadas durante a execução
+
+Esta seção registra as divergências entre o que o plano original prescrevia e o que foi efetivamente implementado, todas autorizadas pelo usuário inline durante a execução. Quando você for ler este plano como referência pra entender o estado do código, **as amendments abaixo prevalecem**.
+
+### Amendment 1 — ESLint v8 + legacy `.eslintrc.json` (Task 2)
+
+- **Plano original:** ESLint v9 com flat config (`eslint.config.mjs`), `@eslint/eslintrc` em devDeps.
+- **Implementação:** ESLint `^8.57.0` com legacy `.eslintrc.json`, sem `@eslint/eslintrc`.
+- **Motivo:** `eslint-config-next@14.2.18` peer-depende de ESLint v8 e usa APIs (`context.getScope`) removidas na v9. Como CLAUDE.md fixa Next 14, ESLint v9 não é viável.
+- **Commit:** `96612b0`
+
+### Amendment 2 — `vitest.config.mts` (Task 2)
+
+- **Plano original:** `vitest.config.ts` (extensão `.ts`).
+- **Implementação:** `vitest.config.mts` (extensão `.mts`).
+- **Motivo:** `vite-tsconfig-paths@5.1.4` é ESM-only. Vitest carrega arquivos `.ts` em modo CJS quando `package.json` não tem `"type": "module"` (e o projeto Next 14 não tem). `.mts` força loader ESM.
+- **Commit:** `96612b0`
+
+### Amendment 3 — Cookie callback typing (Tasks 3 e 4)
+
+- **Plano original:** `setAll: (toSet) => { ... }` em `lib/supabase/server.ts` e `lib/supabase/middleware.ts`.
+- **Implementação:** `setAll: (toSet: CookieToSet[]) => { ... }` com `type CookieToSet = Parameters<SetAllCookies>[0][number]` importado de `@supabase/ssr`.
+- **Motivo:** `createServerClient` é overloaded entre `CookieMethodsServer` e `CookieMethodsServerDeprecated`; TS não propaga o tipo do callback sob `strict + noImplicitAny`. Extrair o tipo via `Parameters<...>` mantém o código alinhado com a tipagem pública do `@supabase/ssr`.
+- **Commits:** `bcc0866` (Task 3 inicial), `7e9b7e4` (refactor pra `Parameters<>`), `3938800` (Task 4 já com o pattern).
+
+### Amendment 4 — Middleware resiliência + matcher (Task 4)
+
+- **Plano original:** `await supabase.auth.getUser();` direto, sem try/catch. Matcher cobria todas as rotas exceto static assets.
+- **Implementação:** `getUser()` envolto em `try/catch` (erros transientes não 500 a request); matcher exclui também `/api/`.
+- **Motivo:** Audiência mobile-first com conectividade flutuante; webhooks/cron handlers em `/api/` não usam sessão Supabase.
+- **Commit:** `04a518b`
+
+### Amendment 5 — Public layout `<main>` landmark (Task 5)
+
+- **Plano original:** `<div className="flex-1">{children}</div>` em `app/(public)/layout.tsx`.
+- **Implementação:** `<main className="flex-1">{children}</main>`.
+- **Motivo:** Consistência com os outros 3 layouts de grupo + landmark de acessibilidade.
+- **Commit:** `02a1185`
+
+### Amendment 6 — Toaster mobile-first (Task 6)
+
+- **Plano original:** `<Toaster position="top-right" ... />`.
+- **Implementação:** `<Toaster position="top-center" ... />`.
+- **Motivo:** Sonner 1.x não auto-stretch toasts `top-right` em mobile (375px viewport); CLAUDE.md §1/§2 mandam mobile-first.
+- **Commit:** `14586fc`
+
+### Amendment 7 — `lib/env.ts` mensagem de erro
+
+- **Plano original:** `throw new Error('Invalid environment variables')`.
+- **Implementação:** mensagem inclui field errors serializados + ponteiro pra `.env.local.example`.
+- **Motivo:** Sobrevive em CI runners que swalow `console.error` e dá ao novo contribuidor uma pista acionável.
+- **Commit:** `7e9b7e4`
+
+### Amendment 8 — `<Database>` generic em middleware
+
+- **Plano original:** `createServerClient(...)` sem generic em `lib/supabase/middleware.ts`.
+- **Implementação:** `createServerClient<Database>(...)` (consistente com browser/server/admin).
+- **Motivo:** Simetria entre os 4 clients; permite consumer code futuro consumir tipos do schema.
+- **Commit:** docs: deste mesmo commit ou o anterior na sequência (verificar `git log`).
+
+---
+
+## Histórico de commits (10)
+
+```
+14586fc refactor: mobile-first toaster position and README polish
+cb78b5f chore: add Radix primitives and sonner
+02a1185 refactor: promote (public) layout wrapper to <main> landmark
+0caff8a chore: scaffold app route groups and base layouts
+04a518b refactor: harden middleware against transient errors and skip /api/
+3938800 chore: add Next.js middleware for auth session refresh
+7e9b7e4 refactor: tighten Supabase cookie typing and env error message
+bcc0866 chore: scaffold Supabase clients and migrations workflow
+96612b0 chore: configure linting, formatting, and Vitest
+eeba805 chore: scaffold Next.js 14 with TypeScript and Tailwind v4
+```
+
+Os 6 `chore:` correspondem 1:1 aos 6 tasks do plano. Os 4 `refactor:` resolveram concerns levantados em code reviews (1 e 2 estágios) durante a execução.

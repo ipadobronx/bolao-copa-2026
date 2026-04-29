@@ -48,7 +48,7 @@ Estas decisões estão consolidadas. Se o usuário pedir uma feature, assuma est
 
 - Tema dark com accent amarelo (`#facc15`).
 - Tipografia: Bebas Neue (display), Archivo (body), JetBrains Mono (números/datas).
-- CSS variables e config Tailwind no `app/globals.css` e `tailwind.config.ts`.
+- CSS variables e config Tailwind direto em `app/globals.css` via diretiva `@theme` (Tailwind v4 — não há `tailwind.config.ts`).
 - **Referência visual obrigatória:** `docs/prototype/bolao-copa-2026.html` — todo componente visual deve ser fiel a essa fonte.
 
 ### Arquitetura de rotas (Next.js App Router)
