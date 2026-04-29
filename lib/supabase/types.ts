@@ -33,16 +33,400 @@ export type Database = {
   };
   public: {
     Tables: {
-      [_ in never]: never;
+      bilhetes: {
+        Row: {
+          asaas_payment_id: string | null;
+          cashback_pago: boolean;
+          created_at: string;
+          expira_em: string | null;
+          id: string;
+          numero_bilhete: number;
+          pago_em: string | null;
+          selecao_cashback_id: number | null;
+          status_pagamento: Database['public']['Enums']['status_pagamento'];
+          updated_at: string;
+          user_id: string;
+          valor_pago: number;
+        };
+        Insert: {
+          asaas_payment_id?: string | null;
+          cashback_pago?: boolean;
+          created_at?: string;
+          expira_em?: string | null;
+          id?: string;
+          numero_bilhete?: number;
+          pago_em?: string | null;
+          selecao_cashback_id?: number | null;
+          status_pagamento?: Database['public']['Enums']['status_pagamento'];
+          updated_at?: string;
+          user_id: string;
+          valor_pago: number;
+        };
+        Update: {
+          asaas_payment_id?: string | null;
+          cashback_pago?: boolean;
+          created_at?: string;
+          expira_em?: string | null;
+          id?: string;
+          numero_bilhete?: number;
+          pago_em?: string | null;
+          selecao_cashback_id?: number | null;
+          status_pagamento?: Database['public']['Enums']['status_pagamento'];
+          updated_at?: string;
+          user_id?: string;
+          valor_pago?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'bilhetes_selecao_cashback_id_fkey';
+            columns: ['selecao_cashback_id'];
+            isOneToOne: false;
+            referencedRelation: 'selecoes';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      copa_resultados: {
+        Row: {
+          artilheiro_nome: string | null;
+          campeao_id: number | null;
+          created_at: string;
+          finalizada: boolean;
+          id: number;
+          quarto_id: number | null;
+          revelacao_id: number | null;
+          terceiro_id: number | null;
+          updated_at: string;
+          vice_id: number | null;
+        };
+        Insert: {
+          artilheiro_nome?: string | null;
+          campeao_id?: number | null;
+          created_at?: string;
+          finalizada?: boolean;
+          id?: number;
+          quarto_id?: number | null;
+          revelacao_id?: number | null;
+          terceiro_id?: number | null;
+          updated_at?: string;
+          vice_id?: number | null;
+        };
+        Update: {
+          artilheiro_nome?: string | null;
+          campeao_id?: number | null;
+          created_at?: string;
+          finalizada?: boolean;
+          id?: number;
+          quarto_id?: number | null;
+          revelacao_id?: number | null;
+          terceiro_id?: number | null;
+          updated_at?: string;
+          vice_id?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'copa_resultados_campeao_id_fkey';
+            columns: ['campeao_id'];
+            isOneToOne: false;
+            referencedRelation: 'selecoes';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'copa_resultados_quarto_id_fkey';
+            columns: ['quarto_id'];
+            isOneToOne: false;
+            referencedRelation: 'selecoes';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'copa_resultados_revelacao_id_fkey';
+            columns: ['revelacao_id'];
+            isOneToOne: false;
+            referencedRelation: 'selecoes';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'copa_resultados_terceiro_id_fkey';
+            columns: ['terceiro_id'];
+            isOneToOne: false;
+            referencedRelation: 'selecoes';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'copa_resultados_vice_id_fkey';
+            columns: ['vice_id'];
+            isOneToOne: false;
+            referencedRelation: 'selecoes';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      jogos: {
+        Row: {
+          created_at: string;
+          data_hora: string;
+          external_id: string | null;
+          fase: Database['public']['Enums']['fase_jogo'];
+          finalizado: boolean;
+          gols_casa: number | null;
+          gols_fora: number | null;
+          id: number;
+          numero_jogo: number;
+          placeholder_casa: string | null;
+          placeholder_fora: string | null;
+          selecao_casa_id: number | null;
+          selecao_fora_id: number | null;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          data_hora: string;
+          external_id?: string | null;
+          fase: Database['public']['Enums']['fase_jogo'];
+          finalizado?: boolean;
+          gols_casa?: number | null;
+          gols_fora?: number | null;
+          id?: number;
+          numero_jogo: number;
+          placeholder_casa?: string | null;
+          placeholder_fora?: string | null;
+          selecao_casa_id?: number | null;
+          selecao_fora_id?: number | null;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          data_hora?: string;
+          external_id?: string | null;
+          fase?: Database['public']['Enums']['fase_jogo'];
+          finalizado?: boolean;
+          gols_casa?: number | null;
+          gols_fora?: number | null;
+          id?: number;
+          numero_jogo?: number;
+          placeholder_casa?: string | null;
+          placeholder_fora?: string | null;
+          selecao_casa_id?: number | null;
+          selecao_fora_id?: number | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'jogos_selecao_casa_id_fkey';
+            columns: ['selecao_casa_id'];
+            isOneToOne: false;
+            referencedRelation: 'selecoes';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'jogos_selecao_fora_id_fkey';
+            columns: ['selecao_fora_id'];
+            isOneToOne: false;
+            referencedRelation: 'selecoes';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      palpites: {
+        Row: {
+          bilhete_id: string;
+          created_at: string;
+          gols_casa: number;
+          gols_fora: number;
+          id: string;
+          jogo_id: number;
+          pontos_calculados: number | null;
+          updated_at: string;
+        };
+        Insert: {
+          bilhete_id: string;
+          created_at?: string;
+          gols_casa: number;
+          gols_fora: number;
+          id?: string;
+          jogo_id: number;
+          pontos_calculados?: number | null;
+          updated_at?: string;
+        };
+        Update: {
+          bilhete_id?: string;
+          created_at?: string;
+          gols_casa?: number;
+          gols_fora?: number;
+          id?: string;
+          jogo_id?: number;
+          pontos_calculados?: number | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'palpites_bilhete_id_fkey';
+            columns: ['bilhete_id'];
+            isOneToOne: false;
+            referencedRelation: 'bilhetes';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'palpites_bilhete_id_fkey';
+            columns: ['bilhete_id'];
+            isOneToOne: false;
+            referencedRelation: 'ranking';
+            referencedColumns: ['bilhete_id'];
+          },
+          {
+            foreignKeyName: 'palpites_jogo_id_fkey';
+            columns: ['jogo_id'];
+            isOneToOne: false;
+            referencedRelation: 'jogos';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      palpites_bonus: {
+        Row: {
+          bilhete_id: string;
+          created_at: string;
+          id: string;
+          jogador_nome: string | null;
+          pontos_calculados: number | null;
+          selecao_id: number | null;
+          tipo: Database['public']['Enums']['tipo_bonus'];
+          updated_at: string;
+        };
+        Insert: {
+          bilhete_id: string;
+          created_at?: string;
+          id?: string;
+          jogador_nome?: string | null;
+          pontos_calculados?: number | null;
+          selecao_id?: number | null;
+          tipo: Database['public']['Enums']['tipo_bonus'];
+          updated_at?: string;
+        };
+        Update: {
+          bilhete_id?: string;
+          created_at?: string;
+          id?: string;
+          jogador_nome?: string | null;
+          pontos_calculados?: number | null;
+          selecao_id?: number | null;
+          tipo?: Database['public']['Enums']['tipo_bonus'];
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'palpites_bonus_bilhete_id_fkey';
+            columns: ['bilhete_id'];
+            isOneToOne: false;
+            referencedRelation: 'bilhetes';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'palpites_bonus_bilhete_id_fkey';
+            columns: ['bilhete_id'];
+            isOneToOne: false;
+            referencedRelation: 'ranking';
+            referencedColumns: ['bilhete_id'];
+          },
+          {
+            foreignKeyName: 'palpites_bonus_selecao_id_fkey';
+            columns: ['selecao_id'];
+            isOneToOne: false;
+            referencedRelation: 'selecoes';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      profiles: {
+        Row: {
+          cpf: string | null;
+          created_at: string;
+          email: string;
+          id: string;
+          is_admin: boolean;
+          nome: string | null;
+          telefone: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          cpf?: string | null;
+          created_at?: string;
+          email: string;
+          id: string;
+          is_admin?: boolean;
+          nome?: string | null;
+          telefone?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          cpf?: string | null;
+          created_at?: string;
+          email?: string;
+          id?: string;
+          is_admin?: boolean;
+          nome?: string | null;
+          telefone?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      selecoes: {
+        Row: {
+          bandeira_emoji: string;
+          codigo_iso: string;
+          created_at: string;
+          grupo: string;
+          id: number;
+          nome: string;
+        };
+        Insert: {
+          bandeira_emoji: string;
+          codigo_iso: string;
+          created_at?: string;
+          grupo: string;
+          id?: number;
+          nome: string;
+        };
+        Update: {
+          bandeira_emoji?: string;
+          codigo_iso?: string;
+          created_at?: string;
+          grupo?: string;
+          id?: number;
+          nome?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
-      [_ in never]: never;
+      ranking: {
+        Row: {
+          acertos_exatos: number | null;
+          acertos_parciais: number | null;
+          bilhete_id: string | null;
+          nome: string | null;
+          numero_bilhete: number | null;
+          pontos_totais: number | null;
+          posicao: number | null;
+          user_id: string | null;
+        };
+        Relationships: [];
+      };
     };
     Functions: {
-      [_ in never]: never;
+      is_admin: { Args: never; Returns: boolean };
     };
     Enums: {
-      [_ in never]: never;
+      fase_jogo:
+        | 'grupos'
+        | '16avos'
+        | 'oitavas'
+        | 'quartas'
+        | 'semis'
+        | 'disputa_terceiro'
+        | 'final';
+      status_pagamento: 'pendente' | 'confirmado' | 'expirado' | 'cancelado';
+      tipo_bonus: 'campeao' | 'vice' | 'terceiro' | 'quarto' | 'artilheiro' | 'revelacao';
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -170,6 +554,10 @@ export const Constants = {
     Enums: {},
   },
   public: {
-    Enums: {},
+    Enums: {
+      fase_jogo: ['grupos', '16avos', 'oitavas', 'quartas', 'semis', 'disputa_terceiro', 'final'],
+      status_pagamento: ['pendente', 'confirmado', 'expirado', 'cancelado'],
+      tipo_bonus: ['campeao', 'vice', 'terceiro', 'quarto', 'artilheiro', 'revelacao'],
+    },
   },
 } as const;
