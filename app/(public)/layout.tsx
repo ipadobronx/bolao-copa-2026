@@ -6,7 +6,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           BOLÃO <span className="text-accent">2026</span>
         </span>
       </header>
-      <div className="flex-1">{children}</div>
+      <main className="flex-1">{children}</main>
       <footer className="border-border text-text-muted border-t px-6 py-4 text-center font-mono text-xs">
         Bolão Copa 2026 — placeholder de footer (real na Feature 3)
       </footer>
