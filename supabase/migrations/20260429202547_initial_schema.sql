@@ -203,3 +203,143 @@ CREATE TRIGGER set_updated_at_palpites_bonus BEFORE UPDATE ON palpites_bonus
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 CREATE TRIGGER set_updated_at_copa_resultados BEFORE UPDATE ON copa_resultados
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+-- ============================================================================
+-- 4. BUSINESS RULE FUNCTIONS AND TRIGGERS
+-- ============================================================================
+
+-- 4.1 is_admin() — RLS helper -------------------------------------------------
+
+CREATE OR REPLACE FUNCTION public.is_admin() RETURNS boolean
+LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT COALESCE(
+    (SELECT is_admin FROM public.profiles WHERE id = auth.uid()),
+    false
+  );
+$$;
+
+-- 4.2 handle_new_user — auto-create profile on signup ------------------------
+
+CREATE OR REPLACE FUNCTION public.handle_new_user() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, nome)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(
+      NEW.raw_user_meta_data->>'full_name',
+      NEW.raw_user_meta_data->>'name',
+      ''
+    )
+  );
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER on_auth_user_created
+AFTER INSERT ON auth.users
+FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- 4.3 prevent_palpite_after_start — palpite window + bilhete confirmed -------
+
+CREATE OR REPLACE FUNCTION public.prevent_palpite_after_start() RETURNS trigger
+LANGUAGE plpgsql AS $$
+DECLARE
+  jogo_data_hora timestamptz;
+  bilhete_status status_pagamento;
+BEGIN
+  SELECT data_hora INTO jogo_data_hora
+  FROM public.jogos WHERE id = NEW.jogo_id;
+
+  SELECT status_pagamento INTO bilhete_status
+  FROM public.bilhetes WHERE id = NEW.bilhete_id;
+
+  IF bilhete_status <> 'confirmado' THEN
+    RAISE EXCEPTION 'Bilhete % não está confirmado (status atual: %)',
+      NEW.bilhete_id, bilhete_status
+      USING ERRCODE = 'check_violation';
+  END IF;
+
+  IF jogo_data_hora <= now() THEN
+    RAISE EXCEPTION 'Janela de palpite encerrada: jogo % iniciou em %',
+      NEW.jogo_id, jogo_data_hora
+      USING ERRCODE = 'check_violation';
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER palpites_window_trigger
+BEFORE INSERT OR UPDATE ON palpites
+FOR EACH ROW EXECUTE FUNCTION public.prevent_palpite_after_start();
+
+-- 4.4 prevent_bonus_when_unconfirmed — bonus only on confirmed bilhete -------
+
+CREATE OR REPLACE FUNCTION public.prevent_bonus_when_unconfirmed() RETURNS trigger
+LANGUAGE plpgsql AS $$
+DECLARE
+  bilhete_status status_pagamento;
+BEGIN
+  SELECT status_pagamento INTO bilhete_status
+  FROM public.bilhetes WHERE id = NEW.bilhete_id;
+
+  IF bilhete_status <> 'confirmado' THEN
+    RAISE EXCEPTION 'Bilhete % não está confirmado (status atual: %)',
+      NEW.bilhete_id, bilhete_status
+      USING ERRCODE = 'check_violation';
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER palpites_bonus_confirmed_trigger
+BEFORE INSERT OR UPDATE ON palpites_bonus
+FOR EACH ROW EXECUTE FUNCTION public.prevent_bonus_when_unconfirmed();
+
+-- 4.5 enforce_cashback_slot_limit — rigid 20-slot cap (CLAUDE.md §3.3) -------
+
+CREATE OR REPLACE FUNCTION public.enforce_cashback_slot_limit() RETURNS trigger
+LANGUAGE plpgsql AS $$
+DECLARE
+  current_count int;
+BEGIN
+  IF NEW.selecao_cashback_id IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  IF TG_OP = 'UPDATE'
+     AND OLD.selecao_cashback_id IS NOT DISTINCT FROM NEW.selecao_cashback_id THEN
+    RETURN NEW;
+  END IF;
+
+  PERFORM pg_advisory_xact_lock(
+    hashtext('cashback_slot_' || NEW.selecao_cashback_id::text)
+  );
+
+  SELECT COUNT(*) INTO current_count
+  FROM public.bilhetes
+  WHERE selecao_cashback_id = NEW.selecao_cashback_id
+    AND id <> NEW.id
+    AND status_pagamento IN ('pendente', 'confirmado')
+    AND (expira_em IS NULL OR expira_em > now());
+
+  IF current_count >= 20 THEN
+    RAISE EXCEPTION 'Limite de 20 vagas de cashback atingido para a seleção %',
+      NEW.selecao_cashback_id
+      USING ERRCODE = 'check_violation';
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER bilhetes_cashback_slot_trigger
+BEFORE INSERT OR UPDATE OF selecao_cashback_id ON bilhetes
+FOR EACH ROW EXECUTE FUNCTION public.enforce_cashback_slot_limit();
