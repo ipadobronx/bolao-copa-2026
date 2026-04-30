@@ -476,5 +476,18 @@ describe('calcularPontosBonus', () => {
         ),
       ).toEqual({ acertou: false, pontos: 0 });
     });
+
+    it('artilheiro com resultados.artilheiro_nome=null → 0 pts (Copa em andamento)', () => {
+      const semArtilheiro = {
+        ...resultadosCheios,
+        artilheiro_nome: null,
+      };
+      expect(
+        calcularPontosBonus(
+          { tipo: 'artilheiro', jogador_nome: 'Mbappé' },
+          semArtilheiro,
+        ),
+      ).toEqual({ acertou: false, pontos: 0 });
+    });
   });
 });

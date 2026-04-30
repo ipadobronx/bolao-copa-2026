@@ -10,5 +10,15 @@ export default defineConfig({
     setupFiles: ['./vitest.setup.ts'],
     include: ['**/*.{test,spec}.{ts,tsx}'],
     exclude: ['**/node_modules/**', '.next', 'e2e', 'supabase', '.worktrees/**'],
+    coverage: {
+      provider: 'v8',
+      include: ['lib/pontuacao.ts'],
+      thresholds: {
+        lines: 95,
+        branches: 95,
+        functions: 95,
+        statements: 95,
+      },
+    },
   },
 });
