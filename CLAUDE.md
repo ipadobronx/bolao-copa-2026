@@ -126,6 +126,17 @@ Total: R$ 10.000.
 - Trigger no banco bloqueia escrita após o início do jogo (defesa em profundidade junto com validação no app).
 - Bilhete precisa estar com `status_pagamento = 'confirmado'` pra aceitar palpites.
 
+### 3.5 Critérios de desempate (ranking)
+
+Quando 2+ apostadores empatam em pontos totais, aplicar em cascata:
+
+1. Mais placares exatos
+2. Acertou o campeão (bônus tipo='campeao' bateu com copa_resultados.campeao_id)
+3. Mais pontos somados nos jogos de mata-mata (fase != 'grupos')
+4. `numero_bilhete ASC` (quem comprou primeiro) — fallback determinístico em vez de sorteio
+
+A view `ranking` da Feature 2 precisará ser atualizada para refletir estes critérios. Pode ser feito na Feature 5 (junto com a lógica de pontuação) ou em migration separada — Superpowers decide durante o brainstorming.
+
 ---
 
 ## 4. Modelo de dados (referência)
