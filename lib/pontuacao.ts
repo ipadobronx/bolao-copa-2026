@@ -100,6 +100,15 @@ export const PONTOS_BONUS = {
 } as const;
 
 // ============================================================================
+// Funções públicas — Camada 2: pontuação base por classe
+// ============================================================================
+
+/** Retorna os pontos base por classe de acerto. CLAUDE.md §3.1. */
+export function pontosBase(classe: ClassePalpite): 0 | 2 | 5 | 7 | 10 {
+  return PONTOS_BASE[classe];
+}
+
+// ============================================================================
 // Funções públicas — Camada 3: multiplicador
 // ============================================================================
 

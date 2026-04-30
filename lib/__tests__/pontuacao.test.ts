@@ -4,6 +4,7 @@ import {
   PONTOS_BONUS,
   MULTIPLICADORES,
   multiplicadorFase,
+  pontosBase,
   type ClassePalpite,
 } from '@/lib/pontuacao';
 
@@ -80,5 +81,27 @@ describe('multiplicadorFase', () => {
 
   it('final → 4', () => {
     expect(multiplicadorFase('final')).toBe(4);
+  });
+});
+
+describe('pontosBase', () => {
+  it('exato → 10', () => {
+    expect(pontosBase('exato')).toBe(10);
+  });
+
+  it('vencedor_saldo → 7', () => {
+    expect(pontosBase('vencedor_saldo')).toBe(7);
+  });
+
+  it('vencedor → 5', () => {
+    expect(pontosBase('vencedor')).toBe(5);
+  });
+
+  it('parcial → 2', () => {
+    expect(pontosBase('parcial')).toBe(2);
+  });
+
+  it('erro → 0', () => {
+    expect(pontosBase('erro')).toBe(0);
   });
 });
