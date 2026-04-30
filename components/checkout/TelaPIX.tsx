@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -83,7 +84,7 @@ export function TelaPIX({
     if (status === 'confirmado') {
       toast.success('Pagamento confirmado!');
       const timer = setTimeout(() => {
-        router.push(`/palpites?bilhete=${bilheteId}`);
+        router.push(`/palpites?bilhete=${bilheteId}` as Route);
       }, 1500);
       return () => clearTimeout(timer);
     }

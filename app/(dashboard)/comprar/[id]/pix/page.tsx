@@ -1,3 +1,4 @@
+import type { Route } from 'next';
 import { redirect, notFound } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { TelaPIX } from '@/components/checkout/TelaPIX';
@@ -22,7 +23,7 @@ export default async function PIXPage({ params }: { params: { id: string } }) {
 
   if (!bilhete || !bilhete.id || bilhete.valor_pago == null) notFound();
   if (bilhete.effective_status === 'confirmado') {
-    redirect(`/palpites?bilhete=${bilhete.id}`);
+    redirect(`/palpites?bilhete=${bilhete.id}` as Route);
   }
   if (bilhete.effective_status !== 'pendente') {
     redirect('/comprar');
