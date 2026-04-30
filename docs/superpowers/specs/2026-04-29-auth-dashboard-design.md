@@ -75,7 +75,7 @@ Sem tela tipo `/jogos/[id]/palpites`. O fluxo único é: `/ranking` → clicar n
 | Bônus pré-Copa | 🔒 (idem) |
 | Email, telefone, CPF | ❌ NUNCA — colunas privadas em `profiles`, query da página pública lista colunas explicitamente |
 
-**Implicação na F8:** cada linha do ranking precisa ser `<Link href={\`/ranking/\${bilheteId}\`}>` envolvendo o nome (ou a row inteira). A view `ranking` já expõe `bilhete_id`. Esta página em si é entregue na F8.
+**Implicação na F8:** cada linha do ranking precisa ser ``<Link href={`/ranking/${bilheteId}`}>`` envolvendo o nome (ou a row inteira). A view `ranking` já expõe `bilhete_id`, `nome`, `posicao`, `pontos_totais` (a view roda com `security_invoker = false`, portanto bypassa RLS de `profiles` e libera leitura cross-user). Esta página em si é entregue na F8.
 
 ---
 
@@ -118,11 +118,11 @@ Sem tela tipo `/jogos/[id]/palpites`. O fluxo único é: `/ranking` → clicar n
      - se exchange falha → redireciona /login?error=link-invalido
      - se ok → redireciona pra `next`
    ↓
-5. Cookie de sessão setado; trigger handle_new_user já rodou no step 2
-   (insert em auth.users dispara o trigger; se profile já existe, RAISE pq UNIQUE
-   no PK, mas o trigger usa SECURITY DEFINER e — IMPORTANTE — não tem ON CONFLICT.
-   Re-cadastro com mesmo email não chega aqui pq Supabase reconhece o user existente
-   e re-emite link sem inserir em auth.users.)
+5. Cookie de sessão setado.
+   (No primeiro signup desse email, o INSERT em auth.users dispara o trigger
+    handle_new_user, que cria a row em profiles. Em logins subsequentes do
+    mesmo email, o Supabase reconhece o user existente e só re-emite o link
+    — sem novo INSERT em auth.users — então o trigger não dispara de novo.)
    ↓
 6. Próximo request passa pelo middleware com cookie válido → user logado
 ```
@@ -255,8 +255,9 @@ lib/
 ```
 middleware.ts                           [adicionar redirect logic via path matching]
 lib/supabase/middleware.ts              [estender pra retornar { response, user }]
-app/globals.css                         [adicionar @utility .panel, .panel-header,
-                                         .sidebar-item, .dashboard-logo se ≥3 usos]
+app/globals.css                         [adicionar @utility .panel, .panel-header, .sidebar-item,
+                                         .sidebar-item-active, .sidebar-item-disabled,
+                                         .sign-out-btn, .btn-sm — ver §5.3]
 ```
 
 ### 5.2 Especificação por componente
@@ -456,8 +457,8 @@ type Props = {
 - Casa: bandeira + nome se `selecao_casa_id` setado; `placeholder_casa` em texto puro caso contrário.
 - Fora: idem.
 - CTA "Palpitar":
-  - Se `selecao_casa_id && selecao_fora_id` → `<Link href={\`/palpites/\${jogo.id}\`} className="btn-sm">Palpitar</Link>` (link real; 404 até F7).
-  - Caso contrário → `<span aria-disabled="true" title="Aguarde os times serem definidos" className="btn-sm opacity-50 cursor-not-allowed pointer-events-none">Palpitar</span>`.
+  - Se `selecao_casa_id && selecao_fora_id` → ``<Link href={`/palpites/${jogo.id}`} className="btn-sm">Palpitar</Link>`` (link real; 404 até F7).
+  - Caso contrário → ``<span aria-disabled="true" title="Aguarde os times serem definidos" className="btn-sm opacity-50 cursor-not-allowed pointer-events-none">Palpitar</span>``.
 - Sublabel discreto à direita do nome do time fora ou abaixo: `<span className="text-text-muted text-xs font-mono">{labelFase(jogo.fase)}</span>` (ex: "Fase de Grupos", "Oitavas", etc.).
 
 **Helper `labelFase`** (inline em `JogoRow.tsx` ou em `lib/format/fase.ts` se ≥3 usos no projeto):
@@ -482,7 +483,7 @@ type Args = { data: Date; agora: Date; locale?: string };
 
 export function formatDataRelativa({ data, agora, locale = 'pt-BR' }: Args): {
   date: string;   // "Hoje" | "Amanhã" | "Sex, 14/06"
-  hour: string;   // "16:00" (TZ default do runtime; SSR roda em UTC mas o servidor Vercel usa TZ env — controlado por TZ=America/Sao_Paulo no vercel env)
+  hour: string;   // "16:00" — sempre em America/Sao_Paulo (TZ explícita; ver nota abaixo)
 }
 ```
 
@@ -799,9 +800,9 @@ Iconografia: **Lucide React** (`lucide-react` já no package.json). Substitui os
 
 ### 11.4 RLS bloqueando query de `profiles` no layout
 
-**Risco:** se a policy `profiles_select` exigir `auth.uid() = id` (e for esquecido o caso self-read), a query do layout cai em null.
+**Risco:** policy de leitura em `profiles` que não permita self-read derrubaria a query do layout.
 
-**Mitigação:** policy atual (linha 409 da migration F2) é `profiles_select FOR SELECT USING (true)` — qualquer authenticated user lê profile de qualquer outro. Self-read funciona naturalmente. Layout só seleciona `nome, email` (defesa contra leak; CPF/telefone fora). Cross-checked.
+**Mitigação:** a policy atual `profiles_select` (linhas 409-411 da migration F2) é `FOR SELECT TO authenticated USING (id = auth.uid() OR public.is_admin())` — ou seja, **só leitura do próprio profile** (mais admin). Isso é compatível com a F4: o layout sempre filtra `.eq('id', user.id)`, então passa naturalmente. Layout só seleciona `nome, email` (defesa contra leak — CPF/telefone fora). Cross-user reads (F8 / perfil público via ranking) usam a view `ranking`, que tem `security_invoker = false` (bypassa RLS) e é granted a `authenticated` — ou seja, ela é o caminho oficial pra ler `nome` de outros bilhetes.
 
 ### 11.5 Loop de redirect entre middleware e layout
 
