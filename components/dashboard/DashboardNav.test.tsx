@@ -37,10 +37,17 @@ afterEach(() => {
 });
 
 describe('<DashboardNav/>', () => {
-  it('renderiza 7 itens — só "Dashboard" como link real, 6 disabled', () => {
+  it('renderiza 8 itens — Dashboard e Comprar tabela como links reais, 6 disabled', () => {
     usePathnameMock.mockReturnValue('/dashboard');
     render(<DashboardNav />);
-    expect(screen.getByRole('link', { name: /dashboard/i })).toHaveAttribute('href', '/dashboard');
+    expect(screen.getByRole('link', { name: /^dashboard$/i })).toHaveAttribute(
+      'href',
+      '/dashboard',
+    );
+    expect(screen.getByRole('link', { name: /comprar tabela/i })).toHaveAttribute(
+      'href',
+      '/comprar',
+    );
 
     const disabledLabels = [
       'Meus Palpites',

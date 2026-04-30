@@ -6,6 +6,7 @@ import {
   Home,
   LogOut,
   Settings,
+  ShoppingCart,
   Target,
   Ticket,
   Trophy,
@@ -34,7 +35,8 @@ const PRINCIPAL: NavLink[] = [
 ];
 
 const CONTA: NavLink[] = [
-  { label: 'Minhas Tabelas', icon: Ticket, disabledHint: 'Em breve (F6)' },
+  { label: 'Comprar tabela', icon: ShoppingCart, href: '/comprar' },
+  { label: 'Minhas Tabelas', icon: Ticket, disabledHint: 'Em breve (F7)' },
   { label: 'Cashback', icon: DollarSign, disabledHint: 'Em breve (F11)' },
   { label: 'Configurações', icon: Settings, disabledHint: 'Em breve' },
 ];

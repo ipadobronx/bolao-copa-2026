@@ -18,7 +18,7 @@ describe('Landing page', () => {
     expect(screen.getByRole('contentinfo')).toBeInTheDocument();
   });
 
-  it('hero exibe título e CTA principal apontando pra /login', () => {
+  it('hero exibe título e CTA principal apontando pra /comprar', () => {
     renderLanding();
     expect(
       screen.getByRole('heading', {
@@ -28,7 +28,7 @@ describe('Landing page', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Comprar minha tabela/i })).toHaveAttribute(
       'href',
-      '/login',
+      '/comprar',
     );
   });
 
@@ -39,12 +39,12 @@ describe('Landing page', () => {
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(4);
   });
 
-  it('seção cashback tem id correto e CTA aponta pra /login', () => {
+  it('seção cashback tem id correto e CTA aponta pra /comprar', () => {
     const { container } = renderLanding();
     expect(container.querySelector('#cashback')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Garantir meu cashback/i })).toHaveAttribute(
       'href',
-      '/login',
+      '/comprar',
     );
   });
 
