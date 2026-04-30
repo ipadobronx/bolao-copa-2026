@@ -43,7 +43,7 @@ export function PromoSection() {
             você recebe 100% do valor pago de volta no PIX. Limite de 20 apostadores por seleção —
             primeiro chegou, levou.
           </p>
-          <Link href="/login" className="btn-primary btn-hero">
+          <Link href="/comprar" className="btn-primary btn-hero">
             Garantir meu cashback →
           </Link>
         </div>

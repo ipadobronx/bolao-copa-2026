@@ -55,7 +55,7 @@ export function HeroSection() {
               volta.
             </p>
             <div className="mb-12 flex flex-wrap gap-3">
-              <Link href="/login" className="btn-primary btn-hero">
+              <Link href="/comprar" className="btn-primary btn-hero">
                 Comprar minha tabela →
               </Link>
               <a href="#features" className="btn-secondary btn-hero">
