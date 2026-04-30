@@ -421,6 +421,7 @@ pnpm supabase:types
 ```
 
 Expected: `lib/supabase/types.ts` regenerado. Diff mostra:
+
 - Em `bilhetes.Row`: `asaas_payment_id: string | null` → `mp_payment_id: string | null`; nova `cashback_multiplicador_snapshot: number`.
 - Em `selecoes.Row`: nova `cashback_multiplicador: number`.
 - Nova entrada em `Views` chamada `bilhetes_view` com todos os campos de bilhetes + `effective_status`.
@@ -871,10 +872,7 @@ export function montarPayloadMP(args: {
  * Lança em status desconhecido (fail-closed) — webhook handler captura
  * e responde 200 com warning log (MP retry não ajuda em status novo).
  */
-export function mapearStatusMP(
-  mp_status: string,
-  _mp_status_detail: string,
-): StatusPagamento {
+export function mapearStatusMP(mp_status: string, _mp_status_detail: string): StatusPagamento {
   switch (mp_status) {
     case 'pending':
     case 'in_process':
@@ -1793,13 +1791,7 @@ type StepperProps = {
   milestone?: number;
 };
 
-export function Stepper({
-  qty,
-  onChange,
-  min = 1,
-  max = 50,
-  milestone = 5,
-}: StepperProps) {
+export function Stepper({ qty, onChange, min = 1, max = 50, milestone = 5 }: StepperProps) {
   const fillPct = Math.min(100, (qty / max) * 100);
   const milestonePct = Math.min(100, (milestone / max) * 100);
   const liberado = qty >= milestone;
@@ -1817,7 +1809,10 @@ export function Stepper({
         >
           <Minus size={18} />
         </button>
-        <span data-testid="stepper-num" className="font-mono text-2xl font-semibold text-yellow-400">
+        <span
+          data-testid="stepper-num"
+          className="font-mono text-2xl font-semibold text-yellow-400"
+        >
           {qty}
         </span>
         <button
@@ -1846,9 +1841,7 @@ export function Stepper({
 
       <div
         className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm ${
-          liberado
-            ? 'bg-green-400/10 text-green-400'
-            : 'bg-zinc-800/40 text-zinc-400'
+          liberado ? 'bg-green-400/10 text-green-400' : 'bg-zinc-800/40 text-zinc-400'
         }`}
       >
         {liberado ? (
@@ -1919,14 +1912,18 @@ const SELECOES: SelecaoElegivel[] = [
 
 describe('CashbackPicker', () => {
   it('renderiza todas as seleções passadas', () => {
-    render(<CashbackPicker selecoes={SELECOES} selectedId={null} onChange={() => {}} valor_pago={100} />);
+    render(
+      <CashbackPicker selecoes={SELECOES} selectedId={null} onChange={() => {}} valor_pago={100} />,
+    );
     expect(screen.getByText('Noruega')).toBeInTheDocument();
     expect(screen.getByText('Brasil')).toBeInTheDocument();
     expect(screen.getByText('França')).toBeInTheDocument();
   });
 
   it('agrupa em tiers 5× / 3× / 2× / 1×', () => {
-    render(<CashbackPicker selecoes={SELECOES} selectedId={null} onChange={() => {}} valor_pago={100} />);
+    render(
+      <CashbackPicker selecoes={SELECOES} selectedId={null} onChange={() => {}} valor_pago={100} />,
+    );
     expect(screen.getByText(/5× — AZARÕES/i)).toBeInTheDocument();
     expect(screen.getByText(/3× — TIME B/i)).toBeInTheDocument();
     expect(screen.getByText(/2× — SUL-AMERICANOS/i)).toBeInTheDocument();
@@ -1934,34 +1931,44 @@ describe('CashbackPicker', () => {
   });
 
   it('callout do tier 5× mostra valor × 5', () => {
-    render(<CashbackPicker selecoes={SELECOES} selectedId={null} onChange={() => {}} valor_pago={100} />);
+    render(
+      <CashbackPicker selecoes={SELECOES} selectedId={null} onChange={() => {}} valor_pago={100} />,
+    );
     // "R$ 100 × 5× = R$ 500"
     expect(screen.getByTestId('callout-5')).toHaveTextContent(/R\$ 100/);
     expect(screen.getByTestId('callout-5')).toHaveTextContent(/R\$ 500/);
   });
 
   it('callout atualiza com valor_pago dinâmico', () => {
-    render(<CashbackPicker selecoes={SELECOES} selectedId={null} onChange={() => {}} valor_pago={200} />);
+    render(
+      <CashbackPicker selecoes={SELECOES} selectedId={null} onChange={() => {}} valor_pago={200} />,
+    );
     expect(screen.getByTestId('callout-5')).toHaveTextContent(/R\$ 1\.000|R\$ 1000/);
     expect(screen.getByTestId('callout-2')).toHaveTextContent(/R\$ 400/);
   });
 
   it('clicar numa seleção chama onChange com o id', () => {
     const onChange = vi.fn();
-    render(<CashbackPicker selecoes={SELECOES} selectedId={null} onChange={onChange} valor_pago={100} />);
+    render(
+      <CashbackPicker selecoes={SELECOES} selectedId={null} onChange={onChange} valor_pago={100} />,
+    );
     fireEvent.click(screen.getByText('Brasil').closest('[role="button"]')!);
     expect(onChange).toHaveBeenCalledWith(4);
   });
 
   it('clicar na seleção já selecionada chama onChange(null) — toggle', () => {
     const onChange = vi.fn();
-    render(<CashbackPicker selecoes={SELECOES} selectedId={4} onChange={onChange} valor_pago={100} />);
+    render(
+      <CashbackPicker selecoes={SELECOES} selectedId={4} onChange={onChange} valor_pago={100} />,
+    );
     fireEvent.click(screen.getByText('Brasil').closest('[role="button"]')!);
     expect(onChange).toHaveBeenCalledWith(null);
   });
 
   it('marca a selecionada com badge SUA', () => {
-    render(<CashbackPicker selecoes={SELECOES} selectedId={4} onChange={() => {}} valor_pago={100} />);
+    render(
+      <CashbackPicker selecoes={SELECOES} selectedId={4} onChange={() => {}} valor_pago={100} />,
+    );
     const brasilRow = screen.getByText('Brasil').closest('[role="button"]')!;
     expect(brasilRow.querySelector('[data-testid="badge-sua"]')).toBeInTheDocument();
   });
@@ -2030,7 +2037,12 @@ const BADGE_COLORS: Record<number, string> = {
 const formatBRL = (v: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 
-export function CashbackPicker({ selecoes, selectedId, onChange, valor_pago }: CashbackPickerProps) {
+export function CashbackPicker({
+  selecoes,
+  selectedId,
+  onChange,
+  valor_pago,
+}: CashbackPickerProps) {
   // Group by multiplicador
   const tiers = [5.0, 3.0, 2.0, 1.0] as const;
 
@@ -2048,7 +2060,7 @@ export function CashbackPicker({ selecoes, selectedId, onChange, valor_pago }: C
 
         return (
           <div key={mult} className="space-y-2">
-            <div className="flex items-baseline justify-between font-mono text-xs uppercase tracking-wider text-zinc-500">
+            <div className="flex items-baseline justify-between font-mono text-xs tracking-wider text-zinc-500 uppercase">
               <span>{TIER_LABELS[mult].label}</span>
               <span>{TIER_LABELS[mult].pct}</span>
             </div>
@@ -2057,7 +2069,8 @@ export function CashbackPicker({ selecoes, selectedId, onChange, valor_pago }: C
               data-testid={`callout-${Math.round(mult)}`}
               className={`flex items-center gap-2 rounded-lg border px-3 py-2 font-mono text-sm ${TIER_COLORS[mult]}`}
             >
-              💸 {formatBRL(valor_pago)} × {Math.round(mult)}× = <strong>{formatBRL(retorno)}</strong> de volta no PIX
+              💸 {formatBRL(valor_pago)} × {Math.round(mult)}× ={' '}
+              <strong>{formatBRL(retorno)}</strong> de volta no PIX
             </div>
 
             <div className="space-y-1.5">
@@ -2078,7 +2091,9 @@ export function CashbackPicker({ selecoes, selectedId, onChange, valor_pago }: C
                   >
                     <span className="text-2xl">{s.bandeira_emoji}</span>
                     <div className="flex-1 font-semibold text-zinc-100">{s.nome}</div>
-                    <span className={`rounded px-2 py-0.5 font-mono text-xs font-bold ${BADGE_COLORS[mult]}`}>
+                    <span
+                      className={`rounded px-2 py-0.5 font-mono text-xs font-bold ${BADGE_COLORS[mult]}`}
+                    >
                       {Math.round(mult)}×
                     </span>
                     {selected && (
@@ -2197,18 +2212,18 @@ export function FormulaCheckout({
   return (
     <div className="mx-auto max-w-md space-y-6 px-4 py-6">
       <header>
-        <h1 className="font-display text-3xl uppercase tracking-wider">Comprar tabelas</h1>
+        <h1 className="font-display text-3xl tracking-wider uppercase">Comprar tabelas</h1>
         <p className="text-sm text-zinc-400">R$ 20,00 por tabela · pagamento via PIX</p>
       </header>
 
       <section>
-        <h2 className="mb-3 font-display text-lg uppercase tracking-wide">Quantas tabelas?</h2>
+        <h2 className="font-display mb-3 text-lg tracking-wide uppercase">Quantas tabelas?</h2>
         <Stepper qty={qty} onChange={onChangeQty} />
       </section>
 
       {cashbackHabilitado && (
         <section>
-          <h2 className="mb-3 font-display text-lg uppercase tracking-wide">Escolhe tua seleção</h2>
+          <h2 className="font-display mb-3 text-lg tracking-wide uppercase">Escolhe tua seleção</h2>
           <CashbackPicker
             selecoes={selecoes}
             selectedId={cashbackEfetivo}
@@ -2220,13 +2235,20 @@ export function FormulaCheckout({
 
       <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
         <div className="flex items-center justify-between font-mono text-sm">
-          <span className="text-zinc-400">{qty} {qty === 1 ? 'tabela' : 'tabelas'}</span>
+          <span className="text-zinc-400">
+            {qty} {qty === 1 ? 'tabela' : 'tabelas'}
+          </span>
           <span>{formatBRL(valor_total)}</span>
         </div>
         {selecaoEscolhida && (
           <div className="mt-2 flex items-center justify-between font-mono text-xs text-green-400">
-            <span>{selecaoEscolhida.bandeira_emoji} {selecaoEscolhida.nome} ({Math.round(selecaoEscolhida.cashback_multiplicador)}×)</span>
-            <span>se campeã: {formatBRL(valor_total * selecaoEscolhida.cashback_multiplicador)}</span>
+            <span>
+              {selecaoEscolhida.bandeira_emoji} {selecaoEscolhida.nome} (
+              {Math.round(selecaoEscolhida.cashback_multiplicador)}×)
+            </span>
+            <span>
+              se campeã: {formatBRL(valor_total * selecaoEscolhida.cashback_multiplicador)}
+            </span>
           </div>
         )}
       </section>
@@ -2393,7 +2415,9 @@ export function TelaPIX({
         <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-green-400/20 px-3 py-1.5 font-mono text-xs font-semibold text-green-400">
           ✓ PAGAMENTO CONFIRMADO
         </div>
-        <div className="my-6 mx-auto grid h-20 w-20 place-items-center rounded-full bg-green-400/15 text-4xl text-green-400">⚽</div>
+        <div className="mx-auto my-6 grid h-20 w-20 place-items-center rounded-full bg-green-400/15 text-4xl text-green-400">
+          ⚽
+        </div>
         <p className="text-sm text-zinc-200">
           {resumo.qty} {resumo.qty === 1 ? 'bilhete liberado' : 'bilhetes liberados'} pra palpitar.
         </p>
@@ -2409,11 +2433,13 @@ export function TelaPIX({
         <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-red-400/15 px-3 py-1.5 font-mono text-xs font-semibold text-red-400">
           ⏱ TEMPO ESGOTADO
         </div>
-        <div className="my-6 mx-auto grid h-16 w-16 place-items-center rounded-full bg-red-400/12 text-3xl">⌛</div>
+        <div className="mx-auto my-6 grid h-16 w-16 place-items-center rounded-full bg-red-400/12 text-3xl">
+          ⌛
+        </div>
         <p className="text-sm text-zinc-100">
           <strong>Bilhete expirou</strong>
         </p>
-        <p className="mb-6 mt-2 text-xs text-zinc-500">
+        <p className="mt-2 mb-6 text-xs text-zinc-500">
           Você não pagou em 30min. Sem stress —<br />
           nenhum valor foi cobrado.
         </p>
@@ -2450,13 +2476,20 @@ export function TelaPIX({
 
       <div className="rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm">
         <div className="flex justify-between">
-          <span>{resumo.qty} {resumo.qty === 1 ? 'tabela' : 'tabelas'}</span>
+          <span>
+            {resumo.qty} {resumo.qty === 1 ? 'tabela' : 'tabelas'}
+          </span>
           <span className="font-mono">{formatBRL(valorTotal)}</span>
         </div>
         {resumo.cashback && (
           <div className="mt-2 flex justify-between border-t border-dashed border-zinc-800 pt-2 text-xs text-green-400">
-            <span>{resumo.cashback.bandeira} {resumo.cashback.selecao} {Math.round(resumo.cashback.multiplicador)}×</span>
-            <span className="font-mono">{formatBRL(valorTotal * resumo.cashback.multiplicador)} se campeã</span>
+            <span>
+              {resumo.cashback.bandeira} {resumo.cashback.selecao}{' '}
+              {Math.round(resumo.cashback.multiplicador)}×
+            </span>
+            <span className="font-mono">
+              {formatBRL(valorTotal * resumo.cashback.multiplicador)} se campeã
+            </span>
           </div>
         )}
       </div>
@@ -2485,7 +2518,8 @@ export function TelaPIX({
       </div>
 
       <p className="border-t border-dashed border-zinc-800 pt-3 text-center text-xs text-zinc-500">
-        Abre o app do banco · escaneia o QR ou cola o código<br />
+        Abre o app do banco · escaneia o QR ou cola o código
+        <br />
         Confirmação automática em segundos
       </p>
     </div>
@@ -2531,11 +2565,7 @@ export const dynamic = 'force-dynamic';
 
 type SearchParams = { qty?: string; cashback?: string };
 
-export default async function ComprarPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
+export default async function ComprarPage({ searchParams }: { searchParams: SearchParams }) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -2720,6 +2750,7 @@ git commit -m "chore(landing): wire CTAs Comprar/Cashback to /comprar"
 **Files:** nenhum (tudo manual)
 
 **Pré-requisito:** Cadastrar URL de webhook no painel MP sandbox antes do Step 1. Duas opções:
+
 - **a)** Domínio público estável (`https://malanacopa.com.br/api/webhooks/mercadopago`) → cadastra 1 vez, fica.
 - **b)** Local + ngrok: `ngrok http 3000` → cadastra a URL `https://<sub>.ngrok.io/api/webhooks/mercadopago` no painel sandbox MP. Webhook secret precisa ser o mesmo do `.env.local`.
 
@@ -2745,7 +2776,7 @@ Expected: cobertura ≥ 95% em `lib/cashback.ts`, `lib/checkout.ts`, `lib/mercad
 
 1. Login com magic link (o user de dev).
 2. Visite `/comprar`.
-3. Stepper em qty=1 → CashbackPicker NÃO aparece (qty*20 < 100).
+3. Stepper em qty=1 → CashbackPicker NÃO aparece (qty\*20 < 100).
 4. Clica "Pagar R$ 20,00 via PIX".
 5. Redireciona pra `/comprar/<id>/pix` com QR.
 6. Em outra aba, abre app sandbox MP do "comprador" e paga.

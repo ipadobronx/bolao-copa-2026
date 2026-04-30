@@ -118,12 +118,12 @@ Total: R$ 10.000.
 - Apenas para compras com `valor_pago >= 100.00`.
 - Apenas as 13 seleções abaixo são elegíveis (multiplicador armazenado em `selecoes.cashback_multiplicador`, `numeric(3,1)`, default `0` pras não-elegíveis):
 
-| Tier | Multiplicador | Seleções                                                  |
-| ---- | ------------- | --------------------------------------------------------- |
-| 1×   | 100% (1.0)    | França, Espanha, Inglaterra                               |
-| 2×   | 200% (2.0)    | Brasil, Argentina                                         |
-| 3×   | 300% (3.0)    | Portugal, Alemanha, Holanda                               |
-| 5×   | 500% (5.0)    | Noruega, Suíça, Bélgica, Colômbia, Uruguai                |
+| Tier | Multiplicador | Seleções                                   |
+| ---- | ------------- | ------------------------------------------ |
+| 1×   | 100% (1.0)    | França, Espanha, Inglaterra                |
+| 2×   | 200% (2.0)    | Brasil, Argentina                          |
+| 3×   | 300% (3.0)    | Portugal, Alemanha, Holanda                |
+| 5×   | 500% (5.0)    | Noruega, Suíça, Bélgica, Colômbia, Uruguai |
 
 - Cashback é pago apenas se a seleção escolhida for campeã (id == `copa_resultados.campeao_id`).
 - **Valor do cashback = `valor_pago × cashback_multiplicador`.** Ex: bilhete de R$ 100 com Colômbia (5×) campeã → R$ 500 de volta.

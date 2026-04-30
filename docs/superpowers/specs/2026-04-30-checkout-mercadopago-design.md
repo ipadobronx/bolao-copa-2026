@@ -39,22 +39,22 @@ Esta feature **não entrega:**
 
 ## 2. Decisões consolidadas no brainstorming
 
-| #   | Pergunta                                                | Escolha                                                                                                                   | Motivação                                                                                                                                              |
-| --- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Q1  | Modelo: 1 PIX = quantos bilhetes?                       | **B — 1 PIX = N bilhetes, 1 carrega `valor_pago` + cashback**                                                             | Encaixa schema F2 sem refatoração; "5 tabelas" = 5 ranking positions; cashback no bilhete principal; outros com `valor_pago=0`.                        |
-| Q2  | Ordem das operações (cashback safety)                   | **P1 — TX1 INSERT pendente, chama MP, TX2 UPDATE com `mp_payment_id` e `expira_em`**                                      | Sem 20-slot a urgência caiu, mas mantém princípio de "criar antes, charge depois" pra simplificar rollback (TX2 vira `cancelado` se MP falhar).        |
-| Q3  | Lifecycle "pendente → expirado"                         | **1 + 2 — lazy via `effective_status` (CASE) + webhook MP flipa quando avisa**                                            | Sem cron extra. View `bilhetes_view` calcula on-read. Webhook é o reforço quando MP envia `payment.cancelled`/`expired`.                               |
-| Q4  | Limite de vagas por seleção (cashback)                  | **🔄 Pivot: SEM LIMITE.** Curadoria do pool de 13 elegíveis substitui a proteção                                          | Decisão de produto durante o brainstorm. CLAUDE.md §1, §3.3, §6 atualizados nesta sessão. Trigger `enforce_cashback_slot_limit` removido na migration. |
-| Q5  | Cashback uniforme ou tiered?                            | **🔄 Tiered:** 100% (FRA/ESP/ENG) · 200% (BRA/ARG) · 300% (POR/GER/NED) · 500% (NOR/SUI/BEL/COL/URU)                      | Curadoria gera o equilíbrio risco/payout. As 35 seleções fora desse pool têm `cashback_multiplicador = 0` e não aparecem no picker.                    |
+| #   | Pergunta                                                | Escolha                                                                                                                    | Motivação                                                                                                                                              |
+| --- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Q1  | Modelo: 1 PIX = quantos bilhetes?                       | **B — 1 PIX = N bilhetes, 1 carrega `valor_pago` + cashback**                                                              | Encaixa schema F2 sem refatoração; "5 tabelas" = 5 ranking positions; cashback no bilhete principal; outros com `valor_pago=0`.                        |
+| Q2  | Ordem das operações (cashback safety)                   | **P1 — TX1 INSERT pendente, chama MP, TX2 UPDATE com `mp_payment_id` e `expira_em`**                                       | Sem 20-slot a urgência caiu, mas mantém princípio de "criar antes, charge depois" pra simplificar rollback (TX2 vira `cancelado` se MP falhar).        |
+| Q3  | Lifecycle "pendente → expirado"                         | **1 + 2 — lazy via `effective_status` (CASE) + webhook MP flipa quando avisa**                                             | Sem cron extra. View `bilhetes_view` calcula on-read. Webhook é o reforço quando MP envia `payment.cancelled`/`expired`.                               |
+| Q4  | Limite de vagas por seleção (cashback)                  | **🔄 Pivot: SEM LIMITE.** Curadoria do pool de 13 elegíveis substitui a proteção                                           | Decisão de produto durante o brainstorm. CLAUDE.md §1, §3.3, §6 atualizados nesta sessão. Trigger `enforce_cashback_slot_limit` removido na migration. |
+| Q5  | Cashback uniforme ou tiered?                            | **🔄 Tiered:** 100% (FRA/ESP/ENG) · 200% (BRA/ARG) · 300% (POR/GER/NED) · 500% (NOR/SUI/BEL/COL/URU)                       | Curadoria gera o equilíbrio risco/payout. As 35 seleções fora desse pool têm `cashback_multiplicador = 0` e não aparecem no picker.                    |
 | Q6  | Multiplicador muda no banco depois → bilhetes vendidos? | **Snapshot na linha do bilhete** (`bilhetes.cashback_multiplicador_snapshot`)                                              | Direito do consumidor: bilhete vendido com 5× retém 5× mesmo se admin baixar pra 0 depois.                                                             |
-| Q7  | Webhook idempotency                                     | **Sem tabela de log.** Sempre `GET /v1/payments/{id}` no MP (estado autoritativo) + UPDATE condicional `WHERE status <>`  | Update naturalmente idempotente. Tabela de audit pode ser adicionada se debugging exigir.                                                              |
-| Q8  | Polling vs Realtime no client                           | **Polling 3s** via `GET /api/checkout/[id]/status` (CLAUDE.md §5 item 6 já decidiu)                                       | Menos infraestrutura; consistente com o resto do app.                                                                                                  |
-| Q9  | Late payment (paga após `expira_em`)                    | **Honra** — webhook flipa pra `confirmado` mesmo após expiração                                                           | PIX é instantâneo; cenário extremamente raro. Sócios resolvem manualmente caso ocorra.                                                                 |
-| Q10 | Public key MP no client?                                | **Não usar.** PIX-only, QR estático server-side                                                                           | Sem JS SDK do MP no client. Reduz superfície de ataque e não pede `MERCADOPAGO_PUBLIC_KEY`.                                                            |
+| Q7  | Webhook idempotency                                     | **Sem tabela de log.** Sempre `GET /v1/payments/{id}` no MP (estado autoritativo) + UPDATE condicional `WHERE status <>`   | Update naturalmente idempotente. Tabela de audit pode ser adicionada se debugging exigir.                                                              |
+| Q8  | Polling vs Realtime no client                           | **Polling 3s** via `GET /api/checkout/[id]/status` (CLAUDE.md §5 item 6 já decidiu)                                        | Menos infraestrutura; consistente com o resto do app.                                                                                                  |
+| Q9  | Late payment (paga após `expira_em`)                    | **Honra** — webhook flipa pra `confirmado` mesmo após expiração                                                            | PIX é instantâneo; cenário extremamente raro. Sócios resolvem manualmente caso ocorra.                                                                 |
+| Q10 | Public key MP no client?                                | **Não usar.** PIX-only, QR estático server-side                                                                            | Sem JS SDK do MP no client. Reduz superfície de ataque e não pede `MERCADOPAGO_PUBLIC_KEY`.                                                            |
 | Q11 | Rate limit                                              | **5 chamadas/min por user_id**, validação via `SELECT count(*) FROM bilhetes WHERE user_id=$1 AND created_at > now()-1min` | Sem tabela nova. CLAUDE.md §6 exige rate limiting em endpoints de pagamento.                                                                           |
 | Q12 | Layout do qty stepper                                   | **C — Stepper com barra de milestone** ("🎁 cashback liberado em 5")                                                       | Mockup `qty-picker.html` aprovado. Educa sobre o threshold sem ser intrusivo.                                                                          |
-| Q13 | Layout do cashback picker                               | **A v3 — tier groups com callout dinâmico do retorno por tier**                                                           | Mockup `cashback-picker-v3.html` aprovado. 13 itens organizados em 4 tiers com fórmula concreta.                                                       |
-| Q14 | Pós-confirmação                                         | **Toast verde + auto-redirect 1.5s pra `/palpites?bilhete=<id>`**                                                         | Sem tela de sucesso intermediária. Mockup `pix-qr-states.html` aprovado.                                                                               |
+| Q13 | Layout do cashback picker                               | **A v3 — tier groups com callout dinâmico do retorno por tier**                                                            | Mockup `cashback-picker-v3.html` aprovado. 13 itens organizados em 4 tiers com fórmula concreta.                                                       |
+| Q14 | Pós-confirmação                                         | **Toast verde + auto-redirect 1.5s pra `/palpites?bilhete=<id>`**                                                          | Sem tela de sucesso intermediária. Mockup `pix-qr-states.html` aprovado.                                                                               |
 
 ---
 
@@ -291,7 +291,7 @@ export type MPPaymentPayload = {
   payer: { email: string; first_name?: string };
   external_reference: string; // bilhete_principal_id (uuid)
   date_of_expiration: string; // ISO 8601 com timezone
-  notification_url?: string;  // opcional; preferimos painel global
+  notification_url?: string; // opcional; preferimos painel global
 };
 
 /**
@@ -340,10 +340,7 @@ export function montarPayloadMP(args: {
  * Lança em status desconhecido (fail-closed) — webhook handler captura
  * e responde 200 com warning log (MP retry não ajuda em status novo).
  */
-export function mapearStatusMP(
-  mp_status: string,
-  _mp_status_detail: string,
-): StatusPagamento {
+export function mapearStatusMP(mp_status: string, _mp_status_detail: string): StatusPagamento {
   switch (mp_status) {
     case 'pending':
     case 'in_process':
@@ -374,12 +371,12 @@ import crypto from 'node:crypto';
 /** Resposta normalizada do MP pro nosso domínio. Usada também por `lib/mercadopago.io.ts`. */
 export type MPPaymentResponse = {
   id: string;
-  status: string;        // raw MP status
+  status: string; // raw MP status
   status_detail: string; // raw MP status_detail
   transaction_amount: number;
   date_approved: string | null;
   date_of_expiration: string;
-  qr_code: string;        // BR Code (copia-cola)
+  qr_code: string; // BR Code (copia-cola)
   qr_code_base64: string; // PNG base64
 };
 
@@ -594,7 +591,9 @@ export type CriarCheckoutResult =
 export async function criarCheckout(input: unknown): Promise<CriarCheckoutResult> {
   // 1. Auth
   const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: 'unauthenticated', mensagem: 'Faça login pra continuar.' };
 
   // 2. Validação Zod
@@ -665,7 +664,10 @@ export async function criarCheckout(input: unknown): Promise<CriarCheckoutResult
     await admin
       .from('bilhetes')
       .update({ status_pagamento: 'cancelado' })
-      .in('id', inserted.map((r) => r.id));
+      .in(
+        'id',
+        inserted.map((r) => r.id),
+      );
     return { ok: false, error: 'mp_failure', mensagem: 'Falha no Mercado Pago. Tenta de novo.' };
   }
 
@@ -673,7 +675,10 @@ export async function criarCheckout(input: unknown): Promise<CriarCheckoutResult
   const { error: updErr } = await admin
     .from('bilhetes')
     .update({ mp_payment_id: mp.id, expira_em: mp.date_of_expiration })
-    .in('id', inserted.map((r) => r.id));
+    .in(
+      'id',
+      inserted.map((r) => r.id),
+    );
 
   if (updErr) {
     // Bilhetes pendentes ficam até effective_status virar expirado.
@@ -741,7 +746,11 @@ export async function POST(req: Request) {
   const x_request_id = req.headers.get('x-request-id') ?? '';
 
   let body: { action?: string; data?: { id?: string } };
-  try { body = JSON.parse(raw); } catch { return new Response(null, { status: 400 }); }
+  try {
+    body = JSON.parse(raw);
+  } catch {
+    return new Response(null, { status: 400 });
+  }
 
   const data_id = body.data?.id;
   if (!data_id) return new Response(null, { status: 400 });
@@ -760,23 +769,30 @@ export async function POST(req: Request) {
 
   // 3. GET autoritativo
   let mp;
-  try { mp = await consultarPagamento(data_id); }
-  catch (e) {
+  try {
+    mp = await consultarPagamento(data_id);
+  } catch (e) {
     console.error('Webhook MP: consulta falhou', { data_id, err: e });
     return new Response(null, { status: 502 }); // MP retry
   }
 
   // 4. Mapear status
   let status;
-  try { status = mapearStatusMP(mp.status, mp.status_detail); }
-  catch (e) {
-    console.warn('Webhook MP: status desconhecido — ignorando', { mp_id: data_id, status: mp.status });
+  try {
+    status = mapearStatusMP(mp.status, mp.status_detail);
+  } catch (e) {
+    console.warn('Webhook MP: status desconhecido — ignorando', {
+      mp_id: data_id,
+      status: mp.status,
+    });
     return new Response(null, { status: 200 }); // 200 pra MP não retentar
   }
 
   // 5. UPDATE idempotente (apenas se status muda)
   const admin = createSupabaseAdminClient();
-  const updates: { status_pagamento: typeof status; pago_em?: string } = { status_pagamento: status };
+  const updates: { status_pagamento: typeof status; pago_em?: string } = {
+    status_pagamento: status,
+  };
   if (status === 'confirmado') {
     updates.pago_em = mp.date_approved ?? new Date().toISOString();
   }
@@ -808,8 +824,8 @@ Variante C (mockup `qty-picker.html`). Client component.
 type StepperProps = {
   qty: number;
   onChange: (qty: number) => void;
-  min?: number;     // default 1
-  max?: number;     // default 50
+  min?: number; // default 1
+  max?: number; // default 50
   milestone?: number; // default 5 (cashback unlock)
 };
 ```
@@ -830,14 +846,15 @@ type SelecaoElegivel = {
 };
 
 type CashbackPickerProps = {
-  selecoes: SelecaoElegivel[];                    // já filtradas (mult > 0) e ordenadas (mult DESC, nome ASC)
+  selecoes: SelecaoElegivel[]; // já filtradas (mult > 0) e ordenadas (mult DESC, nome ASC)
   selectedId: number | null;
   onChange: (selecao_cashback_id: number | null) => void;
-  valor_pago: number;                             // pra render dinâmico do callout
+  valor_pago: number; // pra render dinâmico do callout
 };
 ```
 
 Renderiza: 4 tier groups (5×, 3×, 2×, 1×), cada um com:
+
 - Cabeçalho `5× — AZARÕES` / `3× — TIME B` / etc.
 - Callout colorido com `R$ {valor_pago} × {mult}× = R$ {calcularValorCashback(valor_pago, mult)}`
 - Lista de flag-rows (selectable; selected → border amarela + badge SUA)
@@ -848,8 +865,8 @@ Wrapper. Client component. Estado central:
 
 ```ts
 type State = {
-  qty: number;                            // default 1
-  selecao_cashback_id: number | null;     // null se qty*20 < 100
+  qty: number; // default 1
+  selecao_cashback_id: number | null; // null se qty*20 < 100
 };
 ```
 
@@ -865,8 +882,8 @@ Client component. Recebe estado inicial do Server Component. Polling 3s.
 type TelaPIXProps = {
   bilheteId: string;
   qrCode: string;
-  qrCodeBase64: string;       // PNG base64
-  expiraEm: string;           // ISO 8601
+  qrCodeBase64: string; // PNG base64
+  expiraEm: string; // ISO 8601
   valorTotal: number;
   resumo: { qty: number; cashback?: { selecao: string; multiplicador: number; bandeira: string } };
 };
@@ -880,6 +897,7 @@ type State = { status: Status; secondsLeft: number };
 ```
 
 Comportamento:
+
 - `useEffect` inicia 2 timers: countdown 1s + polling 3s (`fetch('/api/checkout/{id}/status')`).
 - Polling atualiza `state.status`. `confirmado` → `toast.success` + `setTimeout(1500, () => router.push('/palpites?bilhete=' + id))`. `expirado` ou `cancelado` → renderiza tela de retry.
 - Countdown: quando atinge 0, força um poll extra. Não renderiza "expirado" sozinho.
@@ -1000,23 +1018,23 @@ export default async function PIXPage({ params }: { params: { id: string } }) {
 
 ## 4. Plano de commits (sequência reviewable)
 
-| #   | Mensagem                                                                                          | Conteúdo                                                                                                          |
-| --- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| 1   | `chore(env): add MERCADOPAGO_* env vars + .example`                                               | `.env.local`, `.env.local.example`, `lib/env-server.ts` schema com 2 vars novas                                   |
-| 2   | `chore: add mercadopago dependency`                                                               | `pnpm add mercadopago@^2.x.x`                                                                                     |
-| 3   | `feat(db): F6 migration (mp_payment_id rename + cashback tiers + view + triggers)`                | `supabase/migrations/<timestamp>_checkout_mercadopago.sql` — migration única com todos os 8 passos do §3.1        |
-| 4   | `chore(db): regenerate Supabase types`                                                            | `pnpm supabase:types` → `lib/supabase/types.ts`                                                                   |
-| 5   | `feat(checkout): lib/cashback.ts + tests`                                                         | `lib/cashback.ts` + `lib/__tests__/cashback.test.ts` (≥ 95%)                                                      |
-| 6   | `feat(checkout): lib/checkout.ts (mappers MP↔domínio) + tests`                                    | `lib/checkout.ts` + `lib/__tests__/checkout.test.ts` (≥ 95%)                                                      |
-| 7   | `feat(checkout): lib/mercadopago.ts (signature validation) + tests`                               | `lib/mercadopago.ts` + tests; vitest config inclui no coverage                                                    |
-| 8   | `feat(checkout): lib/mercadopago.io.ts (SDK calls)`                                               | `lib/mercadopago.io.ts` (criar/consultar — excluído da cobertura)                                                 |
-| 9   | `feat(checkout): server action criarCheckout`                                                     | `app/(dashboard)/comprar/actions.ts`                                                                              |
-| 10  | `feat(checkout): GET /api/checkout/[id]/status (polling)`                                         | `app/api/checkout/[id]/status/route.ts`                                                                           |
-| 11  | `feat(checkout): POST /api/webhooks/mercadopago (idempotent)`                                     | `app/api/webhooks/mercadopago/route.ts`                                                                           |
-| 12  | `feat(checkout): UI components Stepper, CashbackPicker, FormulaCheckout`                          | `components/checkout/{Stepper,CashbackPicker,FormulaCheckout}.tsx`                                                |
-| 13  | `feat(checkout): UI component TelaPIX`                                                            | `components/checkout/TelaPIX.tsx`                                                                                 |
-| 14  | `feat(checkout): /comprar e /comprar/[id]/pix pages`                                              | `app/(dashboard)/comprar/page.tsx` + `app/(dashboard)/comprar/[id]/pix/page.tsx`                                  |
-| 15  | `chore(landing): linka CTA "Comprar minha tabela →" pra /comprar`                                 | edit em `app/(public)/page.tsx` (ou componentes equivalentes)                                                     |
+| #   | Mensagem                                                                           | Conteúdo                                                                                                   |
+| --- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| 1   | `chore(env): add MERCADOPAGO_* env vars + .example`                                | `.env.local`, `.env.local.example`, `lib/env-server.ts` schema com 2 vars novas                            |
+| 2   | `chore: add mercadopago dependency`                                                | `pnpm add mercadopago@^2.x.x`                                                                              |
+| 3   | `feat(db): F6 migration (mp_payment_id rename + cashback tiers + view + triggers)` | `supabase/migrations/<timestamp>_checkout_mercadopago.sql` — migration única com todos os 8 passos do §3.1 |
+| 4   | `chore(db): regenerate Supabase types`                                             | `pnpm supabase:types` → `lib/supabase/types.ts`                                                            |
+| 5   | `feat(checkout): lib/cashback.ts + tests`                                          | `lib/cashback.ts` + `lib/__tests__/cashback.test.ts` (≥ 95%)                                               |
+| 6   | `feat(checkout): lib/checkout.ts (mappers MP↔domínio) + tests`                     | `lib/checkout.ts` + `lib/__tests__/checkout.test.ts` (≥ 95%)                                               |
+| 7   | `feat(checkout): lib/mercadopago.ts (signature validation) + tests`                | `lib/mercadopago.ts` + tests; vitest config inclui no coverage                                             |
+| 8   | `feat(checkout): lib/mercadopago.io.ts (SDK calls)`                                | `lib/mercadopago.io.ts` (criar/consultar — excluído da cobertura)                                          |
+| 9   | `feat(checkout): server action criarCheckout`                                      | `app/(dashboard)/comprar/actions.ts`                                                                       |
+| 10  | `feat(checkout): GET /api/checkout/[id]/status (polling)`                          | `app/api/checkout/[id]/status/route.ts`                                                                    |
+| 11  | `feat(checkout): POST /api/webhooks/mercadopago (idempotent)`                      | `app/api/webhooks/mercadopago/route.ts`                                                                    |
+| 12  | `feat(checkout): UI components Stepper, CashbackPicker, FormulaCheckout`           | `components/checkout/{Stepper,CashbackPicker,FormulaCheckout}.tsx`                                         |
+| 13  | `feat(checkout): UI component TelaPIX`                                             | `components/checkout/TelaPIX.tsx`                                                                          |
+| 14  | `feat(checkout): /comprar e /comprar/[id]/pix pages`                               | `app/(dashboard)/comprar/page.tsx` + `app/(dashboard)/comprar/[id]/pix/page.tsx`                           |
+| 15  | `chore(landing): linka CTA "Comprar minha tabela →" pra /comprar`                  | edit em `app/(public)/page.tsx` (ou componentes equivalentes)                                              |
 
 ---
 
