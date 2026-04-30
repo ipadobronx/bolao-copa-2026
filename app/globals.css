@@ -101,7 +101,7 @@
 }
 
 @utility sidebar-item-disabled {
-  @apply text-text-muted/60 cursor-not-allowed pointer-events-none;
+  @apply text-text-muted/60 pointer-events-none cursor-not-allowed;
 }
 
 @utility sign-out-btn {
