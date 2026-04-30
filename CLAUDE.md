@@ -20,8 +20,8 @@ Sistema web de bolão da Copa do Mundo 2026 (FIFA, 11/06/2026 a 19/07/2026, sedi
 
 - R$ 20,00 por tabela (1 tabela = 1 conjunto de palpites)
 - Prêmio total R$ 10.000, dividido entre os 10 primeiros do ranking
-- Promoção cashback: comprou ≥ R$ 100 → escolhe 1 seleção; se ela for campeã, recebe 100% do valor pago de volta
-- **Regra crítica de proteção:** limite de 20 apostadores por seleção no cashback (sem isso, o produto pode quebrar financeiramente)
+- Promoção cashback diferenciado: comprou ≥ R$ 100 → escolhe 1 seleção dentre 13 elegíveis; se ela for campeã, recebe `valor_pago × multiplicador` de volta no PIX. Multiplicador varia por tier (100% pra favoritas até 500% pra azarões — ver §3.3).
+- **Sem limite de vagas por seleção:** qualquer número de bilhetes pode escolher a mesma seleção. A proteção financeira agora vem da curadoria do pool de 13 elegíveis (não da limitação de vagas).
 
 **Volume esperado:** 500 a 2.000 tabelas (R$ 10k a R$ 40k arrecadado).
 
@@ -39,7 +39,7 @@ Estas decisões estão consolidadas. Se o usuário pedir uma feature, assuma est
 
 - **Frontend:** Next.js 14 (App Router, TypeScript estrito, Server Components por padrão), Tailwind CSS, Lucide Icons.
 - **Backend:** Supabase (Postgres + Auth + Realtime + Edge Functions + Storage). RLS habilitado em TODAS as tabelas. Auth via OTP por email (magic link).
-- **Pagamentos:** Asaas (PIX). Sandbox em dev, produção depois.
+- **Pagamentos:** Mercado Pago (PIX). Sandbox em dev, produção depois.
 - **Resultados ao vivo:** API-Football (api-football.com).
 - **Deploy:** Vercel (frontend) + Supabase Cloud (banco/functions).
 - **WhatsApp:** Evolution API self-hosted (escopo opcional, fase 2).
@@ -113,12 +113,22 @@ Total: R$ 10.000.
 - 3º → R$ 1.500
 - 4º a 10º → R$ 1.000 dividido igualmente (~R$ 142,86 cada)
 
-### 3.3 Cashback (proteção do caixa)
+### 3.3 Cashback (multiplicador por seleção)
 
 - Apenas para compras com `valor_pago >= 100.00`.
-- Limite **rígido** de 20 apostadores por seleção. Atingiu o limite → seleção sai da lista.
+- Apenas as 13 seleções abaixo são elegíveis (multiplicador armazenado em `selecoes.cashback_multiplicador`, `numeric(3,1)`, default `0` pras não-elegíveis):
+
+| Tier | Multiplicador | Seleções                                                  |
+| ---- | ------------- | --------------------------------------------------------- |
+| 1×   | 100% (1.0)    | França, Espanha, Inglaterra                               |
+| 2×   | 200% (2.0)    | Brasil, Argentina                                         |
+| 3×   | 300% (3.0)    | Portugal, Alemanha, Holanda                               |
+| 5×   | 500% (5.0)    | Noruega, Suíça, Bélgica, Colômbia, Uruguai                |
+
 - Cashback é pago apenas se a seleção escolhida for campeã (id == `copa_resultados.campeao_id`).
-- Valor do cashback = `valor_pago` do bilhete (100%).
+- **Valor do cashback = `valor_pago × cashback_multiplicador`.** Ex: bilhete de R$ 100 com Colômbia (5×) campeã → R$ 500 de volta.
+- **Sem limite de vagas.** Qualquer número de bilhetes pode escolher a mesma seleção. As 35 seleções fora desse pool têm `cashback_multiplicador = 0` e não aparecem no picker.
+- Validação no banco: trigger em `bilhetes` rejeita `selecao_cashback_id` apontando pra seleção com `cashback_multiplicador = 0`.
 
 ### 3.4 Janela de palpites
 
@@ -147,8 +157,9 @@ Schema mestre do Supabase. Quando criar a feature de migrations, use isto como r
 -- Profiles (extends auth.users)
 profiles (id uuid PK ref auth.users, nome, email, telefone, cpf, is_admin bool)
 
--- Seleções da Copa (48 registros)
-selecoes (id, nome, codigo_iso, bandeira_emoji, grupo char(1))
+-- Seleções da Copa (48 registros; 13 com cashback ativo, 35 com multiplicador=0)
+selecoes (id, nome, codigo_iso, bandeira_emoji, grupo char(1),
+          cashback_multiplicador numeric(3,1) NOT NULL DEFAULT 0)
 
 -- Jogos (104 registros: 72 grupos + 32 mata-mata)
 jogos (id, numero_jogo, fase enum, data_hora, selecao_casa_id, selecao_fora_id,
@@ -156,7 +167,7 @@ jogos (id, numero_jogo, fase enum, data_hora, selecao_casa_id, selecao_fora_id,
 
 -- Bilhetes (cada R$20 = 1 bilhete)
 bilhetes (id uuid PK, user_id, numero_bilhete serial, status_pagamento enum,
-          valor_pago, asaas_payment_id, selecao_cashback_id, cashback_pago,
+          valor_pago, mp_payment_id, selecao_cashback_id, cashback_pago,
           pago_em, expira_em)
 
 -- Palpites
@@ -198,7 +209,7 @@ Esta é a ordem recomendada de construção. Cada item vira uma sessão separada
 3. **Landing page** — recriar do protótipo com componentes reutilizáveis
 4. **Auth + layout dashboard** — magic link, sidebar, header, página `dashboard/` com dados reais
 5. **Lógica de pontuação (lib pura)** — `lib/pontuacao.ts` com bateria completa de testes (TDD obrigatório). Esta é a feature mais crítica do sistema; entrega isolada antes de qualquer UI de palpite.
-6. **Checkout + integração Asaas** — criar bilhete, gerar PIX, webhook, polling de status, seletor de cashback
+6. **Checkout + integração Mercado Pago** — criar bilhete, gerar PIX, webhook, polling de status, seletor de cashback
 7. **Tela de palpites** — tabs por fase, inputs com auto-save, validação de janela, bônus
 8. **Ranking realtime** — view do banco + Supabase Realtime + tabela com pódio
 9. **Painel admin (overview)** — KPIs, últimos pagamentos, gráfico de vendas
@@ -206,7 +217,7 @@ Esta é a ordem recomendada de construção. Cada item vira uma sessão separada
 11. **Painel admin (cashbacks)** — vagas por seleção, exposição financeira
 12. **Cron API-Football** — atualização automática de resultados durante a Copa
 13. **WhatsApp (opcional)** — notificações de pagamento, jogos, lembretes
-14. **Deploy + polimento** — domínio, produção Asaas, termos de uso, política de privacidade
+14. **Deploy + polimento** — domínio, produção Mercado Pago, termos de uso, política de privacidade
 
 > Observação sobre #5 (pontuação): por ser regra crítica e independente de UI, este item deve ser feito como módulo puro com cobertura de testes ≥ 95% antes de qualquer feature que dependa dele.
 
@@ -218,7 +229,7 @@ Esta é a ordem recomendada de construção. Cada item vira uma sessão separada
 
 - **NUNCA** expor `SUPABASE_SERVICE_ROLE_KEY` no cliente. Apenas em Server Components, Route Handlers e Edge Functions.
 - Validar TODO input com Zod antes de tocar o banco.
-- Webhook Asaas: validar token de assinatura.
+- Webhook Mercado Pago: validar assinatura HMAC do header `x-signature` (com `x-request-id` + `data.id`).
 - Rate limiting nas API routes que lidam com pagamento.
 
 ### Performance
@@ -233,7 +244,9 @@ Esta é a ordem recomendada de construção. Cada item vira uma sessão separada
 
 ### Risco financeiro do cashback
 
-- Sem o limite de 20 vagas por seleção, o cashback pode consumir mais do que foi arrecadado. Isso é **bloqueador**: a feature de checkout não pode ir pra produção sem essa proteção testada.
+- Exposição máxima por seleção campeã = `SUM(valor_pago) × cashback_multiplicador` dos bilhetes que a escolheram. Tiers altos (3× e 5×) amplificam: se a Colômbia (5×) for campeã e tiver R$ 5k arrecadado nela, o cashback é R$ 25k.
+- Mitigação: o pool das 13 elegíveis é curado pra que vencedores improváveis tenham multiplicadores altos (azarões 5×) e favoritos tenham multiplicadores baixos (1×–2×). Risco real concentra-se nos azarões; probabilidade × payout precisa fechar.
+- Painel admin (Feature 11) mostra exposição em tempo real por seleção (`SUM(valor_pago) × multiplicador`) e permite avaliar se algum tier ficou desbalanceado pré-Copa. Sócios podem decidir desativar uma seleção do pool (set `cashback_multiplicador = 0`) se concentração ficar perigosa antes do início.
 
 ---
 
@@ -245,8 +258,8 @@ Manter em `.env.local` (e replicar em `.env.local.example` sem valores):
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
-ASAAS_API_KEY=
-ASAAS_WEBHOOK_TOKEN=
+MERCADOPAGO_ACCESS_TOKEN=
+MERCADOPAGO_WEBHOOK_SECRET=
 API_FOOTBALL_KEY=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```

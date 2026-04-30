@@ -21,6 +21,9 @@ supabase/.branches/
 # Git worktrees (project-local isolation)
 .worktrees/
 
+# Superpowers brainstorming visual companion (mockups persisted per session)
+.superpowers/
+
 # Node / Next
 node_modules/
 .next/
