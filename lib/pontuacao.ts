@@ -100,24 +100,6 @@ export const PONTOS_BONUS = {
 } as const;
 
 // ============================================================================
-// Funções públicas — Camada 2: pontuação base por classe
-// ============================================================================
-
-/** Retorna os pontos base por classe de acerto. CLAUDE.md §3.1. */
-export function pontosBase(classe: ClassePalpite): 0 | 2 | 5 | 7 | 10 {
-  return PONTOS_BASE[classe];
-}
-
-// ============================================================================
-// Funções públicas — Camada 3: multiplicador
-// ============================================================================
-
-/** Retorna o multiplicador da fase. CLAUDE.md §3.1. */
-export function multiplicadorFase(fase: FaseJogo): 1 | 1.5 | 2 | 2.5 | 3 | 4 {
-  return MULTIPLICADORES[fase];
-}
-
-// ============================================================================
 // Funções públicas — Camada 1: classificação
 // ============================================================================
 
@@ -176,4 +158,22 @@ export function classificarPalpite(
 // Helper privado.
 function sinal(n: number): -1 | 0 | 1 {
   return n > 0 ? 1 : n < 0 ? -1 : 0;
+}
+
+// ============================================================================
+// Funções públicas — Camada 2: pontuação base por classe
+// ============================================================================
+
+/** Retorna os pontos base por classe de acerto. CLAUDE.md §3.1. */
+export function pontosBase(classe: ClassePalpite): 0 | 2 | 5 | 7 | 10 {
+  return PONTOS_BASE[classe];
+}
+
+// ============================================================================
+// Funções públicas — Camada 3: multiplicador
+// ============================================================================
+
+/** Retorna o multiplicador da fase. CLAUDE.md §3.1. */
+export function multiplicadorFase(fase: FaseJogo): 1 | 1.5 | 2 | 2.5 | 3 | 4 {
+  return MULTIPLICADORES[fase];
 }
