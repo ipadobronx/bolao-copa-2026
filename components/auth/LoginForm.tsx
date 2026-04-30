@@ -18,7 +18,7 @@ type Sent = { kind: 'sent'; email: string; cooldownLeft: number };
 type State = Idle | Sending | Sent;
 
 export type LoginFormProps = {
-  defaultNext?: string;
+  defaultNext?: string | undefined;
 };
 
 const COOLDOWN_SECONDS = 60;
