@@ -4,7 +4,6 @@ import { Loader2 } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
-import { env } from '@/lib/env';
 import { loginSchema } from '@/lib/validators/login';
 import { safeNext } from '@/lib/validators/next';
 
@@ -62,7 +61,7 @@ export function LoginForm({ defaultNext }: LoginFormProps) {
     try {
       const supabase = createSupabaseBrowserClient();
       const next = safeNext(defaultNext);
-      const emailRedirectTo = `${env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=${encodeURIComponent(next)}`;
+      const emailRedirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
       const { error } = await supabase.auth.signInWithOtp({
         email: values.email,
         options: {

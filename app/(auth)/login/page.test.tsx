@@ -1,18 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-// LoginForm uses Supabase + env; in the page smoke test we don't exercise it,
-// but we still need imports not to throw.
+// LoginForm uses Supabase browser client at module load (via createSupabaseBrowserClient).
+// We don't exercise it in the page smoke test, but the import path must not throw.
 vi.mock('@/lib/supabase/browser', () => ({
   createSupabaseBrowserClient: () => ({ auth: { signInWithOtp: vi.fn() } }),
-}));
-vi.mock('@/lib/env', () => ({
-  env: {
-    NEXT_PUBLIC_SITE_URL: 'http://localhost:3000',
-    NEXT_PUBLIC_SUPABASE_URL: 'http://localhost:54321',
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: 'anon',
-    SUPABASE_SERVICE_ROLE_KEY: 'service',
-  },
 }));
 
 import LoginPage from './page';
