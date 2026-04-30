@@ -24,48 +24,48 @@ A feature também atualiza a view `ranking` (F2) pra refletir os tiebreakers de 
 
 ## 2. Decisões tomadas durante o brainstorming
 
-| #   | Pergunta                                                | Escolha                                                                                                                                                | Motivação                                                                                                                                              |
-| --- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Q1  | Escopo da feature                                       | **B — Lib TS pura + atualização da view `ranking`** (sem Edge Function nesta feature)                                                                  | Tiebreaker é regra de negócio da mesma família; adiar deixa §3.5 num limbo. Edge Function fica com a F10 (responsável pelo painel admin que a aciona). |
-| Q2  | Regra do "+2 bônus" (acertou gols de 1 time)            | **A — Stand-alone**: só é dado quando errou o vencedor. Não acumula com 5 ou 7 pts.                                                                    | Leitura literal de "sem acertar resultado" em §3.1. Mantém 4 categorias mutuamente exclusivas (10/7/5/2). Evita inflação do ranking por +2 quase grátis. |
-| Q3  | Empate não-exato com qualquer placar de empate (ex: predito 2×2, real 1×1) | **A — Sempre 5 pts**: o tier de 7 pts ("vencedor + saldo") só vale para vitórias. Saldo "trivial" de 0 em empates não qualifica. | "(ou empate)" em §3.1 já posiciona empate no tier dos 5. Evita incentivo perverso de cravar empates esquisitos pra pegar 7 pts genericamente.          |
-| Q4  | Comparação de `artilheiro_nome` (text livre)            | Normalização agressiva: `trim` + `toLocaleLowerCase('pt-BR')` + remover diacríticos (`NFD` + `\p{Diacritic}`) + colapsar whitespace. **Sem match parcial.** | "Mbappé" === "mbappe" === "  MBAPPE  " — útil. "Mbappé" ≠ "Kylian Mbappé" — match parcial é cilada (Silva pega múltiplos jogadores).                |
-| Q5  | Forma da API                                            | **B — Camadas expostas**: `classificarPalpite`, `pontosBase`, `multiplicadorFase` separados + `calcularPontosPalpite` como composição.                  | TDD vira cascata natural; cobertura ≥95% sai sem combinatória explosiva. F7 reusa `pontosBase`/`multiplicadorFase` pra preview "vale até X pts".       |
+| #   | Pergunta                                                                   | Escolha                                                                                                                                                     | Motivação                                                                                                                                                |
+| --- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Q1  | Escopo da feature                                                          | **B — Lib TS pura + atualização da view `ranking`** (sem Edge Function nesta feature)                                                                       | Tiebreaker é regra de negócio da mesma família; adiar deixa §3.5 num limbo. Edge Function fica com a F10 (responsável pelo painel admin que a aciona).   |
+| Q2  | Regra do "+2 bônus" (acertou gols de 1 time)                               | **A — Stand-alone**: só é dado quando errou o vencedor. Não acumula com 5 ou 7 pts.                                                                         | Leitura literal de "sem acertar resultado" em §3.1. Mantém 4 categorias mutuamente exclusivas (10/7/5/2). Evita inflação do ranking por +2 quase grátis. |
+| Q3  | Empate não-exato com qualquer placar de empate (ex: predito 2×2, real 1×1) | **A — Sempre 5 pts**: o tier de 7 pts ("vencedor + saldo") só vale para vitórias. Saldo "trivial" de 0 em empates não qualifica.                            | "(ou empate)" em §3.1 já posiciona empate no tier dos 5. Evita incentivo perverso de cravar empates esquisitos pra pegar 7 pts genericamente.            |
+| Q4  | Comparação de `artilheiro_nome` (text livre)                               | Normalização agressiva: `trim` + `toLocaleLowerCase('pt-BR')` + remover diacríticos (`NFD` + `\p{Diacritic}`) + colapsar whitespace. **Sem match parcial.** | "Mbappé" === "mbappe" === " MBAPPE " — útil. "Mbappé" ≠ "Kylian Mbappé" — match parcial é cilada (Silva pega múltiplos jogadores).                       |
+| Q5  | Forma da API                                                               | **B — Camadas expostas**: `classificarPalpite`, `pontosBase`, `multiplicadorFase` separados + `calcularPontosPalpite` como composição.                      | TDD vira cascata natural; cobertura ≥95% sai sem combinatória explosiva. F7 reusa `pontosBase`/`multiplicadorFase` pra preview "vale até X pts".         |
 
 ### Tabela de pontuação consolidada (referência)
 
-| Categoria              | Pts base | Quando se aplica                                               | Mutuamente exclusivo? |
-| ---------------------- | -------- | -------------------------------------------------------------- | --------------------- |
-| `exato`                | 10       | `palpite.gols_casa = real.gols_casa` E idem fora                | ✅                    |
-| `vencedor_saldo`       | 7        | Não-exato, vitória predita = vitória real, saldo idêntico (não-empate) | ✅                    |
-| `vencedor`             | 5        | Não-exato, "vencedor" certo (vitória OU empate), mas saldo diferente OU é empate | ✅                    |
-| `parcial`              | 2        | Errou o vencedor, mas acertou os gols exatos de UM dos times    | ✅                    |
-| `erro`                 | 0        | Resto                                                          | ✅                    |
+| Categoria        | Pts base | Quando se aplica                                                                 | Mutuamente exclusivo? |
+| ---------------- | -------- | -------------------------------------------------------------------------------- | --------------------- |
+| `exato`          | 10       | `palpite.gols_casa = real.gols_casa` E idem fora                                 | ✅                    |
+| `vencedor_saldo` | 7        | Não-exato, vitória predita = vitória real, saldo idêntico (não-empate)           | ✅                    |
+| `vencedor`       | 5        | Não-exato, "vencedor" certo (vitória OU empate), mas saldo diferente OU é empate | ✅                    |
+| `parcial`        | 2        | Errou o vencedor, mas acertou os gols exatos de UM dos times                     | ✅                    |
+| `erro`           | 0        | Resto                                                                            | ✅                    |
 
 `pontos_total = Math.round(pontos_base × multiplicador_da_fase)`.
 
 Multiplicadores (de `CLAUDE.md` §3.1):
 
-| Fase                | Multiplicador |
-| ------------------- | ------------- |
-| `grupos`            | 1             |
-| `16avos`            | 1.5           |
-| `oitavas`           | 2             |
-| `quartas`           | 2.5           |
-| `semis`             | 3             |
-| `disputa_terceiro`  | 2             |
-| `final`             | 4             |
+| Fase               | Multiplicador |
+| ------------------ | ------------- |
+| `grupos`           | 1             |
+| `16avos`           | 1.5           |
+| `oitavas`          | 2             |
+| `quartas`          | 2.5           |
+| `semis`            | 3             |
+| `disputa_terceiro` | 2             |
+| `final`            | 4             |
 
 Bônus (sem multiplicador, valores flat de `CLAUDE.md` §3.1):
 
-| Tipo         | Pts | Como compara                                  |
-| ------------ | --- | --------------------------------------------- |
-| `campeao`    | 50  | `bonus.selecao_id === resultados.campeao_id`  |
-| `vice`       | 30  | `bonus.selecao_id === resultados.vice_id`     |
-| `terceiro`   | 15  | `bonus.selecao_id === resultados.terceiro_id` |
-| `quarto`     | 15  | `bonus.selecao_id === resultados.quarto_id`   |
+| Tipo         | Pts | Como compara                                                                |
+| ------------ | --- | --------------------------------------------------------------------------- |
+| `campeao`    | 50  | `bonus.selecao_id === resultados.campeao_id`                                |
+| `vice`       | 30  | `bonus.selecao_id === resultados.vice_id`                                   |
+| `terceiro`   | 15  | `bonus.selecao_id === resultados.terceiro_id`                               |
+| `quarto`     | 15  | `bonus.selecao_id === resultados.quarto_id`                                 |
 | `artilheiro` | 25  | `normalizar(bonus.jogador_nome) === normalizar(resultados.artilheiro_nome)` |
-| `revelacao`  | 15  | `bonus.selecao_id === resultados.revelacao_id` |
+| `revelacao`  | 15  | `bonus.selecao_id === resultados.revelacao_id`                              |
 
 ---
 
@@ -89,13 +89,7 @@ export type FaseJogo =
   | 'final';
 
 /** Enum local — espelha Database['public']['Enums']['tipo_bonus']. */
-export type TipoBonus =
-  | 'campeao'
-  | 'vice'
-  | 'terceiro'
-  | 'quarto'
-  | 'artilheiro'
-  | 'revelacao';
+export type TipoBonus = 'campeao' | 'vice' | 'terceiro' | 'quarto' | 'artilheiro' | 'revelacao';
 
 /** Palpite de jogo (gols NOT NULL no banco). */
 export type PalpiteInput = {
@@ -127,22 +121,14 @@ export type CopaResultadosInput = {
 };
 
 /** Classificação de um palpite vs jogo finalizado. */
-export type ClassePalpite =
-  | 'exato'
-  | 'vencedor_saldo'
-  | 'vencedor'
-  | 'parcial'
-  | 'erro';
+export type ClassePalpite = 'exato' | 'vencedor_saldo' | 'vencedor' | 'parcial' | 'erro';
 ```
 
 ### 3.2 Funções públicas
 
 ```ts
 /** Camada 1 — classifica o palpite, sem aplicar fase. */
-export function classificarPalpite(
-  palpite: PalpiteInput,
-  jogo: JogoInput,
-): ClassePalpite;
+export function classificarPalpite(palpite: PalpiteInput, jogo: JogoInput): ClassePalpite;
 
 /** Camada 2 — pontuação base por classe, sem fase. */
 export function pontosBase(classe: ClassePalpite): 0 | 2 | 5 | 7 | 10;
@@ -156,9 +142,9 @@ export function calcularPontosPalpite(
   jogo: JogoInput,
 ): {
   classe: ClassePalpite;
-  base: number;          // 0..10
+  base: number; // 0..10
   multiplicador: number; // 1..4
-  total: number;         // Math.round(base * multiplicador)
+  total: number; // Math.round(base * multiplicador)
 };
 
 /** Bônus — flat, sem multiplicador. */
@@ -217,19 +203,13 @@ export const PONTOS_BONUS = {
 ### 4.1 Algoritmo de `classificarPalpite`
 
 ```ts
-export function classificarPalpite(
-  palpite: PalpiteInput,
-  jogo: JogoInput,
-): ClassePalpite {
+export function classificarPalpite(palpite: PalpiteInput, jogo: JogoInput): ClassePalpite {
   if (jogo.finalizado !== true) {
     throw new Error('Jogo não finalizado: classificação inválida');
   }
 
   // 1. Placar exato
-  if (
-    palpite.gols_casa === jogo.gols_casa &&
-    palpite.gols_fora === jogo.gols_fora
-  ) {
+  if (palpite.gols_casa === jogo.gols_casa && palpite.gols_fora === jogo.gols_fora) {
     return 'exato';
   }
 
@@ -260,6 +240,7 @@ function sinal(n: number): -1 | 0 | 1 {
 ```
 
 5 caminhos terminais:
+
 - `exato` (curto-circuito)
 - `parcial` (errou vencedor + acertou 1 time)
 - `erro` (errou vencedor + errou ambos)
@@ -296,8 +277,7 @@ export function calcularPontosBonus(
 ): { acertou: boolean; pontos: number } {
   if (bonus.tipo === 'artilheiro') {
     if (!resultados.artilheiro_nome) return { acertou: false, pontos: 0 };
-    const acertou =
-      normalizar(bonus.jogador_nome) === normalizar(resultados.artilheiro_nome);
+    const acertou = normalizar(bonus.jogador_nome) === normalizar(resultados.artilheiro_nome);
     return { acertou, pontos: acertou ? PONTOS_BONUS.artilheiro : 0 };
   }
 
@@ -322,23 +302,23 @@ export function calcularPontosBonus(
 
 Estes 15 casos viram testes nomeados no arquivo de testes (com nomes tipo `case 1: placar exato em fase de grupos`). Calibração de regras com casos reais:
 
-| #   | Real | Palpite | Classe          | Base | Fase              | Mult | Total                         |
-| --- | ---- | ------- | --------------- | ---- | ----------------- | ---- | ----------------------------- |
-| 1   | 2×0  | 2×0     | exato           | 10   | grupos            | 1    | 10                            |
-| 2   | 2×0  | 3×1     | vencedor_saldo  | 7    | grupos            | 1    | 7                             |
-| 3   | 2×0  | 1×0     | vencedor        | 5    | grupos            | 1    | 5                             |
-| 4   | 2×0  | 0×2     | erro            | 0    | grupos            | 1    | 0                             |
-| 5   | 2×0  | 0×0     | parcial         | 2    | grupos            | 1    | 2                             |
-| 6   | 1×1  | 1×1     | exato           | 10   | grupos            | 1    | 10                            |
-| 7   | 1×1  | 2×2     | vencedor        | 5    | grupos            | 1    | 5 (Q3-A)                      |
-| 8   | 1×1  | 0×0     | vencedor        | 5    | grupos            | 1    | 5 (Q3-A)                      |
-| 9   | 1×1  | 1×0     | parcial         | 2    | grupos            | 1    | 2                             |
-| 10  | 1×1  | 2×0     | erro            | 0    | grupos            | 1    | 0                             |
-| 11  | 3×2  | 1×0     | vencedor_saldo  | 7    | final             | 4    | 28                            |
-| 12  | 3×2  | 3×0     | vencedor        | 5    | final             | 4    | 20                            |
-| 13  | 0×0  | 0×0     | exato           | 10   | semis             | 3    | 30                            |
-| 14  | 1×0  | 0×0     | parcial         | 2    | 16avos            | 1.5  | 3 (Math.round(3.0))           |
-| 15  | 2×1  | 3×2     | vencedor_saldo  | 7    | 16avos            | 1.5  | 11 (Math.round(10.5)=11)      |
+| #   | Real | Palpite | Classe         | Base | Fase   | Mult | Total                    |
+| --- | ---- | ------- | -------------- | ---- | ------ | ---- | ------------------------ |
+| 1   | 2×0  | 2×0     | exato          | 10   | grupos | 1    | 10                       |
+| 2   | 2×0  | 3×1     | vencedor_saldo | 7    | grupos | 1    | 7                        |
+| 3   | 2×0  | 1×0     | vencedor       | 5    | grupos | 1    | 5                        |
+| 4   | 2×0  | 0×2     | erro           | 0    | grupos | 1    | 0                        |
+| 5   | 2×0  | 0×0     | parcial        | 2    | grupos | 1    | 2                        |
+| 6   | 1×1  | 1×1     | exato          | 10   | grupos | 1    | 10                       |
+| 7   | 1×1  | 2×2     | vencedor       | 5    | grupos | 1    | 5 (Q3-A)                 |
+| 8   | 1×1  | 0×0     | vencedor       | 5    | grupos | 1    | 5 (Q3-A)                 |
+| 9   | 1×1  | 1×0     | parcial        | 2    | grupos | 1    | 2                        |
+| 10  | 1×1  | 2×0     | erro           | 0    | grupos | 1    | 0                        |
+| 11  | 3×2  | 1×0     | vencedor_saldo | 7    | final  | 4    | 28                       |
+| 12  | 3×2  | 3×0     | vencedor       | 5    | final  | 4    | 20                       |
+| 13  | 0×0  | 0×0     | exato          | 10   | semis  | 3    | 30                       |
+| 14  | 1×0  | 0×0     | parcial        | 2    | 16avos | 1.5  | 3 (Math.round(3.0))      |
+| 15  | 2×1  | 3×2     | vencedor_saldo | 7    | 16avos | 1.5  | 11 (Math.round(10.5)=11) |
 
 **Sobre `Math.round` em JS:** comporta-se como round-half-away-from-zero pra positivos (`Math.round(10.5) === 11`, `Math.round(7.5) === 8`). Não usa banker's rounding. Caso #15 documenta esse comportamento.
 
@@ -494,9 +474,11 @@ Single-file na lib (~150-200 LOC). Quebrar em subarquivos só se passar de ~300.
 ### 6.2 Quebra de testes por função (alvo: ≥95% cobertura em `lib/pontuacao.ts`)
 
 #### `multiplicadorFase` — 7 testes
+
 Um por fase, batendo o valor exato. Anti-regressão pra mudança acidental do mapa.
 
 #### `pontosBase` — 5 testes
+
 Um por classe (`exato`, `vencedor_saldo`, `vencedor`, `parcial`, `erro`).
 
 #### `classificarPalpite` — 23 testes (coração da lib)
@@ -515,16 +497,16 @@ Organizado em `describe` blocks:
 
 Cobre os 15 casos da §4.4, com foco em arredondamento:
 
-| # | Real | Palpite | Fase             | Esperado |
-| - | ---- | ------- | ---------------- | -------- |
-| 1 | 2×0  | 2×0     | grupos           | 10       |
-| 2 | 3×2  | 1×0     | final            | 28       |
-| 3 | 0×0  | 0×0     | semis            | 30       |
-| 4 | 1×1  | 2×2     | quartas          | 13 (round(5×2.5)=12.5→13) |
-| 5 | 2×0  | 0×0     | 16avos           | 3 (round(2×1.5)=3.0→3)    |
-| 6 | 1×0  | 0×1     | 16avos           | 0        |
-| 7 | 5×0  | 5×0     | disputa_terceiro | 20       |
-| 8 | 2×1  | 3×2     | 16avos           | 11 (round(7×1.5)=10.5→11) |
+| #   | Real | Palpite | Fase             | Esperado                  |
+| --- | ---- | ------- | ---------------- | ------------------------- |
+| 1   | 2×0  | 2×0     | grupos           | 10                        |
+| 2   | 3×2  | 1×0     | final            | 28                        |
+| 3   | 0×0  | 0×0     | semis            | 30                        |
+| 4   | 1×1  | 2×2     | quartas          | 13 (round(5×2.5)=12.5→13) |
+| 5   | 2×0  | 0×0     | 16avos           | 3 (round(2×1.5)=3.0→3)    |
+| 6   | 1×0  | 0×1     | 16avos           | 0                         |
+| 7   | 5×0  | 5×0     | disputa_terceiro | 20                        |
+| 8   | 2×1  | 3×2     | 16avos           | 11 (round(7×1.5)=10.5→11) |
 
 Casos 4, 5 e 8 documentam comportamento de `Math.round` em half-up.
 
@@ -536,8 +518,8 @@ Casos 4, 5 e 8 documentam comportamento de `Math.round` em half-up.
 - **Artilheiro com normalização** (5 testes):
   - "Mbappé" === "Mbappé" → acertou
   - "MBAPPE" === "Mbappé" → acertou (case + acento)
-  - "  Mbappé  " === "Mbappé" → acertou (trim)
-  - "Kylian  Mbappé" === "Kylian Mbappé" → acertou (whitespace colapsado)
+  - " Mbappé " === "Mbappé" → acertou (trim)
+  - "Kylian Mbappé" === "Kylian Mbappé" → acertou (whitespace colapsado)
   - "Mbappé" === "Kylian Mbappé" → ERROU (sem match parcial — decisão consciente)
 
 ### 6.3 Cobertura
@@ -563,6 +545,7 @@ test: {
 Não impor threshold global (outras libs já passam mas o compromisso é da F5).
 
 Comandos:
+
 - `pnpm test:run` — passa todos os testes, sem coverage.
 - `pnpm test:run --coverage` — gera relatório e enforce threshold.
 
@@ -596,26 +579,26 @@ Comandos:
 
 ### 7.1 Lib
 
-| Cenário                                                        | Comportamento                                                                                                                  |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `classificarPalpite` chamada com `jogo.finalizado=false`        | `throw new Error('Jogo não finalizado: classificação inválida')`                                                                |
-| `calcularPontosPalpite` chamada com `jogo.finalizado=false`     | mesmo throw (delega pra `classificarPalpite`)                                                                                  |
-| `calcularPontosBonus` para `campeao` com `resultados.campeao_id=null` | `{ acertou: false, pontos: 0 }` (Copa em andamento, estado válido)                                                          |
-| `calcularPontosBonus` para `artilheiro` com `resultados.artilheiro_nome=null` | `{ acertou: false, pontos: 0 }` (idem)                                                                                |
-| Palpite ausente (caller nem chama a lib)                        | Caller pula; banco não tem row em `palpites` → não soma 0, simplesmente não existe (memory: "palpite ausente vale 0 pts").     |
-| `gols_casa` ou `gols_fora` negativos                            | Banco rejeita (CHECK ≥ 0). Lib não valida explicitamente, mas o algoritmo opera corretamente com negativos: `sinal` aceita qualquer int, `===` compara qualquer número. Não há caminho que quebre. |
-| Empate em `artilheiro` na vida real                             | Admin escolhe um nome canônico. Schema é `text` singular; sem mudança.                                                         |
-| Match parcial em artilheiro ("Mbappé" vs "Kylian Mbappé")       | NÃO bate (sem startsWith/contains). Decisão consciente: front-end da F7 oferece dropdown de ~30 nomes prováveis pra evitar typos. |
+| Cenário                                                                       | Comportamento                                                                                                                                                                                      |
+| ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `classificarPalpite` chamada com `jogo.finalizado=false`                      | `throw new Error('Jogo não finalizado: classificação inválida')`                                                                                                                                   |
+| `calcularPontosPalpite` chamada com `jogo.finalizado=false`                   | mesmo throw (delega pra `classificarPalpite`)                                                                                                                                                      |
+| `calcularPontosBonus` para `campeao` com `resultados.campeao_id=null`         | `{ acertou: false, pontos: 0 }` (Copa em andamento, estado válido)                                                                                                                                 |
+| `calcularPontosBonus` para `artilheiro` com `resultados.artilheiro_nome=null` | `{ acertou: false, pontos: 0 }` (idem)                                                                                                                                                             |
+| Palpite ausente (caller nem chama a lib)                                      | Caller pula; banco não tem row em `palpites` → não soma 0, simplesmente não existe (memory: "palpite ausente vale 0 pts").                                                                         |
+| `gols_casa` ou `gols_fora` negativos                                          | Banco rejeita (CHECK ≥ 0). Lib não valida explicitamente, mas o algoritmo opera corretamente com negativos: `sinal` aceita qualquer int, `===` compara qualquer número. Não há caminho que quebre. |
+| Empate em `artilheiro` na vida real                                           | Admin escolhe um nome canônico. Schema é `text` singular; sem mudança.                                                                                                                             |
+| Match parcial em artilheiro ("Mbappé" vs "Kylian Mbappé")                     | NÃO bate (sem startsWith/contains). Decisão consciente: front-end da F7 oferece dropdown de ~30 nomes prováveis pra evitar typos.                                                                  |
 
 ### 7.2 Migration
 
-| Cenário                                              | Comportamento                                                                                                                                  |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Pré-Copa (`copa_resultados.campeao_id=null`)         | `campeao_hit` CTE retorna 0 linhas; `acertou_campeao=false` pra todos; tiebreaker degrada pra `pontos_mata_mata` → `numero_bilhete`.            |
-| Bilhete sem palpites de mata-mata ainda              | `pontos_mata_mata=0`; entra no tiebreaker normalmente.                                                                                          |
-| Bilhete sem palpite_bonus de tipo='campeao'          | `acertou_campeao=false`. LEFT JOIN com `campeao_hit` retorna NULL → `(IS NOT NULL) = false`.                                                    |
-| Múltiplas palpites de tipo='campeao' por bilhete     | Constraint UNIQUE(bilhete_id, tipo) na F2 já impede.                                                                                            |
-| Bilhete em status `pendente`/`expirado`/`cancelado`  | Filtrado pelo WHERE da view (`status_pagamento = 'confirmado'`). Não aparece no ranking.                                                        |
+| Cenário                                             | Comportamento                                                                                                                        |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Pré-Copa (`copa_resultados.campeao_id=null`)        | `campeao_hit` CTE retorna 0 linhas; `acertou_campeao=false` pra todos; tiebreaker degrada pra `pontos_mata_mata` → `numero_bilhete`. |
+| Bilhete sem palpites de mata-mata ainda             | `pontos_mata_mata=0`; entra no tiebreaker normalmente.                                                                               |
+| Bilhete sem palpite_bonus de tipo='campeao'         | `acertou_campeao=false`. LEFT JOIN com `campeao_hit` retorna NULL → `(IS NOT NULL) = false`.                                         |
+| Múltiplas palpites de tipo='campeao' por bilhete    | Constraint UNIQUE(bilhete_id, tipo) na F2 já impede.                                                                                 |
+| Bilhete em status `pendente`/`expirado`/`cancelado` | Filtrado pelo WHERE da view (`status_pagamento = 'confirmado'`). Não aparece no ranking.                                             |
 
 ---
 
