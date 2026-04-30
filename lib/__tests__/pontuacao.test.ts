@@ -6,6 +6,7 @@ import {
   multiplicadorFase,
   pontosBase,
   classificarPalpite,
+  calcularPontosPalpite,
   type ClassePalpite,
   type FaseJogo,
   type JogoInput,
@@ -279,5 +280,84 @@ describe('classificarPalpite', () => {
         classificarPalpite({ gols_casa: 2, gols_fora: 0 }, jogoNaoFinalizado),
       ).toThrow('Jogo não finalizado: classificação inválida');
     });
+  });
+});
+
+describe('calcularPontosPalpite (composição: classe × multiplicador × Math.round)', () => {
+  it('case #1 — 2×0 vs 2×0 grupos → 10 pts (exato × 1)', () => {
+    expect(
+      calcularPontosPalpite(
+        { gols_casa: 2, gols_fora: 0 },
+        { fase: 'grupos', finalizado: true, gols_casa: 2, gols_fora: 0 },
+      ),
+    ).toEqual({ classe: 'exato', base: 10, multiplicador: 1, total: 10 });
+  });
+
+  it('case #11 — 3×2 vs 1×0 final → 28 pts (vencedor_saldo × 4)', () => {
+    expect(
+      calcularPontosPalpite(
+        { gols_casa: 1, gols_fora: 0 },
+        { fase: 'final', finalizado: true, gols_casa: 3, gols_fora: 2 },
+      ),
+    ).toEqual({ classe: 'vencedor_saldo', base: 7, multiplicador: 4, total: 28 });
+  });
+
+  it('case #13 — 0×0 vs 0×0 semis → 30 pts (exato × 3)', () => {
+    expect(
+      calcularPontosPalpite(
+        { gols_casa: 0, gols_fora: 0 },
+        { fase: 'semis', finalizado: true, gols_casa: 0, gols_fora: 0 },
+      ),
+    ).toEqual({ classe: 'exato', base: 10, multiplicador: 3, total: 30 });
+  });
+
+  it('1×1 vs 2×2 quartas → 13 pts (vencedor empate × 2.5, half-up)', () => {
+    expect(
+      calcularPontosPalpite(
+        { gols_casa: 2, gols_fora: 2 },
+        { fase: 'quartas', finalizado: true, gols_casa: 1, gols_fora: 1 },
+      ),
+    ).toEqual({ classe: 'vencedor', base: 5, multiplicador: 2.5, total: 13 });
+  });
+
+  it('case #14 — 1×0 vs 0×0 16avos → 3 pts (parcial × 1.5, sem rounding)', () => {
+    expect(
+      calcularPontosPalpite(
+        { gols_casa: 0, gols_fora: 0 },
+        { fase: '16avos', finalizado: true, gols_casa: 1, gols_fora: 0 },
+      ),
+    ).toEqual({ classe: 'parcial', base: 2, multiplicador: 1.5, total: 3 });
+  });
+
+  it('1×0 vs 0×1 16avos → 0 pts (erro × 1.5 = 0)', () => {
+    expect(
+      calcularPontosPalpite(
+        { gols_casa: 0, gols_fora: 1 },
+        { fase: '16avos', finalizado: true, gols_casa: 1, gols_fora: 0 },
+      ),
+    ).toEqual({ classe: 'erro', base: 0, multiplicador: 1.5, total: 0 });
+  });
+
+  it('5×0 vs 5×0 disputa_terceiro → 20 pts (exato × 2)', () => {
+    expect(
+      calcularPontosPalpite(
+        { gols_casa: 5, gols_fora: 0 },
+        {
+          fase: 'disputa_terceiro',
+          finalizado: true,
+          gols_casa: 5,
+          gols_fora: 0,
+        },
+      ),
+    ).toEqual({ classe: 'exato', base: 10, multiplicador: 2, total: 20 });
+  });
+
+  it('case #15 — 2×1 vs 3×2 16avos → 11 pts (vencedor_saldo × 1.5, Math.round half-up: 10.5 → 11)', () => {
+    expect(
+      calcularPontosPalpite(
+        { gols_casa: 3, gols_fora: 2 },
+        { fase: '16avos', finalizado: true, gols_casa: 2, gols_fora: 1 },
+      ),
+    ).toEqual({ classe: 'vencedor_saldo', base: 7, multiplicador: 1.5, total: 11 });
   });
 });

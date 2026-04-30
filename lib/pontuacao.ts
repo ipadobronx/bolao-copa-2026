@@ -177,3 +177,24 @@ export function pontosBase(classe: ClassePalpite): 0 | 2 | 5 | 7 | 10 {
 export function multiplicadorFase(fase: FaseJogo): 1 | 1.5 | 2 | 2.5 | 3 | 4 {
   return MULTIPLICADORES[fase];
 }
+
+// ============================================================================
+// Funções públicas — Camada 4: composição (chamada principal de F10)
+// ============================================================================
+
+/** Compõe classificação + base + multiplicador + arredondamento. */
+export function calcularPontosPalpite(
+  palpite: PalpiteInput,
+  jogo: JogoInput,
+): {
+  classe: ClassePalpite;
+  base: number;
+  multiplicador: number;
+  total: number;
+} {
+  const classe = classificarPalpite(palpite, jogo);
+  const base = pontosBase(classe);
+  const multiplicador = multiplicadorFase(jogo.fase);
+  const total = Math.round(base * multiplicador);
+  return { classe, base, multiplicador, total };
+}
