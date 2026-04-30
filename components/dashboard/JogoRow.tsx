@@ -17,7 +17,7 @@ export type JogoRowData = {
 
 export type JogoRowProps = {
   jogo: JogoRowData;
-  agora?: Date; // override pra testes; default = new Date()
+  agora?: Date | undefined; // override pra testes; default = new Date()
 };
 
 const FASE_LABEL: Record<FaseEnum, string> = {
