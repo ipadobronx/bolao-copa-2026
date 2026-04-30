@@ -12,7 +12,7 @@ export default defineConfig({
     exclude: ['**/node_modules/**', '.next', 'e2e', 'supabase', '.worktrees/**'],
     coverage: {
       provider: 'v8',
-      include: ['lib/pontuacao.ts'],
+      include: ['lib/pontuacao.ts', 'lib/cashback.ts', 'lib/checkout.ts', 'lib/mercadopago.ts'],
       thresholds: {
         lines: 95,
         branches: 95,
