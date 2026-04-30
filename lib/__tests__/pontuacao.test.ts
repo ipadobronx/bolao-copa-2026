@@ -7,7 +7,9 @@ import {
   pontosBase,
   classificarPalpite,
   calcularPontosPalpite,
+  calcularPontosBonus,
   type ClassePalpite,
+  type CopaResultadosInput,
   type FaseJogo,
   type JogoInput,
 } from '@/lib/pontuacao';
@@ -359,5 +361,120 @@ describe('calcularPontosPalpite (composição: classe × multiplicador × Math.r
         { fase: '16avos', finalizado: true, gols_casa: 2, gols_fora: 1 },
       ),
     ).toEqual({ classe: 'vencedor_saldo', base: 7, multiplicador: 1.5, total: 11 });
+  });
+});
+
+describe('calcularPontosBonus', () => {
+  // Helper para resultados oficiais "default" (todos preenchidos).
+  const resultadosCheios: CopaResultadosInput = {
+    campeao_id: 9, // Brasil (id 9 conforme seed F2 — Grupo C)
+    vice_id: 11,
+    terceiro_id: 5,
+    quarto_id: 7,
+    artilheiro_nome: 'Mbappé',
+    revelacao_id: 12,
+  };
+
+  describe('tipos com selecao_id (campeao, vice, terceiro, quarto, revelacao)', () => {
+    it('campeao acertou (selecao_id === campeao_id) → 50 pts', () => {
+      expect(
+        calcularPontosBonus({ tipo: 'campeao', selecao_id: 9 }, resultadosCheios),
+      ).toEqual({ acertou: true, pontos: 50 });
+    });
+
+    it('vice acertou → 30 pts', () => {
+      expect(
+        calcularPontosBonus({ tipo: 'vice', selecao_id: 11 }, resultadosCheios),
+      ).toEqual({ acertou: true, pontos: 30 });
+    });
+
+    it('terceiro acertou → 15 pts', () => {
+      expect(
+        calcularPontosBonus({ tipo: 'terceiro', selecao_id: 5 }, resultadosCheios),
+      ).toEqual({ acertou: true, pontos: 15 });
+    });
+
+    it('quarto acertou → 15 pts', () => {
+      expect(
+        calcularPontosBonus({ tipo: 'quarto', selecao_id: 7 }, resultadosCheios),
+      ).toEqual({ acertou: true, pontos: 15 });
+    });
+
+    it('revelacao acertou → 15 pts', () => {
+      expect(
+        calcularPontosBonus(
+          { tipo: 'revelacao', selecao_id: 12 },
+          resultadosCheios,
+        ),
+      ).toEqual({ acertou: true, pontos: 15 });
+    });
+
+    it('campeao errou (selecao_id ≠ campeao_id) → 0 pts', () => {
+      expect(
+        calcularPontosBonus({ tipo: 'campeao', selecao_id: 99 }, resultadosCheios),
+      ).toEqual({ acertou: false, pontos: 0 });
+    });
+
+    it('campeao com resultados.campeao_id=null (Copa em andamento) → 0 pts', () => {
+      const semCampeao = { ...resultadosCheios, campeao_id: null };
+      expect(
+        calcularPontosBonus({ tipo: 'campeao', selecao_id: 9 }, semCampeao),
+      ).toEqual({ acertou: false, pontos: 0 });
+    });
+  });
+
+  describe('artilheiro (jogador_nome com normalização)', () => {
+    it('match exato — "Mbappé" === "Mbappé" → 25 pts', () => {
+      expect(
+        calcularPontosBonus(
+          { tipo: 'artilheiro', jogador_nome: 'Mbappé' },
+          resultadosCheios,
+        ),
+      ).toEqual({ acertou: true, pontos: 25 });
+    });
+
+    it('case + acento ignorados — "MBAPPE" === "Mbappé" → 25 pts', () => {
+      expect(
+        calcularPontosBonus(
+          { tipo: 'artilheiro', jogador_nome: 'MBAPPE' },
+          resultadosCheios,
+        ),
+      ).toEqual({ acertou: true, pontos: 25 });
+    });
+
+    it('whitespace nas pontas — "  Mbappé  " === "Mbappé" → 25 pts', () => {
+      expect(
+        calcularPontosBonus(
+          { tipo: 'artilheiro', jogador_nome: '  Mbappé  ' },
+          resultadosCheios,
+        ),
+      ).toEqual({ acertou: true, pontos: 25 });
+    });
+
+    it('whitespace interno colapsado — "Kylian  Mbappé" === "Kylian Mbappé"', () => {
+      const resultadosKylian = {
+        ...resultadosCheios,
+        artilheiro_nome: 'Kylian Mbappé',
+      };
+      expect(
+        calcularPontosBonus(
+          { tipo: 'artilheiro', jogador_nome: 'Kylian  Mbappé' },
+          resultadosKylian,
+        ),
+      ).toEqual({ acertou: true, pontos: 25 });
+    });
+
+    it('match parcial NÃO bate — "Mbappé" ≠ "Kylian Mbappé" → 0 pts (decisão consciente)', () => {
+      const resultadosKylian = {
+        ...resultadosCheios,
+        artilheiro_nome: 'Kylian Mbappé',
+      };
+      expect(
+        calcularPontosBonus(
+          { tipo: 'artilheiro', jogador_nome: 'Mbappé' },
+          resultadosKylian,
+        ),
+      ).toEqual({ acertou: false, pontos: 0 });
+    });
   });
 });

@@ -198,3 +198,49 @@ export function calcularPontosPalpite(
   const total = Math.round(base * multiplicador);
   return { classe, base, multiplicador, total };
 }
+
+// ============================================================================
+// Funções públicas — Bônus (sem multiplicador, valores flat)
+// ============================================================================
+
+/** Pontuação dos bônus de Copa. CLAUDE.md §3.1. */
+export function calcularPontosBonus(
+  bonus: BonusInput,
+  resultados: CopaResultadosInput,
+): { acertou: boolean; pontos: number } {
+  if (bonus.tipo === 'artilheiro') {
+    if (!resultados.artilheiro_nome) {
+      return { acertou: false, pontos: 0 };
+    }
+    const acertou =
+      normalizar(bonus.jogador_nome) === normalizar(resultados.artilheiro_nome);
+    return { acertou, pontos: acertou ? PONTOS_BONUS.artilheiro : 0 };
+  }
+
+  // bonus.tipo é 'campeao' | 'vice' | 'terceiro' | 'quarto' | 'revelacao'
+  // (TS estreita pelo discriminated union).
+  const oficialId = {
+    campeao: resultados.campeao_id,
+    vice: resultados.vice_id,
+    terceiro: resultados.terceiro_id,
+    quarto: resultados.quarto_id,
+    revelacao: resultados.revelacao_id,
+  }[bonus.tipo];
+
+  if (oficialId == null) {
+    return { acertou: false, pontos: 0 };
+  }
+
+  const acertou = bonus.selecao_id === oficialId;
+  return { acertou, pontos: acertou ? PONTOS_BONUS[bonus.tipo] : 0 };
+}
+
+// Helper privado — normalização de nome de jogador.
+function normalizar(s: string): string {
+  return s
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLocaleLowerCase('pt-BR')
+    .trim()
+    .replace(/\s+/g, ' ');
+}
