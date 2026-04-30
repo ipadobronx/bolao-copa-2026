@@ -26,7 +26,8 @@ const jetBrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: 'Bolão Copa 2026',
-  description: 'Bolão da Copa do Mundo FIFA 2026.',
+  description:
+    'Bolão da Copa do Mundo FIFA 2026. R$ 20 a tabela, R$ 10 mil em prêmios, ranking ao vivo.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
