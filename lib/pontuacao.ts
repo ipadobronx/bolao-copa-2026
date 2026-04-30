@@ -116,3 +116,64 @@ export function pontosBase(classe: ClassePalpite): 0 | 2 | 5 | 7 | 10 {
 export function multiplicadorFase(fase: FaseJogo): 1 | 1.5 | 2 | 2.5 | 3 | 4 {
   return MULTIPLICADORES[fase];
 }
+
+// ============================================================================
+// Funções públicas — Camada 1: classificação
+// ============================================================================
+
+/**
+ * Classifica o palpite vs jogo finalizado em uma das 5 classes.
+ *
+ * Mutuamente exclusivas:
+ *   - exato: placar exato bate
+ *   - vencedor_saldo: vitória com saldo idêntico (apenas vitórias, não empates)
+ *   - vencedor: acertou vencedor (ou empate não-exato), mas saldo errado ou empate
+ *   - parcial: errou vencedor, mas acertou os gols de UM dos times (+2 stand-alone)
+ *   - erro: nada bate
+ *
+ * Lança Error se `jogo.finalizado !== true`. Caller filtra antes.
+ */
+export function classificarPalpite(
+  palpite: PalpiteInput,
+  jogo: JogoInput,
+): ClassePalpite {
+  if (jogo.finalizado !== true) {
+    throw new Error('Jogo não finalizado: classificação inválida');
+  }
+
+  // 1. Placar exato
+  if (
+    palpite.gols_casa === jogo.gols_casa &&
+    palpite.gols_fora === jogo.gols_fora
+  ) {
+    return 'exato';
+  }
+
+  const sinalReal = sinal(jogo.gols_casa - jogo.gols_fora);
+  const sinalPalpite = sinal(palpite.gols_casa - palpite.gols_fora);
+  const acertouVencedor = sinalReal === sinalPalpite;
+
+  // 2. Errou vencedor → parcial ou erro
+  if (!acertouVencedor) {
+    const acertouCasa = palpite.gols_casa === jogo.gols_casa;
+    const acertouFora = palpite.gols_fora === jogo.gols_fora;
+    return acertouCasa || acertouFora ? 'parcial' : 'erro';
+  }
+
+  // 3. Acertou vencedor — distinguir empate / vencedor_saldo / vencedor
+  const ehEmpate = sinalReal === 0;
+  if (ehEmpate) {
+    // Q3-A do spec: empate não-exato sempre cai em vencedor (5 pts).
+    // Saldo "trivial" de 0 NÃO qualifica para vencedor_saldo.
+    return 'vencedor';
+  }
+
+  const saldoReal = jogo.gols_casa - jogo.gols_fora;
+  const saldoPalpite = palpite.gols_casa - palpite.gols_fora;
+  return saldoReal === saldoPalpite ? 'vencedor_saldo' : 'vencedor';
+}
+
+// Helper privado.
+function sinal(n: number): -1 | 0 | 1 {
+  return n > 0 ? 1 : n < 0 ? -1 : 0;
+}
