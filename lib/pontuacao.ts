@@ -23,13 +23,7 @@ export type FaseJogo =
   | 'final';
 
 /** Espelha `Database['public']['Enums']['tipo_bonus']`. */
-export type TipoBonus =
-  | 'campeao'
-  | 'vice'
-  | 'terceiro'
-  | 'quarto'
-  | 'artilheiro'
-  | 'revelacao';
+export type TipoBonus = 'campeao' | 'vice' | 'terceiro' | 'quarto' | 'artilheiro' | 'revelacao';
 
 /** Palpite de jogo. Gols são NOT NULL no banco (F2). */
 export type PalpiteInput = {
@@ -61,12 +55,7 @@ export type CopaResultadosInput = {
 };
 
 /** Classe de acerto de um palpite vs jogo finalizado. */
-export type ClassePalpite =
-  | 'exato'
-  | 'vencedor_saldo'
-  | 'vencedor'
-  | 'parcial'
-  | 'erro';
+export type ClassePalpite = 'exato' | 'vencedor_saldo' | 'vencedor' | 'parcial' | 'erro';
 
 // ============================================================================
 // Constantes exportadas (uso em F7 para preview "vale até X pts")
@@ -115,19 +104,13 @@ export const PONTOS_BONUS = {
  *
  * Lança Error se `jogo.finalizado !== true`. Caller filtra antes.
  */
-export function classificarPalpite(
-  palpite: PalpiteInput,
-  jogo: JogoInput,
-): ClassePalpite {
+export function classificarPalpite(palpite: PalpiteInput, jogo: JogoInput): ClassePalpite {
   if (jogo.finalizado !== true) {
     throw new Error('Jogo não finalizado: classificação inválida');
   }
 
   // 1. Placar exato
-  if (
-    palpite.gols_casa === jogo.gols_casa &&
-    palpite.gols_fora === jogo.gols_fora
-  ) {
+  if (palpite.gols_casa === jogo.gols_casa && palpite.gols_fora === jogo.gols_fora) {
     return 'exato';
   }
 
@@ -212,8 +195,7 @@ export function calcularPontosBonus(
     if (!resultados.artilheiro_nome) {
       return { acertou: false, pontos: 0 };
     }
-    const acertou =
-      normalizar(bonus.jogador_nome) === normalizar(resultados.artilheiro_nome);
+    const acertou = normalizar(bonus.jogador_nome) === normalizar(resultados.artilheiro_nome);
     return { acertou, pontos: acertou ? PONTOS_BONUS.artilheiro : 0 };
   }
 

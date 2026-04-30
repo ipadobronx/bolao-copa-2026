@@ -36,6 +36,7 @@
 **Goal:** Setup mínimo: instalar `@vitest/coverage-v8` (precisa pra o threshold da Task 7), criar `lib/pontuacao.ts` com **apenas os tipos e constantes** (sem funções ainda), e criar `lib/__tests__/pontuacao.test.ts` vazio. Garante que typecheck e import compilam antes de começar a escrever testes/funções.
 
 **Files:**
+
 - Modify: `package.json`, `pnpm-lock.yaml` (via `pnpm add`)
 - Create: `lib/pontuacao.ts`
 - Create: `lib/__tests__/pontuacao.test.ts`
@@ -90,13 +91,7 @@ export type FaseJogo =
   | 'final';
 
 /** Espelha `Database['public']['Enums']['tipo_bonus']`. */
-export type TipoBonus =
-  | 'campeao'
-  | 'vice'
-  | 'terceiro'
-  | 'quarto'
-  | 'artilheiro'
-  | 'revelacao';
+export type TipoBonus = 'campeao' | 'vice' | 'terceiro' | 'quarto' | 'artilheiro' | 'revelacao';
 
 /** Palpite de jogo. Gols são NOT NULL no banco (F2). */
 export type PalpiteInput = {
@@ -128,12 +123,7 @@ export type CopaResultadosInput = {
 };
 
 /** Classe de acerto de um palpite vs jogo finalizado. */
-export type ClassePalpite =
-  | 'exato'
-  | 'vencedor_saldo'
-  | 'vencedor'
-  | 'parcial'
-  | 'erro';
+export type ClassePalpite = 'exato' | 'vencedor_saldo' | 'vencedor' | 'parcial' | 'erro';
 
 // ============================================================================
 // Constantes exportadas (uso em F7 para preview "vale até X pts")
@@ -173,12 +163,7 @@ Create `lib/__tests__/pontuacao.test.ts` with this content:
 
 ```ts
 import { describe, expect, it } from 'vitest';
-import {
-  PONTOS_BASE,
-  PONTOS_BONUS,
-  MULTIPLICADORES,
-  type ClassePalpite,
-} from '@/lib/pontuacao';
+import { PONTOS_BASE, PONTOS_BONUS, MULTIPLICADORES, type ClassePalpite } from '@/lib/pontuacao';
 
 describe('lib/pontuacao — sanity check (será removido após Task 2)', () => {
   it('PONTOS_BASE bate com a tabela do spec §4.4', () => {
@@ -215,13 +200,7 @@ describe('lib/pontuacao — sanity check (será removido após Task 2)', () => {
   });
 
   it('ClassePalpite tem exatamente 5 valores (compile-time check)', () => {
-    const valid: ClassePalpite[] = [
-      'exato',
-      'vencedor_saldo',
-      'vencedor',
-      'parcial',
-      'erro',
-    ];
+    const valid: ClassePalpite[] = ['exato', 'vencedor_saldo', 'vencedor', 'parcial', 'erro'];
     expect(valid).toHaveLength(5);
   });
 });
@@ -261,6 +240,7 @@ git commit -m "chore(pontuacao): scaffold types, constants, coverage dep"
 **Goal:** Função simples que mapeia `FaseJogo` → multiplicador. 7 testes (um por fase). Anti-regressão pra mudança acidental do mapa.
 
 **Files:**
+
 - Modify: `lib/pontuacao.ts`
 - Modify: `lib/__tests__/pontuacao.test.ts`
 
@@ -364,6 +344,7 @@ git commit -m "feat(pontuacao): add multiplicadorFase with full test coverage"
 **Goal:** Função que mapeia `ClassePalpite` → pontos base (0/2/5/7/10). 5 testes.
 
 **Files:**
+
 - Modify: `lib/pontuacao.ts`
 - Modify: `lib/__tests__/pontuacao.test.ts`
 
@@ -457,6 +438,7 @@ git commit -m "feat(pontuacao): add pontosBase with full test coverage"
 **Goal:** A função mais crítica do sistema. Recebe palpite + jogo finalizado, retorna a classe de acerto. 23 testes organizados em 7 `describe` blocks cobrindo: placar exato, vencedor com saldo, apenas vencedor não-empate, empates, parcial, erro, precondição.
 
 **Files:**
+
 - Modify: `lib/pontuacao.ts`
 - Modify: `lib/__tests__/pontuacao.test.ts`
 
@@ -467,11 +449,7 @@ Append to `lib/__tests__/pontuacao.test.ts`:
 ```ts
 describe('classificarPalpite', () => {
   // Helper pra montar o JogoInput de forma legível em todos os testes.
-  const jogo = (
-    gols_casa: number,
-    gols_fora: number,
-    fase: FaseJogo = 'grupos',
-  ): JogoInput => ({
+  const jogo = (gols_casa: number, gols_fora: number, fase: FaseJogo = 'grupos'): JogoInput => ({
     fase,
     finalizado: true,
     gols_casa,
@@ -480,145 +458,101 @@ describe('classificarPalpite', () => {
 
   describe('placar exato', () => {
     it('case #1 — 2×0 vs 2×0 → exato', () => {
-      expect(classificarPalpite({ gols_casa: 2, gols_fora: 0 }, jogo(2, 0))).toBe(
-        'exato',
-      );
+      expect(classificarPalpite({ gols_casa: 2, gols_fora: 0 }, jogo(2, 0))).toBe('exato');
     });
 
     it('case #6 — 1×1 vs 1×1 → exato', () => {
-      expect(classificarPalpite({ gols_casa: 1, gols_fora: 1 }, jogo(1, 1))).toBe(
-        'exato',
-      );
+      expect(classificarPalpite({ gols_casa: 1, gols_fora: 1 }, jogo(1, 1))).toBe('exato');
     });
 
     it('0×0 vs 0×0 → exato', () => {
-      expect(classificarPalpite({ gols_casa: 0, gols_fora: 0 }, jogo(0, 0))).toBe(
-        'exato',
-      );
+      expect(classificarPalpite({ gols_casa: 0, gols_fora: 0 }, jogo(0, 0))).toBe('exato');
     });
 
     it('3×2 vs 3×2 → exato', () => {
-      expect(classificarPalpite({ gols_casa: 3, gols_fora: 2 }, jogo(3, 2))).toBe(
-        'exato',
-      );
+      expect(classificarPalpite({ gols_casa: 3, gols_fora: 2 }, jogo(3, 2))).toBe('exato');
     });
   });
 
   describe('vencedor + saldo (vitórias apenas)', () => {
     it('case #2 — 2×0 vs 3×1 → vencedor_saldo (saldo +2 ambos)', () => {
-      expect(classificarPalpite({ gols_casa: 3, gols_fora: 1 }, jogo(2, 0))).toBe(
-        'vencedor_saldo',
-      );
+      expect(classificarPalpite({ gols_casa: 3, gols_fora: 1 }, jogo(2, 0))).toBe('vencedor_saldo');
     });
 
     it('vitória de fora com saldo +1 — 0×2 vs 1×3 → vencedor_saldo', () => {
-      expect(classificarPalpite({ gols_casa: 1, gols_fora: 3 }, jogo(0, 2))).toBe(
-        'vencedor_saldo',
-      );
+      expect(classificarPalpite({ gols_casa: 1, gols_fora: 3 }, jogo(0, 2))).toBe('vencedor_saldo');
     });
 
     it('vitória de casa com saldo +3 — 4×1 vs 5×2 → vencedor_saldo', () => {
-      expect(classificarPalpite({ gols_casa: 5, gols_fora: 2 }, jogo(4, 1))).toBe(
-        'vencedor_saldo',
-      );
+      expect(classificarPalpite({ gols_casa: 5, gols_fora: 2 }, jogo(4, 1))).toBe('vencedor_saldo');
     });
 
     it('vitória de fora com saldo -2 — real 1×3 vs palpite 2×4 → vencedor_saldo', () => {
-      expect(classificarPalpite({ gols_casa: 2, gols_fora: 4 }, jogo(1, 3))).toBe(
-        'vencedor_saldo',
-      );
+      expect(classificarPalpite({ gols_casa: 2, gols_fora: 4 }, jogo(1, 3))).toBe('vencedor_saldo');
     });
   });
 
   describe('apenas vencedor não-empate (saldo errado, sem +2 acumulando)', () => {
     it('case #3 — 2×0 vs 1×0 → vencedor (acertou casa-zero não conta como +2 porque acertou vencedor)', () => {
-      expect(classificarPalpite({ gols_casa: 1, gols_fora: 0 }, jogo(2, 0))).toBe(
-        'vencedor',
-      );
+      expect(classificarPalpite({ gols_casa: 1, gols_fora: 0 }, jogo(2, 0))).toBe('vencedor');
     });
 
     it('case #12 — 3×2 vs 3×0 → vencedor (acertou casa-3 não acumula +2)', () => {
-      expect(classificarPalpite({ gols_casa: 3, gols_fora: 0 }, jogo(3, 2))).toBe(
-        'vencedor',
-      );
+      expect(classificarPalpite({ gols_casa: 3, gols_fora: 0 }, jogo(3, 2))).toBe('vencedor');
     });
 
     it('vitória de fora com saldo errado — 0×2 vs 0×3 → vencedor', () => {
-      expect(classificarPalpite({ gols_casa: 0, gols_fora: 3 }, jogo(0, 2))).toBe(
-        'vencedor',
-      );
+      expect(classificarPalpite({ gols_casa: 0, gols_fora: 3 }, jogo(0, 2))).toBe('vencedor');
     });
 
     it('vencedor certo, saldo +1 vs +3, ambos zero em casa — 0×1 vs 0×3 → vencedor', () => {
-      expect(classificarPalpite({ gols_casa: 0, gols_fora: 3 }, jogo(0, 1))).toBe(
-        'vencedor',
-      );
+      expect(classificarPalpite({ gols_casa: 0, gols_fora: 3 }, jogo(0, 1))).toBe('vencedor');
     });
   });
 
   describe('empate não-exato sempre = vencedor (Q3-A do spec)', () => {
     it('case #7 — 1×1 vs 2×2 → vencedor (saldo trivial 0 não conta como vencedor_saldo)', () => {
-      expect(classificarPalpite({ gols_casa: 2, gols_fora: 2 }, jogo(1, 1))).toBe(
-        'vencedor',
-      );
+      expect(classificarPalpite({ gols_casa: 2, gols_fora: 2 }, jogo(1, 1))).toBe('vencedor');
     });
 
     it('case #8 — 1×1 vs 0×0 → vencedor', () => {
-      expect(classificarPalpite({ gols_casa: 0, gols_fora: 0 }, jogo(1, 1))).toBe(
-        'vencedor',
-      );
+      expect(classificarPalpite({ gols_casa: 0, gols_fora: 0 }, jogo(1, 1))).toBe('vencedor');
     });
 
     it('2×2 vs 1×1 → vencedor', () => {
-      expect(classificarPalpite({ gols_casa: 1, gols_fora: 1 }, jogo(2, 2))).toBe(
-        'vencedor',
-      );
+      expect(classificarPalpite({ gols_casa: 1, gols_fora: 1 }, jogo(2, 2))).toBe('vencedor');
     });
   });
 
   describe('parcial (errou vencedor + acertou gols de 1 time)', () => {
     it('case #5 — 2×0 vs 0×0 → parcial (acertou fora=0, errou vencedor)', () => {
-      expect(classificarPalpite({ gols_casa: 0, gols_fora: 0 }, jogo(2, 0))).toBe(
-        'parcial',
-      );
+      expect(classificarPalpite({ gols_casa: 0, gols_fora: 0 }, jogo(2, 0))).toBe('parcial');
     });
 
     it('vencedor errado em vitória — 2×0 vs 2×3 → parcial (acertou casa=2)', () => {
-      expect(classificarPalpite({ gols_casa: 2, gols_fora: 3 }, jogo(2, 0))).toBe(
-        'parcial',
-      );
+      expect(classificarPalpite({ gols_casa: 2, gols_fora: 3 }, jogo(2, 0))).toBe('parcial');
     });
 
     it('case #9 — 1×1 vs 1×0 → parcial (errou vencedor empate vs vitória, acertou casa=1)', () => {
-      expect(classificarPalpite({ gols_casa: 1, gols_fora: 0 }, jogo(1, 1))).toBe(
-        'parcial',
-      );
+      expect(classificarPalpite({ gols_casa: 1, gols_fora: 0 }, jogo(1, 1))).toBe('parcial');
     });
 
     it('vencedor errado, acertou apenas fora — 1×1 vs 0×1 → parcial', () => {
-      expect(classificarPalpite({ gols_casa: 0, gols_fora: 1 }, jogo(1, 1))).toBe(
-        'parcial',
-      );
+      expect(classificarPalpite({ gols_casa: 0, gols_fora: 1 }, jogo(1, 1))).toBe('parcial');
     });
   });
 
   describe('erro (errou tudo)', () => {
     it('case #4 — 2×0 vs 0×2 → erro (saldo invertido, gols ambos errados)', () => {
-      expect(classificarPalpite({ gols_casa: 0, gols_fora: 2 }, jogo(2, 0))).toBe(
-        'erro',
-      );
+      expect(classificarPalpite({ gols_casa: 0, gols_fora: 2 }, jogo(2, 0))).toBe('erro');
     });
 
     it('case #10 — 1×1 vs 2×0 → erro (errou empate predito vitória + ambos gols errados)', () => {
-      expect(classificarPalpite({ gols_casa: 2, gols_fora: 0 }, jogo(1, 1))).toBe(
-        'erro',
-      );
+      expect(classificarPalpite({ gols_casa: 2, gols_fora: 0 }, jogo(1, 1))).toBe('erro');
     });
 
     it('saldo invertido, ambos errados — 3×1 vs 0×4 → erro', () => {
-      expect(classificarPalpite({ gols_casa: 0, gols_fora: 4 }, jogo(3, 1))).toBe(
-        'erro',
-      );
+      expect(classificarPalpite({ gols_casa: 0, gols_fora: 4 }, jogo(3, 1))).toBe('erro');
     });
   });
 
@@ -631,9 +565,9 @@ describe('classificarPalpite', () => {
         gols_fora: 0,
       } as unknown as JogoInput;
 
-      expect(() =>
-        classificarPalpite({ gols_casa: 2, gols_fora: 0 }, jogoNaoFinalizado),
-      ).toThrow('Jogo não finalizado: classificação inválida');
+      expect(() => classificarPalpite({ gols_casa: 2, gols_fora: 0 }, jogoNaoFinalizado)).toThrow(
+        'Jogo não finalizado: classificação inválida',
+      );
     });
   });
 });
@@ -686,19 +620,13 @@ Append depois de `pontosBase`:
  *
  * Lança Error se `jogo.finalizado !== true`. Caller filtra antes.
  */
-export function classificarPalpite(
-  palpite: PalpiteInput,
-  jogo: JogoInput,
-): ClassePalpite {
+export function classificarPalpite(palpite: PalpiteInput, jogo: JogoInput): ClassePalpite {
   if (jogo.finalizado !== true) {
     throw new Error('Jogo não finalizado: classificação inválida');
   }
 
   // 1. Placar exato
-  if (
-    palpite.gols_casa === jogo.gols_casa &&
-    palpite.gols_fora === jogo.gols_fora
-  ) {
+  if (palpite.gols_casa === jogo.gols_casa && palpite.gols_fora === jogo.gols_fora) {
     return 'exato';
   }
 
@@ -756,6 +684,7 @@ git commit -m "feat(pontuacao): add classificarPalpite with 23 tests covering al
 **Goal:** Função que compõe `classificarPalpite` + `pontosBase` + `multiplicadorFase` + `Math.round`. Cobre os cases #11-15 do spec §4.4 + 3 cases adicionais que exercitam multiplicadores e arredondamento half-up.
 
 **Files:**
+
 - Modify: `lib/pontuacao.ts`
 - Modify: `lib/__tests__/pontuacao.test.ts`
 
@@ -922,6 +851,7 @@ git commit -m "feat(pontuacao): add calcularPontosPalpite composing all 4 layers
 **Goal:** Função que pontua bônus (campeao/vice/terceiro/quarto/revelacao via `selecao_id`; artilheiro via `jogador_nome` com normalização agressiva). 12 testes: 5 acertos por tipo + 1 errou + 1 null + 5 normalização de artilheiro.
 
 **Files:**
+
 - Modify: `lib/pontuacao.ts`
 - Modify: `lib/__tests__/pontuacao.test.ts`
 
@@ -943,77 +873,72 @@ describe('calcularPontosBonus', () => {
 
   describe('tipos com selecao_id (campeao, vice, terceiro, quarto, revelacao)', () => {
     it('campeao acertou (selecao_id === campeao_id) → 50 pts', () => {
-      expect(
-        calcularPontosBonus({ tipo: 'campeao', selecao_id: 9 }, resultadosCheios),
-      ).toEqual({ acertou: true, pontos: 50 });
+      expect(calcularPontosBonus({ tipo: 'campeao', selecao_id: 9 }, resultadosCheios)).toEqual({
+        acertou: true,
+        pontos: 50,
+      });
     });
 
     it('vice acertou → 30 pts', () => {
-      expect(
-        calcularPontosBonus({ tipo: 'vice', selecao_id: 11 }, resultadosCheios),
-      ).toEqual({ acertou: true, pontos: 30 });
+      expect(calcularPontosBonus({ tipo: 'vice', selecao_id: 11 }, resultadosCheios)).toEqual({
+        acertou: true,
+        pontos: 30,
+      });
     });
 
     it('terceiro acertou → 15 pts', () => {
-      expect(
-        calcularPontosBonus({ tipo: 'terceiro', selecao_id: 5 }, resultadosCheios),
-      ).toEqual({ acertou: true, pontos: 15 });
+      expect(calcularPontosBonus({ tipo: 'terceiro', selecao_id: 5 }, resultadosCheios)).toEqual({
+        acertou: true,
+        pontos: 15,
+      });
     });
 
     it('quarto acertou → 15 pts', () => {
-      expect(
-        calcularPontosBonus({ tipo: 'quarto', selecao_id: 7 }, resultadosCheios),
-      ).toEqual({ acertou: true, pontos: 15 });
+      expect(calcularPontosBonus({ tipo: 'quarto', selecao_id: 7 }, resultadosCheios)).toEqual({
+        acertou: true,
+        pontos: 15,
+      });
     });
 
     it('revelacao acertou → 15 pts', () => {
-      expect(
-        calcularPontosBonus(
-          { tipo: 'revelacao', selecao_id: 12 },
-          resultadosCheios,
-        ),
-      ).toEqual({ acertou: true, pontos: 15 });
+      expect(calcularPontosBonus({ tipo: 'revelacao', selecao_id: 12 }, resultadosCheios)).toEqual({
+        acertou: true,
+        pontos: 15,
+      });
     });
 
     it('campeao errou (selecao_id ≠ campeao_id) → 0 pts', () => {
-      expect(
-        calcularPontosBonus({ tipo: 'campeao', selecao_id: 99 }, resultadosCheios),
-      ).toEqual({ acertou: false, pontos: 0 });
+      expect(calcularPontosBonus({ tipo: 'campeao', selecao_id: 99 }, resultadosCheios)).toEqual({
+        acertou: false,
+        pontos: 0,
+      });
     });
 
     it('campeao com resultados.campeao_id=null (Copa em andamento) → 0 pts', () => {
       const semCampeao = { ...resultadosCheios, campeao_id: null };
-      expect(
-        calcularPontosBonus({ tipo: 'campeao', selecao_id: 9 }, semCampeao),
-      ).toEqual({ acertou: false, pontos: 0 });
+      expect(calcularPontosBonus({ tipo: 'campeao', selecao_id: 9 }, semCampeao)).toEqual({
+        acertou: false,
+        pontos: 0,
+      });
     });
   });
 
   describe('artilheiro (jogador_nome com normalização)', () => {
     it('match exato — "Mbappé" === "Mbappé" → 25 pts', () => {
       expect(
-        calcularPontosBonus(
-          { tipo: 'artilheiro', jogador_nome: 'Mbappé' },
-          resultadosCheios,
-        ),
+        calcularPontosBonus({ tipo: 'artilheiro', jogador_nome: 'Mbappé' }, resultadosCheios),
       ).toEqual({ acertou: true, pontos: 25 });
     });
 
     it('case + acento ignorados — "MBAPPE" === "Mbappé" → 25 pts', () => {
       expect(
-        calcularPontosBonus(
-          { tipo: 'artilheiro', jogador_nome: 'MBAPPE' },
-          resultadosCheios,
-        ),
+        calcularPontosBonus({ tipo: 'artilheiro', jogador_nome: 'MBAPPE' }, resultadosCheios),
       ).toEqual({ acertou: true, pontos: 25 });
     });
 
     it('whitespace nas pontas — "  Mbappé  " === "Mbappé" → 25 pts', () => {
       expect(
-        calcularPontosBonus(
-          { tipo: 'artilheiro', jogador_nome: '  Mbappé  ' },
-          resultadosCheios,
-        ),
+        calcularPontosBonus({ tipo: 'artilheiro', jogador_nome: '  Mbappé  ' }, resultadosCheios),
       ).toEqual({ acertou: true, pontos: 25 });
     });
 
@@ -1036,10 +961,7 @@ describe('calcularPontosBonus', () => {
         artilheiro_nome: 'Kylian Mbappé',
       };
       expect(
-        calcularPontosBonus(
-          { tipo: 'artilheiro', jogador_nome: 'Mbappé' },
-          resultadosKylian,
-        ),
+        calcularPontosBonus({ tipo: 'artilheiro', jogador_nome: 'Mbappé' }, resultadosKylian),
       ).toEqual({ acertou: false, pontos: 0 });
     });
   });
@@ -1093,8 +1015,7 @@ export function calcularPontosBonus(
     if (!resultados.artilheiro_nome) {
       return { acertou: false, pontos: 0 };
     }
-    const acertou =
-      normalizar(bonus.jogador_nome) === normalizar(resultados.artilheiro_nome);
+    const acertou = normalizar(bonus.jogador_nome) === normalizar(resultados.artilheiro_nome);
     return { acertou, pontos: acertou ? PONTOS_BONUS.artilheiro : 0 };
   }
 
@@ -1151,6 +1072,7 @@ git commit -m "feat(pontuacao): add calcularPontosBonus with normalizar helper"
 **Goal:** Configurar threshold de cobertura no `vitest.config.mts` escopado a `lib/pontuacao.ts`. Verificar que rodar `pnpm test:run --coverage` reporta ≥95% em linhas, branches, functions e statements.
 
 **Files:**
+
 - Modify: `vitest.config.mts`
 
 - [ ] **Step 1: Open `vitest.config.mts` and replace the `test` block**
@@ -1193,6 +1115,7 @@ pnpm test:run --coverage
 ```
 
 Expected:
+
 - Todos os 59 testes passam.
 - Output do v8 reporter mostra uma tabela com `lib/pontuacao.ts` e percentages ≥95% em todas as 4 colunas (Statements, Branches, Functions, Lines).
 - Comando termina com exit code 0 (threshold passou).
@@ -1207,10 +1130,7 @@ If coverage falla abaixo de 95% em alguma métrica, identificar a linha não-cob
 it('artilheiro com resultados.artilheiro_nome=null → 0 pts', () => {
   const semArtilheiro = { ...resultadosCheios, artilheiro_nome: null };
   expect(
-    calcularPontosBonus(
-      { tipo: 'artilheiro', jogador_nome: 'Mbappé' },
-      semArtilheiro,
-    ),
+    calcularPontosBonus({ tipo: 'artilheiro', jogador_nome: 'Mbappé' }, semArtilheiro),
   ).toEqual({ acertou: false, pontos: 0 });
 });
 ```
@@ -1231,6 +1151,7 @@ git commit -m "chore(test): add v8 coverage threshold (≥95%) for lib/pontuacao
 **Goal:** Criar `supabase/migrations/20260430120000_ranking_tiebreakers.sql` que substitui a view `ranking` da F2 por uma versão que usa os tiebreakers de §3.5 (acertou_campeao + pontos_mata_mata + numero_bilhete) preservando colunas 1-8 da F2 e anexando colunas 9 e 10. Verificar via `supabase db reset` + inspeção de `information_schema.columns`.
 
 **Files:**
+
 - Create: `supabase/migrations/20260430120000_ranking_tiebreakers.sql`
 
 - [ ] **Step 1: Create the migration file**
@@ -1335,6 +1256,7 @@ supabase db reset
 ```
 
 Expected:
+
 - "Resetting local database..."
 - "Applying migration 20260429202547_initial_schema.sql..."
 - "Applying migration 20260430120000_ranking_tiebreakers.sql..."
@@ -1439,11 +1361,11 @@ Expected: status mostra `API URL`, `DB URL`, etc. Se aparecer "supabase local de
 
 Abrir `http://localhost:54323` no browser → "Authentication" → "Users" → "Add user" → "Create new user". Criar 3 usuários, anotando os UUIDs gerados:
 
-| Slot | Email             | Nome (em "user metadata", chave `full_name`) |
-| ---- | ----------------- | -------------------------------------------- |
-| A    | a@smoke.local     | Apostador A                                  |
-| B    | b@smoke.local     | Apostador B                                  |
-| C    | c@smoke.local     | Apostador C                                  |
+| Slot | Email         | Nome (em "user metadata", chave `full_name`) |
+| ---- | ------------- | -------------------------------------------- |
+| A    | a@smoke.local | Apostador A                                  |
+| B    | b@smoke.local | Apostador B                                  |
+| C    | c@smoke.local | Apostador C                                  |
 
 Senha: qualquer (ex: `smoke123!`). O trigger `handle_new_user` (F2) cria automaticamente as rows em `public.profiles` com `nome` baseado no `full_name`.
 
@@ -1573,12 +1495,14 @@ Expected output do `SELECT` final:
 ```
 
 Validações:
+
 - ✅ Os 3 estão empatados em `pontos_totais=100` e `acertos_exatos=0`.
 - ✅ A e B aparecem antes de C porque `acertou_campeao=true` > `false` (apesar de C ter `pontos_mata_mata=50`).
 - ✅ Entre A e B (empatados também em `acertou_campeao`), A vem antes porque `pontos_mata_mata=30 > 20`.
 - ✅ `posicao` é 1, 2, 3.
 
 Se a ordem estiver errada:
+
 - A e B na ordem errada → investigar `pontos_mata_mata` (cálculo da CTE `palpite_aggregates` com `FILTER (WHERE j.fase <> 'grupos')`).
 - C antes de A/B → investigar `campeao_hit` CTE (provavelmente o `selecao_id=9` no bônus de A/B não casou com `copa_resultados.campeao_id=9`).
 - Algum bilhete sumiu → checar `WHERE b.status_pagamento = 'confirmado'` na view (deveria pegar todos os 3).
@@ -1675,6 +1599,7 @@ git diff main..HEAD --stat
 ```
 
 Expected:
+
 - 7-9 commits na branch `feat/pontuacao` (1 por task de TDD + bootstrap + coverage + migration).
 - Arquivos modificados: `lib/pontuacao.ts` (NOVO), `lib/__tests__/pontuacao.test.ts` (NOVO), `vitest.config.mts` (modificado), `supabase/migrations/20260430120000_ranking_tiebreakers.sql` (NOVO), `package.json` + `pnpm-lock.yaml` (modificados pelo `@vitest/coverage-v8`).
 - Nenhum arquivo de smoke commitado.
