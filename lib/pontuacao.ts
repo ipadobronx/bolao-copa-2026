@@ -98,3 +98,12 @@ export const PONTOS_BONUS = {
   artilheiro: 25,
   revelacao: 15,
 } as const;
+
+// ============================================================================
+// Funções públicas — Camada 3: multiplicador
+// ============================================================================
+
+/** Retorna o multiplicador da fase. CLAUDE.md §3.1. */
+export function multiplicadorFase(fase: FaseJogo): 1 | 1.5 | 2 | 2.5 | 3 | 4 {
+  return MULTIPLICADORES[fase];
+}

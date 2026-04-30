@@ -3,10 +3,11 @@ import {
   PONTOS_BASE,
   PONTOS_BONUS,
   MULTIPLICADORES,
+  multiplicadorFase,
   type ClassePalpite,
 } from '@/lib/pontuacao';
 
-describe('lib/pontuacao — sanity check (será removido após Task 2)', () => {
+describe('lib/pontuacao — sanity check de constantes (permanente)', () => {
   it('PONTOS_BASE bate com a tabela do spec §4.4', () => {
     expect(PONTOS_BASE).toEqual({
       exato: 10,
@@ -49,5 +50,35 @@ describe('lib/pontuacao — sanity check (será removido após Task 2)', () => {
       'erro',
     ];
     expect(valid).toHaveLength(5);
+  });
+});
+
+describe('multiplicadorFase', () => {
+  it('grupos → 1', () => {
+    expect(multiplicadorFase('grupos')).toBe(1);
+  });
+
+  it('16avos → 1.5', () => {
+    expect(multiplicadorFase('16avos')).toBe(1.5);
+  });
+
+  it('oitavas → 2', () => {
+    expect(multiplicadorFase('oitavas')).toBe(2);
+  });
+
+  it('quartas → 2.5', () => {
+    expect(multiplicadorFase('quartas')).toBe(2.5);
+  });
+
+  it('semis → 3', () => {
+    expect(multiplicadorFase('semis')).toBe(3);
+  });
+
+  it('disputa_terceiro → 2', () => {
+    expect(multiplicadorFase('disputa_terceiro')).toBe(2);
+  });
+
+  it('final → 4', () => {
+    expect(multiplicadorFase('final')).toBe(4);
   });
 });
