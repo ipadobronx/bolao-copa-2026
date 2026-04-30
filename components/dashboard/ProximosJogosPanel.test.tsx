@@ -63,20 +63,13 @@ describe('<ProximosJogosPanel/>', () => {
   });
 
   it('errored renderiza fallback de erro mesmo com jogos no array', () => {
-    render(
-      <ProximosJogosPanel agora={AGORA} jogos={[jogo({ id: 1 })]} errored />,
-    );
+    render(<ProximosJogosPanel agora={AGORA} jogos={[jogo({ id: 1 })]} errored />);
     expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
     expect(screen.getByText(/Não foi possível carregar/i)).toBeInTheDocument();
   });
 
   it('mostra label da fase em desktop apenas (a classe md:inline cobre isso; markup contém o texto)', () => {
-    render(
-      <ProximosJogosPanel
-        agora={AGORA}
-        jogos={[jogo({ id: 1, fase: 'final' })]}
-      />,
-    );
+    render(<ProximosJogosPanel agora={AGORA} jogos={[jogo({ id: 1, fase: 'final' })]} />);
     const item = screen.getByRole('listitem');
     expect(within(item).getByText(/^final$/i)).toBeInTheDocument();
   });

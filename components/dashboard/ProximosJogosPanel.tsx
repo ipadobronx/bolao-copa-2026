@@ -11,10 +11,7 @@ export function ProximosJogosPanel({ jogos, errored = false, agora }: ProximosJo
     <section className="panel">
       <header className="panel-header">
         <div className="flex items-center gap-2.5 text-base font-bold">
-          <span
-            aria-hidden="true"
-            className="bg-success size-2 animate-pulse-dot rounded-full"
-          />
+          <span aria-hidden="true" className="bg-success animate-pulse-dot size-2 rounded-full" />
           Próximos jogos · Copa 2026
         </div>
       </header>

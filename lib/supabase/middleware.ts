@@ -20,9 +20,7 @@ export async function updateSupabaseSession(
         setAll: (toSet: CookieToSet[]) => {
           toSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
-          toSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
-          );
+          toSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
         },
       },
     },

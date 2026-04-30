@@ -50,7 +50,9 @@ export function JogoRow({ jogo, agora = new Date() }: JogoRowProps) {
             <span>{jogo.casa.nome}</span>
           </>
         ) : (
-          <span className="text-text-muted text-sm font-mono">{jogo.placeholder_casa ?? 'TBD'}</span>
+          <span className="text-text-muted font-mono text-sm">
+            {jogo.placeholder_casa ?? 'TBD'}
+          </span>
         )}
       </div>
 
@@ -65,7 +67,9 @@ export function JogoRow({ jogo, agora = new Date() }: JogoRowProps) {
             </span>
           </>
         ) : (
-          <span className="text-text-muted text-sm font-mono">{jogo.placeholder_fora ?? 'TBD'}</span>
+          <span className="text-text-muted font-mono text-sm">
+            {jogo.placeholder_fora ?? 'TBD'}
+          </span>
         )}
       </div>
 
@@ -83,7 +87,7 @@ export function JogoRow({ jogo, agora = new Date() }: JogoRowProps) {
             Palpitar
           </Link>
         )}
-        <span className="text-text-muted hidden font-mono text-[10px] uppercase tracking-wider md:inline">
+        <span className="text-text-muted hidden font-mono text-[10px] tracking-wider uppercase md:inline">
           {FASE_LABEL[jogo.fase]}
         </span>
       </div>
