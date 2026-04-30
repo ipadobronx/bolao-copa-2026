@@ -62,11 +62,15 @@ export function LoginForm({ defaultNext }: LoginFormProps) {
       const supabase = createSupabaseBrowserClient();
       const next = safeNext(defaultNext);
       const emailRedirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
+      const trimmedNome = values.nome.trim();
       const { error } = await supabase.auth.signInWithOtp({
         email: values.email,
         options: {
           emailRedirectTo,
-          data: { full_name: values.nome.trim() },
+          // Só passa metadata quando há nome — signInWithOtp ignora `data` em
+          // re-login de email existente; em signup novo o trigger handle_new_user
+          // usa raw_user_meta_data->>'full_name' pra popular profiles.nome.
+          ...(trimmedNome ? { data: { full_name: trimmedNome } } : {}),
         },
       });
       if (error) throw error;
@@ -134,7 +138,7 @@ export function LoginForm({ defaultNext }: LoginFormProps) {
     <form onSubmit={handleSubmit} className="space-y-4" noValidate>
       <div className="space-y-1.5">
         <label htmlFor={nomeId} className="font-body text-text-secondary text-sm">
-          Nome
+          Nome <span className="text-text-muted text-xs">(só na primeira vez)</span>
         </label>
         <input
           id={nomeId}

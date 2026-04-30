@@ -5,7 +5,12 @@ import { Menu } from 'lucide-react';
 import { useState } from 'react';
 import { DashboardNav } from '@/components/dashboard/DashboardNav';
 
-export function DashboardTopbarMobile() {
+export type DashboardTopbarMobileProps = {
+  nome: string;
+  email: string;
+};
+
+export function DashboardTopbarMobile({ nome, email }: DashboardTopbarMobileProps) {
   const [open, setOpen] = useState(false);
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
@@ -39,7 +44,7 @@ export function DashboardTopbarMobile() {
           <Dialog.Description className="sr-only">
             Navegação do painel do apostador
           </Dialog.Description>
-          <DashboardNav onItemClick={() => setOpen(false)} />
+          <DashboardNav onItemClick={() => setOpen(false)} showUser={{ nome, email }} />
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

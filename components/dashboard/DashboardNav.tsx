@@ -15,6 +15,7 @@ import type { Route } from 'next';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { UserBadge } from '@/components/dashboard/UserBadge';
 import { cn } from '@/lib/utils';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 
@@ -41,9 +42,14 @@ const CONTA: NavLink[] = [
 export type DashboardNavProps = {
   className?: string;
   onItemClick?: () => void;
+  // Optional user identity to render at the top of the nav. Used by the
+  // mobile drawer (TopbarMobile) so the user knows whose account is open
+  // while the dashboard header is hidden by the drawer overlay. Desktop
+  // sidebar doesn't pass it because the dash-header already shows UserBadge.
+  showUser?: { nome: string; email: string };
 };
 
-export function DashboardNav({ className, onItemClick }: DashboardNavProps) {
+export function DashboardNav({ className, onItemClick, showUser }: DashboardNavProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -75,6 +81,12 @@ export function DashboardNav({ className, onItemClick }: DashboardNavProps) {
           BOLÃO<span className="text-accent">26</span>
         </span>
       </div>
+
+      {showUser ? (
+        <div className="border-border mb-6 border-b pb-6">
+          <UserBadge nome={showUser.nome} email={showUser.email} />
+        </div>
+      ) : null}
 
       <Section label="Principal">
         {PRINCIPAL.map((item) => (

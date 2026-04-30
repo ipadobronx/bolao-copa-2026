@@ -11,7 +11,7 @@ export type DashboardShellProps = {
 export function DashboardShell({ nome, email, children }: DashboardShellProps) {
   return (
     <div className="min-h-screen md:grid md:grid-cols-[240px_1fr]">
-      <DashboardTopbarMobile />
+      <DashboardTopbarMobile nome={nome} email={email} />
       <DashboardNav className="hidden md:flex" />
       <div className="flex flex-col">
         <main className="flex-1 px-5 pt-20 pb-10 md:p-8 md:pt-8">

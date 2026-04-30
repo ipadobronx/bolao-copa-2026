@@ -83,6 +83,23 @@ describe('<LoginForm/>', () => {
     );
   });
 
+  it('submit com nome vazio não passa "data" pro signInWithOtp (re-login)', async () => {
+    signInWithOtpMock.mockResolvedValue({ error: null });
+    render(<LoginForm />);
+
+    // Não preenche nome; só email.
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'antonio@example.com' } });
+    fireEvent.submit(screen.getByRole('button', { name: /receber link/i }).closest('form')!);
+
+    await waitFor(() => {
+      expect(signInWithOtpMock).toHaveBeenCalledTimes(1);
+    });
+
+    const arg = signInWithOtpMock.mock.calls[0]![0];
+    expect(arg.email).toBe('antonio@example.com');
+    expect(arg.options.data).toBeUndefined();
+  });
+
   it('volta a idle e dispara toast.error quando signInWithOtp rejeita', async () => {
     signInWithOtpMock.mockRejectedValue(new Error('network down'));
     render(<LoginForm />);

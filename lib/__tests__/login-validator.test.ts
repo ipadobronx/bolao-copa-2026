@@ -23,9 +23,16 @@ describe('loginSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('rejeita nome só com whitespace (vira string vazia após trim)', () => {
+  it('aceita nome vazio (re-login só com email)', () => {
+    const result = loginSchema.safeParse({ nome: '', email: 'a@b.com' });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.nome).toBe('');
+  });
+
+  it('aceita nome só com whitespace (vira string vazia após trim)', () => {
     const result = loginSchema.safeParse({ nome: '   ', email: 'a@b.com' });
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.nome).toBe('');
   });
 
   it('rejeita nome maior que 80 caracteres', () => {
