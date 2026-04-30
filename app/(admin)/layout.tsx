@@ -1,4 +1,14 @@
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+import { redirect } from 'next/navigation';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  // Guard de auth (F4). Guard de is_admin entra na F9.
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect('/login?next=/admin');
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-border bg-bg-elevated border-b px-6 py-4">

@@ -64,7 +64,7 @@ Open `app/globals.css` and append these blocks **after** the existing `@utility 
 }
 
 @utility sidebar-item-disabled {
-  @apply text-text-muted/60 cursor-not-allowed pointer-events-none;
+  @apply text-text-muted/60 pointer-events-none cursor-not-allowed;
 }
 
 @utility sign-out-btn {
@@ -550,7 +550,10 @@ Create `lib/validators/next.ts`:
 ```ts
 const INTERNAL_PATH = /^\/(?!\/)/;
 
-export function safeNext(value: string | null | undefined, fallback: string = '/dashboard'): string {
+export function safeNext(
+  value: string | null | undefined,
+  fallback: string = '/dashboard',
+): string {
   if (typeof value !== 'string' || value.length === 0) return fallback;
   return INTERNAL_PATH.test(value) ? value : fallback;
 }
@@ -709,7 +712,7 @@ export function LoginForm({ defaultNext }: LoginFormProps) {
           type="button"
           onClick={handleResend}
           disabled={state.cooldownLeft > 0}
-          className="btn-sm w-full disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-sm w-full disabled:cursor-not-allowed disabled:opacity-50"
         >
           {state.cooldownLeft > 0 ? `Reenviar (${state.cooldownLeft}s)` : 'Reenviar link'}
         </button>
@@ -741,7 +744,7 @@ export function LoginForm({ defaultNext }: LoginFormProps) {
               errors: state.kind === 'idle' ? { ...state.errors, nome: undefined } : {},
             })
           }
-          className="bg-bg-dark border-border focus:border-accent focus:ring-accent w-full rounded-md border px-3 py-2 font-body text-sm outline-none focus:ring-1 disabled:opacity-50"
+          className="bg-bg-dark border-border focus:border-accent focus:ring-accent font-body w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-1 disabled:opacity-50"
         />
         {state.kind === 'idle' && state.errors.nome ? (
           <p id={nomeErrorId} className="text-danger font-mono text-xs">
@@ -771,7 +774,7 @@ export function LoginForm({ defaultNext }: LoginFormProps) {
               errors: state.kind === 'idle' ? { ...state.errors, email: undefined } : {},
             })
           }
-          className="bg-bg-dark border-border focus:border-accent focus:ring-accent w-full rounded-md border px-3 py-2 font-body text-sm outline-none focus:ring-1 disabled:opacity-50"
+          className="bg-bg-dark border-border focus:border-accent focus:ring-accent font-body w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-1 disabled:opacity-50"
         />
         {state.kind === 'idle' && state.errors.email ? (
           <p id={emailErrorId} className="text-danger font-mono text-xs">
@@ -784,7 +787,7 @@ export function LoginForm({ defaultNext }: LoginFormProps) {
         type="submit"
         disabled={sending}
         aria-busy={sending}
-        className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+        className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50"
       >
         {sending ? (
           <span className="flex items-center justify-center gap-2">
@@ -1176,9 +1179,7 @@ export async function updateSupabaseSession(
         setAll: (toSet: CookieToSet[]) => {
           toSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
-          toSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
-          );
+          toSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
         },
       },
     },
@@ -1475,7 +1476,9 @@ export function JogoRow({ jogo, agora = new Date() }: JogoRowProps) {
             <span>{jogo.casa.nome}</span>
           </>
         ) : (
-          <span className="text-text-muted text-sm font-mono">{jogo.placeholder_casa ?? 'TBD'}</span>
+          <span className="text-text-muted font-mono text-sm">
+            {jogo.placeholder_casa ?? 'TBD'}
+          </span>
         )}
       </div>
 
@@ -1490,7 +1493,9 @@ export function JogoRow({ jogo, agora = new Date() }: JogoRowProps) {
             </span>
           </>
         ) : (
-          <span className="text-text-muted text-sm font-mono">{jogo.placeholder_fora ?? 'TBD'}</span>
+          <span className="text-text-muted font-mono text-sm">
+            {jogo.placeholder_fora ?? 'TBD'}
+          </span>
         )}
       </div>
 
@@ -1508,7 +1513,7 @@ export function JogoRow({ jogo, agora = new Date() }: JogoRowProps) {
             Palpitar
           </Link>
         )}
-        <span className="text-text-muted hidden font-mono text-[10px] uppercase tracking-wider md:inline">
+        <span className="text-text-muted hidden font-mono text-[10px] tracking-wider uppercase md:inline">
           {FASE_LABEL[jogo.fase]}
         </span>
       </div>
@@ -1556,10 +1561,7 @@ export function ProximosJogosPanel({ jogos, errored = false, agora }: ProximosJo
     <section className="panel">
       <header className="panel-header">
         <div className="flex items-center gap-2.5 text-base font-bold">
-          <span
-            aria-hidden="true"
-            className="bg-success size-2 animate-pulse-dot rounded-full"
-          />
+          <span aria-hidden="true" className="bg-success animate-pulse-dot size-2 rounded-full" />
           Próximos jogos · Copa 2026
         </div>
       </header>
@@ -1653,20 +1655,13 @@ describe('<ProximosJogosPanel/>', () => {
   });
 
   it('errored renderiza fallback de erro mesmo com jogos no array', () => {
-    render(
-      <ProximosJogosPanel agora={AGORA} jogos={[jogo({ id: 1 })]} errored />,
-    );
+    render(<ProximosJogosPanel agora={AGORA} jogos={[jogo({ id: 1 })]} errored />);
     expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
     expect(screen.getByText(/Não foi possível carregar/i)).toBeInTheDocument();
   });
 
   it('mostra label da fase em desktop apenas (a classe md:inline cobre isso; markup contém o texto)', () => {
-    render(
-      <ProximosJogosPanel
-        agora={AGORA}
-        jogos={[jogo({ id: 1, fase: 'final' })]}
-      />,
-    );
+    render(<ProximosJogosPanel agora={AGORA} jogos={[jogo({ id: 1, fase: 'final' })]} />);
     const item = screen.getByRole('listitem');
     expect(within(item).getByText(/^final$/i)).toBeInTheDocument();
   });
@@ -1893,7 +1888,14 @@ describe('<DashboardNav/>', () => {
     render(<DashboardNav />);
     expect(screen.getByRole('link', { name: /dashboard/i })).toHaveAttribute('href', '/dashboard');
 
-    const disabledLabels = ['Meus Palpites', 'Ranking', 'Bônus', 'Minhas Tabelas', 'Cashback', 'Configurações'];
+    const disabledLabels = [
+      'Meus Palpites',
+      'Ranking',
+      'Bônus',
+      'Minhas Tabelas',
+      'Cashback',
+      'Configurações',
+    ];
     for (const label of disabledLabels) {
       const span = screen.getByText(new RegExp(`^\\s*${label}\\s*$`));
       const wrapper = span.closest('[aria-disabled="true"]');
@@ -1910,7 +1912,10 @@ describe('<DashboardNav/>', () => {
   it('Dashboard ativo via aria-current="page" quando pathname casa', () => {
     usePathnameMock.mockReturnValue('/dashboard');
     render(<DashboardNav />);
-    expect(screen.getByRole('link', { name: /dashboard/i })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: /dashboard/i })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
   });
 
   it('clicar em "Sair" chama signOut + router.push("/login") + refresh + onItemClick', async () => {

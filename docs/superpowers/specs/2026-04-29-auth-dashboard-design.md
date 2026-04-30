@@ -66,14 +66,14 @@ Sem tela tipo `/jogos/[id]/palpites`. O fluxo único é: `/ranking` → clicar n
 
 **O que aparece em `/ranking/[bilheteId]`:**
 
-| Campo | Visível? |
-|---|---|
-| Nome (da view `ranking`) | ✅ |
-| Posição, pontos, acertos | ✅ |
-| Palpites de jogos com apito dado (em curso ou finalizados) | ✅ (RLS libera) |
-| Palpites de jogos pendentes | 🔒 (placeholder "🔒 palpite escondido até o jogo começar") |
-| Bônus pré-Copa | 🔒 (idem) |
-| Email, telefone, CPF | ❌ NUNCA — colunas privadas em `profiles`, query da página pública lista colunas explicitamente |
+| Campo                                                      | Visível?                                                                                        |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Nome (da view `ranking`)                                   | ✅                                                                                              |
+| Posição, pontos, acertos                                   | ✅                                                                                              |
+| Palpites de jogos com apito dado (em curso ou finalizados) | ✅ (RLS libera)                                                                                 |
+| Palpites de jogos pendentes                                | 🔒 (placeholder "🔒 palpite escondido até o jogo começar")                                      |
+| Bônus pré-Copa                                             | 🔒 (idem)                                                                                       |
+| Email, telefone, CPF                                       | ❌ NUNCA — colunas privadas em `profiles`, query da página pública lista colunas explicitamente |
 
 **Implicação na F8:** cada linha do ranking precisa ser ``<Link href={`/ranking/${bilheteId}`}>`` envolvendo o nome (ou a row inteira). A view `ranking` já expõe `bilhete_id`, `nome`, `posicao`, `pontos_totais` (a view roda com `security_invoker = false`, portanto bypassa RLS de `profiles` e libera leitura cross-user). Esta página em si é entregue na F8.
 
@@ -81,16 +81,16 @@ Sem tela tipo `/jogos/[id]/palpites`. O fluxo único é: `/ranking` → clicar n
 
 ## 3. Decisões de design da Feature 4
 
-| #   | Pergunta                              | Escolha                                                                                                                                            | Motivação                                                                                                |
-| --- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Q1  | Escopo do dashboard                   | **Chrome real + 1 painel "Próximos jogos da Copa"** (sem stats, progresso, cashback)                                                               | Aproveita `jogos` seedados sem depender de F6/F7; entrega valor visível sem hack                          |
-| Q2  | Fluxo do magic link                   | **Magic link puro** + form `nome` + `email`; metadata `full_name` lido pelo trigger                                                                | UX mais simples; nome resolvido no signup, sem onboarding modal                                          |
-| Q3  | Sidebar items                         | **7 itens completos**, 6 disabled "em breve" (`text-muted` + `cursor-not-allowed` + `aria-disabled`)                                               | Fiel ao protótipo; ativar futuras features = trocar 1 flag                                               |
-| Q4  | Mobile nav                            | **Top bar fixa** (logo + hamburger) + **drawer Radix Dialog** reusando `<DashboardNav/>`                                                            | `@radix-ui/react-dialog` já instalado; 1 componente serve desktop e mobile                               |
-| Q5  | Sign-out                              | **Único botão** no rodapé do `<DashboardNav/>` (`mt-auto` + divider)                                                                               | `<DashboardNav/>` já é Client por causa do drawer; centraliza a lógica de logout                         |
-| Q6  | Redirects e proteção                  | **Tudo no middleware**: anon → `/login?next=...` em `/dashboard*` / `/admin*` / `/palpites*`; logado → `/dashboard` em `/login`                    | Single source of truth; layouts continuam re-checando `getUser` por defesa em profundidade               |
-| Q7  | UX pós-submit do login                | **`<LoginForm/>` controla seu próprio estado**: idle → sending → sent (form some, mostra "Link enviado", reenviar com cooldown 60s)                | Sem rota extra; estado vivo no client; mobile-friendly                                                   |
-| Q8  | Painel "Próximos jogos"               | **Top 5** por `data_hora ASC`; server query direto; data formatada (`Hoje`/`Amanhã`/`Sex, 14/06`); CTA "Palpitar" por linha → `/palpites/[id]`     | Cobre o caso 100% Copa antes do início (próximos 5 = primeiros 5 jogos) e durante (próximos 5 = mistura) |
+| #   | Pergunta                | Escolha                                                                                                                                        | Motivação                                                                                                |
+| --- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Q1  | Escopo do dashboard     | **Chrome real + 1 painel "Próximos jogos da Copa"** (sem stats, progresso, cashback)                                                           | Aproveita `jogos` seedados sem depender de F6/F7; entrega valor visível sem hack                         |
+| Q2  | Fluxo do magic link     | **Magic link puro** + form `nome` + `email`; metadata `full_name` lido pelo trigger                                                            | UX mais simples; nome resolvido no signup, sem onboarding modal                                          |
+| Q3  | Sidebar items           | **7 itens completos**, 6 disabled "em breve" (`text-muted` + `cursor-not-allowed` + `aria-disabled`)                                           | Fiel ao protótipo; ativar futuras features = trocar 1 flag                                               |
+| Q4  | Mobile nav              | **Top bar fixa** (logo + hamburger) + **drawer Radix Dialog** reusando `<DashboardNav/>`                                                       | `@radix-ui/react-dialog` já instalado; 1 componente serve desktop e mobile                               |
+| Q5  | Sign-out                | **Único botão** no rodapé do `<DashboardNav/>` (`mt-auto` + divider)                                                                           | `<DashboardNav/>` já é Client por causa do drawer; centraliza a lógica de logout                         |
+| Q6  | Redirects e proteção    | **Tudo no middleware**: anon → `/login?next=...` em `/dashboard*` / `/admin*` / `/palpites*`; logado → `/dashboard` em `/login`                | Single source of truth; layouts continuam re-checando `getUser` por defesa em profundidade               |
+| Q7  | UX pós-submit do login  | **`<LoginForm/>` controla seu próprio estado**: idle → sending → sent (form some, mostra "Link enviado", reenviar com cooldown 60s)            | Sem rota extra; estado vivo no client; mobile-friendly                                                   |
+| Q8  | Painel "Próximos jogos" | **Top 5** por `data_hora ASC`; server query direto; data formatada (`Hoje`/`Amanhã`/`Sex, 14/06`); CTA "Palpitar" por linha → `/palpites/[id]` | Cobre o caso 100% Copa antes do início (próximos 5 = primeiros 5 jogos) e durante (próximos 5 = mistura) |
 
 ---
 
@@ -269,20 +269,27 @@ app/globals.css                         [adicionar @utility .panel, .panel-heade
 **Props:** `{ defaultNext?: string }` — recebido do query param `?next=` lido no Server Component shell.
 
 **Estado interno:**
+
 ```ts
 type State =
-  | { kind: 'idle'; values: { nome: string; email: string }; errors: Partial<Record<'nome' | 'email', string>> }
+  | {
+      kind: 'idle';
+      values: { nome: string; email: string };
+      errors: Partial<Record<'nome' | 'email', string>>;
+    }
   | { kind: 'sending'; values: { nome: string; email: string } }
-  | { kind: 'sent'; email: string; cooldownLeft: number }
+  | { kind: 'sent'; email: string; cooldownLeft: number };
 ```
 
 **Comportamento:**
+
 - Submit em `idle`: valida com `loginSchema` (Zod). Se inválido, escreve em `errors` e fica em `idle`. Se válido, transiciona pra `sending`.
 - Em `sending`: chama `supabase.auth.signInWithOtp(...)`. Se erro, volta pra `idle` mantendo valores; mostra `toast.error(mensagem)` via sonner. Se ok, transiciona pra `sent` com `cooldownLeft = 60`.
 - Em `sent`: timer `setInterval(1000)` decrementa `cooldownLeft` até 0. Botão "Reenviar" habilita em 0. Reenviar volta pra `sending` (mesmo email, sem novo nome).
 - Banner de erro vinda do callback: lê `?error=link-invalido` no Server Component shell, passa como prop adicional, exibe acima do form.
 
 **Acessibilidade:**
+
 - Inputs com `<label>` associados (`htmlFor` / `id`).
 - Erros inline com `aria-describedby` apontando pro span de erro.
 - Botão de submit com `aria-busy={state.kind === 'sending'}`.
@@ -295,6 +302,7 @@ type State =
 **Props:** `{ nome: string; email: string; children: React.ReactNode }`.
 
 **Markup:**
+
 ```tsx
 <div className="min-h-screen md:grid md:grid-cols-[240px_1fr]">
   <DashboardTopbarMobile nome={nome} email={email} />
@@ -319,19 +327,20 @@ type State =
 **Por que Client:** controla o estado `open` do `Dialog` Radix e passa pra `<DashboardNav/>` (a sidebar e o conteúdo do drawer compartilham o mesmo componente; quem decide se está em drawer mode é uma prop).
 
 **Markup (resumido):**
+
 ```tsx
 <Dialog.Root open={open} onOpenChange={setOpen}>
-  <header className="fixed top-0 inset-x-0 z-40 h-14 md:hidden bg-bg-dark/95 backdrop-blur-md border-b border-border flex items-center justify-between px-4">
+  <header className="bg-bg-dark/95 border-border fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b px-4 backdrop-blur-md md:hidden">
     <DashboardLogo />
     <Dialog.Trigger asChild>
-      <button aria-label="Abrir menu" className="p-2 rounded-lg hover:bg-bg-elevated">
+      <button aria-label="Abrir menu" className="hover:bg-bg-elevated rounded-lg p-2">
         <Menu className="size-5" />
       </button>
     </Dialog.Trigger>
   </header>
   <Dialog.Portal>
-    <Dialog.Overlay className="fixed inset-0 bg-black/60 z-50 md:hidden" />
-    <Dialog.Content className="fixed top-0 left-0 bottom-0 z-50 w-72 md:hidden">
+    <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 md:hidden" />
+    <Dialog.Content className="fixed top-0 bottom-0 left-0 z-50 w-72 md:hidden">
       <Dialog.Title className="sr-only">Menu</Dialog.Title>
       <DashboardNav nome={nome} email={email} drawerMode onItemClick={() => setOpen(false)} />
     </Dialog.Content>
@@ -344,12 +353,13 @@ type State =
 **Responsabilidade:** lista de nav items (sidebar fixa no desktop, conteúdo do drawer no mobile) + botão "Sair".
 
 **Props:**
+
 ```ts
 type Props = {
   nome: string;
   email: string;
-  drawerMode?: boolean;        // se true, o componente está dentro do drawer
-  onItemClick?: () => void;    // callback opcional pra fechar o drawer ao clicar
+  drawerMode?: boolean; // se true, o componente está dentro do drawer
+  onItemClick?: () => void; // callback opcional pra fechar o drawer ao clicar
   className?: string;
 };
 ```
@@ -357,30 +367,32 @@ type Props = {
 **Por que Client:** chama `supabase.auth.signOut()` no clique de "Sair" + `router.push/refresh`.
 
 **Estrutura:**
+
 ```tsx
-<nav className={cn("flex flex-col h-full bg-bg-card border-r border-border p-6", className)}>
+<nav className={cn('bg-bg-card border-border flex h-full flex-col border-r p-6', className)}>
   <DashboardLogo className="mb-8" />
 
   <Section label="Principal">
-    <NavItem icon={<Home/>} label="Dashboard" href="/dashboard" active />
-    <NavItem icon={<Trophy/>} label="Meus Palpites" disabled hint="Em breve (F7)" />
-    <NavItem icon={<Award/>} label="Ranking" disabled hint="Em breve (F8)" />
-    <NavItem icon={<Target/>} label="Bônus" disabled hint="Em breve (F7)" />
+    <NavItem icon={<Home />} label="Dashboard" href="/dashboard" active />
+    <NavItem icon={<Trophy />} label="Meus Palpites" disabled hint="Em breve (F7)" />
+    <NavItem icon={<Award />} label="Ranking" disabled hint="Em breve (F8)" />
+    <NavItem icon={<Target />} label="Bônus" disabled hint="Em breve (F7)" />
   </Section>
 
   <Section label="Conta">
-    <NavItem icon={<Ticket/>} label="Minhas Tabelas" disabled hint="Em breve (F6)" />
-    <NavItem icon={<DollarSign/>} label="Cashback" disabled hint="Em breve (F11)" />
-    <NavItem icon={<Settings/>} label="Configurações" disabled hint="Em breve" />
+    <NavItem icon={<Ticket />} label="Minhas Tabelas" disabled hint="Em breve (F6)" />
+    <NavItem icon={<DollarSign />} label="Cashback" disabled hint="Em breve (F11)" />
+    <NavItem icon={<Settings />} label="Configurações" disabled hint="Em breve" />
   </Section>
 
-  <button onClick={handleSignOut} className="mt-auto sign-out-btn">
+  <button onClick={handleSignOut} className="sign-out-btn mt-auto">
     <LogOut className="size-4" /> Sair
   </button>
 </nav>
 ```
 
 `<NavItem/>` (componente interno):
+
 - `disabled`: renderiza `<span aria-disabled="true" title={hint} className="...cursor-not-allowed text-text-muted/60">` — sem `<Link>`, não navega.
 - `active`: `bg-accent/10 text-accent`. Caminho atual marcado via `usePathname()` (`active={pathname === href}`); na F4 só `/dashboard` casa.
 
@@ -391,13 +403,14 @@ type Props = {
 **Props:** `{ nome: string; email: string }`.
 
 **Markup:**
+
 ```tsx
-<header className="flex flex-wrap items-start justify-between gap-4 mb-8">
+<header className="mb-8 flex flex-wrap items-start justify-between gap-4">
   <div>
-    <h1 className="font-display text-[38px] tracking-wide leading-none">
+    <h1 className="font-display text-[38px] leading-none tracking-wide">
       Salve, <span className="text-accent">{primeiroNome(nome)}</span> 👋
     </h1>
-    <p className="font-body text-text-secondary text-sm mt-2">
+    <p className="font-body text-text-secondary mt-2 text-sm">
       Sua primeira tabela ainda não está no jogo. Disponível em breve.
     </p>
   </div>
@@ -410,14 +423,15 @@ type Props = {
 #### `<UserBadge/>` — Server
 
 **Markup:**
+
 ```tsx
-<div className="flex items-center gap-2.5 bg-bg-card border border-border px-3.5 py-2 rounded-full">
-  <div className="avatar w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-bg-dark font-extrabold text-[13px]">
+<div className="bg-bg-card border-border flex items-center gap-2.5 rounded-full border px-3.5 py-2">
+  <div className="avatar text-bg-dark flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-[13px] font-extrabold">
     {iniciais(nome)}
   </div>
   <div className="text-[13px] leading-tight">
     <div className="font-semibold">{nome || 'Apostador'}</div>
-    <div className="font-mono text-[11px] text-text-muted">@{handle(email)} · 0 tabelas</div>
+    <div className="text-text-muted font-mono text-[11px]">@{handle(email)} · 0 tabelas</div>
   </div>
 </div>
 ```
@@ -429,21 +443,24 @@ type Props = {
 **Props:** `{ jogos: JogoComSelecoes[] }` (tipo derivado do select da page; documentado inline como type literal).
 
 **Markup:**
+
 ```tsx
 <section className="panel">
   <header className="panel-header">
     <div className="flex items-center gap-2.5 text-base font-bold">
-      <span className="size-2 rounded-full bg-success animate-pulse-dot" />
+      <span className="bg-success animate-pulse-dot size-2 rounded-full" />
       Próximos jogos · Copa 2026
     </div>
   </header>
   {jogos.length === 0 ? (
-    <div className="px-6 py-12 text-center text-text-muted">
+    <div className="text-text-muted px-6 py-12 text-center">
       <p className="font-display text-2xl">A Copa acabou. Bola pra frente. ⚽</p>
     </div>
   ) : (
     <ul>
-      {jogos.map(j => <JogoRow key={j.id} jogo={j} />)}
+      {jogos.map((j) => (
+        <JogoRow key={j.id} jogo={j} />
+      ))}
     </ul>
   )}
 </section>
@@ -452,16 +469,18 @@ type Props = {
 #### `<JogoRow/>` — Server
 
 **Comportamento:**
+
 - 5 colunas no desktop: data | casa | × | fora | ação.
 - Stack centralizado no mobile.
 - Casa: bandeira + nome se `selecao_casa_id` setado; `placeholder_casa` em texto puro caso contrário.
 - Fora: idem.
 - CTA "Palpitar":
   - Se `selecao_casa_id && selecao_fora_id` → ``<Link href={`/palpites/${jogo.id}`} className="btn-sm">Palpitar</Link>`` (link real; 404 até F7).
-  - Caso contrário → ``<span aria-disabled="true" title="Aguarde os times serem definidos" className="btn-sm opacity-50 cursor-not-allowed pointer-events-none">Palpitar</span>``.
+  - Caso contrário → `<span aria-disabled="true" title="Aguarde os times serem definidos" className="btn-sm opacity-50 cursor-not-allowed pointer-events-none">Palpitar</span>`.
 - Sublabel discreto à direita do nome do time fora ou abaixo: `<span className="text-text-muted text-xs font-mono">{labelFase(jogo.fase)}</span>` (ex: "Fase de Grupos", "Oitavas", etc.).
 
 **Helper `labelFase`** (inline em `JogoRow.tsx` ou em `lib/format/fase.ts` se ≥3 usos no projeto):
+
 ```ts
 function labelFase(fase: Database['public']['Enums']['fase_jogo']): string {
   return {
@@ -482,12 +501,13 @@ function labelFase(fase: Database['public']['Enums']['fase_jogo']): string {
 type Args = { data: Date; agora: Date; locale?: string };
 
 export function formatDataRelativa({ data, agora, locale = 'pt-BR' }: Args): {
-  date: string;   // "Hoje" | "Amanhã" | "Sex, 14/06"
-  hour: string;   // "16:00" — sempre em America/Sao_Paulo (TZ explícita; ver nota abaixo)
-}
+  date: string; // "Hoje" | "Amanhã" | "Sex, 14/06"
+  hour: string; // "16:00" — sempre em America/Sao_Paulo (TZ explícita; ver nota abaixo)
+};
 ```
 
 Implementação resumida:
+
 - normaliza `data` e `agora` em "início do dia" (00:00:00 local).
 - diff em dias: 0 → "Hoje"; 1 → "Amanhã"; senão → `format(data, 'EEE, dd/MM', { locale: ptBR })` usando `Intl.DateTimeFormat` (sem date-fns — evitar dep extra).
 - hora: `Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(data)`.
@@ -512,14 +532,12 @@ export function iniciais(nome: string | null | undefined): string {
 import { z } from 'zod';
 
 export const loginSchema = z.object({
-  nome: z.string()
+  nome: z
+    .string()
     .trim()
     .min(2, 'Nome precisa ter pelo menos 2 caracteres.')
     .max(80, 'Nome muito longo.'),
-  email: z.string()
-    .trim()
-    .email('Email inválido.')
-    .toLowerCase(),
+  email: z.string().trim().email('Email inválido.').toLowerCase(),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
@@ -595,7 +613,9 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   // Guard de auth (F4). Guard de is_admin entra na F9.
   const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect('/login?next=/admin');
 
   return (
@@ -636,11 +656,11 @@ Adicionar `@utility` apenas pra padrões que aparecem ≥3× nesta feature (mesm
 }
 
 @utility sidebar-item-disabled {
-  @apply text-text-muted/60 cursor-not-allowed pointer-events-none;
+  @apply text-text-muted/60 pointer-events-none cursor-not-allowed;
 }
 
 @utility sign-out-btn {
-  @apply text-text-secondary hover:bg-bg-elevated hover:text-danger mt-auto flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors border-t border-border pt-4;
+  @apply text-text-secondary hover:bg-bg-elevated hover:text-danger border-border mt-auto flex items-center gap-2 rounded-lg border-t px-3 py-2.5 pt-4 text-sm font-medium transition-colors;
 }
 
 @utility btn-sm {
@@ -666,42 +686,42 @@ Iconografia: **Lucide React** (`lucide-react` já no package.json). Substitui os
 
 ### 7.1 Auth
 
-| Cenário | Comportamento |
-|---|---|
-| `signInWithOtp` retorna erro de rede | `<LoginForm/>` volta pra `idle`, `toast.error('Não consegui enviar o link. Tenta de novo.')` |
-| Email rejeitado pelo Supabase (formato/rate limit) | Mesmo path; mensagem mapeada se possível ('Aguarda 60s pra pedir outro link.') |
-| Submit com `nome.length < 2` ou email inválido | Validação Zod no client antes da chamada; erro inline abaixo do input via `errors[field]` |
-| `/auth/callback` recebe `?code=` mas exchange falha | Redireciona pra `/login?error=link-invalido`. Login shell lê o param e mostra banner vermelho fixo no topo do card |
-| `/auth/callback` recebe sem `code` ou com `?error=...` | Mesmo path acima |
-| `next` query malicioso (ex: `next=https://evil.com` ou `next=//evil.com`) | Validação `^/(?!\/)`. Falhou → ignora, usa `/dashboard` |
-| User clica "Reenviar link" antes do cooldown | Botão `disabled` + counter visível ("Reenviar (32s)") |
-| Supabase Auth indisponível durante middleware | `updateSupabaseSession` retorna `user: null` (sem 500). Rota protegida → redirect pra `/login` (fail-closed). Rota pública → segue. |
+| Cenário                                                                   | Comportamento                                                                                                                       |
+| ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `signInWithOtp` retorna erro de rede                                      | `<LoginForm/>` volta pra `idle`, `toast.error('Não consegui enviar o link. Tenta de novo.')`                                        |
+| Email rejeitado pelo Supabase (formato/rate limit)                        | Mesmo path; mensagem mapeada se possível ('Aguarda 60s pra pedir outro link.')                                                      |
+| Submit com `nome.length < 2` ou email inválido                            | Validação Zod no client antes da chamada; erro inline abaixo do input via `errors[field]`                                           |
+| `/auth/callback` recebe `?code=` mas exchange falha                       | Redireciona pra `/login?error=link-invalido`. Login shell lê o param e mostra banner vermelho fixo no topo do card                  |
+| `/auth/callback` recebe sem `code` ou com `?error=...`                    | Mesmo path acima                                                                                                                    |
+| `next` query malicioso (ex: `next=https://evil.com` ou `next=//evil.com`) | Validação `^/(?!\/)`. Falhou → ignora, usa `/dashboard`                                                                             |
+| User clica "Reenviar link" antes do cooldown                              | Botão `disabled` + counter visível ("Reenviar (32s)")                                                                               |
+| Supabase Auth indisponível durante middleware                             | `updateSupabaseSession` retorna `user: null` (sem 500). Rota protegida → redirect pra `/login` (fail-closed). Rota pública → segue. |
 
 ### 7.2 Dashboard
 
-| Cenário | Comportamento |
-|---|---|
-| `profiles.nome` vazio (trigger fallback `''`) | `<DashboardHeader/>` usa "Apostador" via `primeiroNome(nome)` que trata vazio. `<UserBadge/>` mostra "Apostador". Logger emite `console.warn` server-side. |
-| Query de `profiles` retorna erro (não should happen com RLS atual + user logado) | Layout deixa propagar pro `app/error.tsx` (já existe; mostra "Tentar novamente"). |
-| Query de `próximos jogos` falha | `<ProximosJogosPanel/>` recebe `[]`; renderiza fallback "Não foi possível carregar os próximos jogos. Tenta atualizar a página." (variante do empty state). Page component captura erro e passa flag `errored: true` pro panel. |
-| `próximos jogos` retorna 0 (Copa acabou ou cenário pós-Copa) | Empty state "A Copa acabou. Bola pra frente. ⚽" |
-| Jogo com `selecao_casa_id: null` (mata-mata TBD) | `<JogoRow/>` renderiza `placeholder_casa` em texto. CTA "Palpitar" disabled com `aria-disabled` + title. |
-| User logado mas sessão revogada/expirada | `getUser()` retorna null no middleware → redirect pra `/login?next=/dashboard`. Layout serve como segunda barreira. |
+| Cenário                                                                          | Comportamento                                                                                                                                                                                                                   |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `profiles.nome` vazio (trigger fallback `''`)                                    | `<DashboardHeader/>` usa "Apostador" via `primeiroNome(nome)` que trata vazio. `<UserBadge/>` mostra "Apostador". Logger emite `console.warn` server-side.                                                                      |
+| Query de `profiles` retorna erro (não should happen com RLS atual + user logado) | Layout deixa propagar pro `app/error.tsx` (já existe; mostra "Tentar novamente").                                                                                                                                               |
+| Query de `próximos jogos` falha                                                  | `<ProximosJogosPanel/>` recebe `[]`; renderiza fallback "Não foi possível carregar os próximos jogos. Tenta atualizar a página." (variante do empty state). Page component captura erro e passa flag `errored: true` pro panel. |
+| `próximos jogos` retorna 0 (Copa acabou ou cenário pós-Copa)                     | Empty state "A Copa acabou. Bola pra frente. ⚽"                                                                                                                                                                                |
+| Jogo com `selecao_casa_id: null` (mata-mata TBD)                                 | `<JogoRow/>` renderiza `placeholder_casa` em texto. CTA "Palpitar" disabled com `aria-disabled` + title.                                                                                                                        |
+| User logado mas sessão revogada/expirada                                         | `getUser()` retorna null no middleware → redirect pra `/login?next=/dashboard`. Layout serve como segunda barreira.                                                                                                             |
 
 ### 7.3 Logout
 
-| Cenário | Comportamento |
-|---|---|
+| Cenário                  | Comportamento                                                       |
+| ------------------------ | ------------------------------------------------------------------- |
 | `signOut()` retorna erro | `toast.error('Não consegui deslogar. Tenta de novo.')`. Não navega. |
-| `signOut()` ok | `router.push('/login')` + `router.refresh()` (limpa cache RSC). |
+| `signOut()` ok           | `router.push('/login')` + `router.refresh()` (limpa cache RSC).     |
 
 ### 7.4 Mobile drawer
 
-| Cenário | Comportamento |
-|---|---|
-| Drawer aberto + clique em item disabled | Drawer permanece aberto; clique não consome (item é `<span>` sem href). |
-| Drawer aberto + clique em "Sair" | Fecha drawer (via `onItemClick` callback do `<DashboardNav/>`) + executa `signOut()`. |
-| Drawer aberto + clique fora ou Esc | Radix Dialog fecha (default behavior). |
+| Cenário                                                               | Comportamento                                                                                          |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Drawer aberto + clique em item disabled                               | Drawer permanece aberto; clique não consome (item é `<span>` sem href).                                |
+| Drawer aberto + clique em "Sair"                                      | Fecha drawer (via `onItemClick` callback do `<DashboardNav/>`) + executa `signOut()`.                  |
+| Drawer aberto + clique fora ou Esc                                    | Radix Dialog fecha (default behavior).                                                                 |
 | User abre drawer no mobile e a viewport vira desktop (rotação tablet) | Radix Dialog continua aberto até user fechar; sidebar fixa também aparece. Caso raro, não prioritário. |
 
 ---
