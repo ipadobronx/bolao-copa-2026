@@ -159,7 +159,7 @@ function ScoreInput({
       readOnly={readonly}
       placeholder="?"
       className={cn(
-        'h-9 w-9 rounded-lg border text-center font-mono text-base font-bold outline-none',
+        'h-11 w-11 rounded-lg border text-center font-mono text-lg font-bold outline-none',
         variant === 'normal' &&
           !readonly &&
           'bg-bg-elevated border-border-strong text-text-primary focus:border-accent',
