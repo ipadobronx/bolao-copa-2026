@@ -37,7 +37,7 @@ afterEach(() => {
 });
 
 describe('<DashboardNav/>', () => {
-  it('renderiza 8 itens — Dashboard e Comprar tabela como links reais, 6 disabled', () => {
+  it('renderiza 8 itens — Dashboard, Comprar tabela e Ranking como links reais, 5 disabled', () => {
     usePathnameMock.mockReturnValue('/dashboard');
     render(<DashboardNav />);
     expect(screen.getByRole('link', { name: /^dashboard$/i })).toHaveAttribute(
@@ -48,10 +48,10 @@ describe('<DashboardNav/>', () => {
       'href',
       '/comprar',
     );
+    expect(screen.getByRole('link', { name: /^ranking$/i })).toHaveAttribute('href', '/ranking');
 
     const disabledLabels = [
       'Meus Palpites',
-      'Ranking',
       'Bônus',
       'Minhas Tabelas',
       'Cashback',
