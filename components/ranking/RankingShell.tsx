@@ -28,9 +28,9 @@ export function RankingShell({
     const res = await fetch('/api/ranking')
     if (!res.ok) return
     const json = await res.json()
-    setRows(json.geral ?? rows)
-    setPeriodoRows(json.periodo ?? periodoRows)
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    if (json.geral) setRows(json.geral)
+    if (json.periodo) setPeriodoRows(json.periodo)
+  }, [])
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient()
