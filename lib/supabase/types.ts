@@ -423,6 +423,39 @@ export type Database = {
         }
         Relationships: []
       }
+      ranking_snapshots: {
+        Row: {
+          id: string
+          user_id: string
+          posicao: number
+          pontos_totais: number
+          periodo: string
+          snapshot_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          posicao: number
+          pontos_totais: number
+          periodo: string
+          snapshot_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          posicao?: number
+          pontos_totais?: number
+          periodo?: string
+          snapshot_at?: string
+        }
+        Relationships: []
+      }
+      ranking_signals: {
+        Row: { id: number; updated_at: string }
+        Insert: { id?: number; updated_at?: string }
+        Update: { id?: number; updated_at?: string }
+        Relationships: []
+      }
     }
     Views: {
       bilhetes_view: {
@@ -504,6 +537,22 @@ export type Database = {
           pontos_totais: number | null
           posicao: number | null
           user_id: string | null
+        }
+        Relationships: []
+      }
+      ranking_usuarios: {
+        Row: {
+          user_id: string | null
+          nome: string | null
+          melhor_bilhete_id: string | null
+          melhor_numero_bilhete: number | null
+          pontos_totais: number | null
+          acertos_exatos: number | null
+          acertos_parciais: number | null
+          pontos_mata_mata: number | null
+          acertou_campeao: boolean | null
+          total_bilhetes: number | null
+          posicao: number | null
         }
         Relationships: []
       }
