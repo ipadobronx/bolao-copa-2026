@@ -109,7 +109,7 @@ export async function upsertBonus(
   const { error } = await supabase.from('palpites_bonus').upsert(
     {
       bilhete_id: bilheteId,
-      tipo: tipo as Parameters<typeof upsertBonusSchema.parse>[0]['tipo'],
+      tipo: parsed.data.tipo,
       selecao_id: selecaoId ?? null,
       jogador_nome: jogadorNome?.trim() ?? null,
     },

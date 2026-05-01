@@ -79,9 +79,9 @@ describe('MatchRow — estado open', () => {
     upsertPalpiteMock.mockResolvedValue({ ok: true });
     render(<MatchRow bilheteId="abc" jogo={JOGO_ABERTO} palpiteSalvo={null} />);
 
-    const [inputCasa, inputFora] = screen.getAllByRole('spinbutton');
-    fireEvent.change(inputCasa, { target: { value: '2' } });
-    fireEvent.change(inputFora, { target: { value: '1' } });
+    const inputs = screen.getAllByRole('spinbutton');
+    fireEvent.change(inputs[0]!, { target: { value: '2' } });
+    fireEvent.change(inputs[1]!, { target: { value: '1' } });
 
     expect(upsertPalpiteMock).not.toHaveBeenCalled();
     await act(async () => { vi.advanceTimersByTime(1000); });
@@ -90,8 +90,8 @@ describe('MatchRow — estado open', () => {
 
   it('não chama upsertPalpite se apenas um campo preenchido', async () => {
     render(<MatchRow bilheteId="abc" jogo={JOGO_ABERTO} palpiteSalvo={null} />);
-    const [inputCasa] = screen.getAllByRole('spinbutton');
-    fireEvent.change(inputCasa, { target: { value: '2' } });
+    const inputs = screen.getAllByRole('spinbutton');
+    fireEvent.change(inputs[0]!, { target: { value: '2' } });
     vi.advanceTimersByTime(1000);
     expect(upsertPalpiteMock).not.toHaveBeenCalled();
   });
@@ -99,9 +99,9 @@ describe('MatchRow — estado open', () => {
   it('mostra toast de erro se upsertPalpite falhar', async () => {
     upsertPalpiteMock.mockResolvedValue({ ok: false, error: 'Prazo encerrado.' });
     render(<MatchRow bilheteId="abc" jogo={JOGO_ABERTO} palpiteSalvo={null} />);
-    const [inputCasa, inputFora] = screen.getAllByRole('spinbutton');
-    fireEvent.change(inputCasa, { target: { value: '1' } });
-    fireEvent.change(inputFora, { target: { value: '0' } });
+    const inputs = screen.getAllByRole('spinbutton');
+    fireEvent.change(inputs[0]!, { target: { value: '1' } });
+    fireEvent.change(inputs[1]!, { target: { value: '0' } });
     await act(async () => { vi.advanceTimersByTime(1000); });
     await Promise.resolve(); // flush promise from upsertPalpite
     expect(toastErrorMock).toHaveBeenCalledWith('Prazo encerrado.');

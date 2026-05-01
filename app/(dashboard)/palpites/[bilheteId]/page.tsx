@@ -99,7 +99,7 @@ export default async function PalpitesBilhetePage({
       palpitesSalvos={(palpitesRaw ?? []) as PalpiteSalvo[]}
       bonusSalvos={(bonusRaw ?? []) as BonusSalvo[]}
       selecoes={(selecoesRaw ?? []) as SelecaoBasica[]}
-      initialTab={tab}
+      initialTab={tab ?? null}
     />
   );
 }

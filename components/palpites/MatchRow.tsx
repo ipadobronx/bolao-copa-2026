@@ -131,7 +131,7 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
 
       {/* Chip */}
       <div className="text-right">
-        <StatusChip estado={estado} saveState={saveState} pts={palpiteSalvo?.pontos_calculados} />
+        <StatusChip estado={estado} saveState={saveState} pts={palpiteSalvo?.pontos_calculados ?? null} />
       </div>
     </div>
   );

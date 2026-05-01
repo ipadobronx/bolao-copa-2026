@@ -72,16 +72,16 @@ describe('inferirRodadas', () => {
 
   it('deadline de cada rodada é o min(data_hora) dos seus jogos', () => {
     const rodadas = inferirRodadas(jogos);
-    expect(rodadas[0].deadline).toBe('2026-06-11T16:00:00Z');
-    expect(rodadas[1].deadline).toBe('2026-06-15T16:00:00Z');
-    expect(rodadas[2].deadline).toBe('2026-06-19T16:00:00Z');
+    expect(rodadas[0]!.deadline).toBe('2026-06-11T16:00:00Z');
+    expect(rodadas[1]!.deadline).toBe('2026-06-15T16:00:00Z');
+    expect(rodadas[2]!.deadline).toBe('2026-06-19T16:00:00Z');
   });
 
   it('funciona com jogos desordenados como input', () => {
-    const shuffled = [jogos[4], jogos[2], jogos[0], jogos[5], jogos[3], jogos[1]];
+    const shuffled = [jogos[4]!, jogos[2]!, jogos[0]!, jogos[5]!, jogos[3]!, jogos[1]!];
     const rodadas = inferirRodadas(shuffled);
-    expect(rodadas[0].jogos.map((j) => j.id).sort()).toEqual([1, 2]);
-    expect(rodadas[2].jogos.map((j) => j.id).sort()).toEqual([5, 6]);
+    expect(rodadas[0]!.jogos.map((j) => j.id).sort()).toEqual([1, 2]);
+    expect(rodadas[2]!.jogos.map((j) => j.id).sort()).toEqual([5, 6]);
   });
 });
 

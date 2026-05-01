@@ -27,8 +27,7 @@ export default async function PalpitesRedirectPage({
   if (confirmed.length >= 2) redirect('/minhas-tabelas');
 
   const { tab } = await searchParams;
-  const dest = tab
-    ? `/palpites/${confirmed[0].id}?tab=${tab}`
-    : `/palpites/${confirmed[0].id}`;
+  const bilheteId = confirmed[0]!.id;
+  const dest = tab ? `/palpites/${bilheteId}?tab=${tab}` : `/palpites/${bilheteId}`;
   redirect(dest);
 }

@@ -91,7 +91,7 @@ export function inferirRodadas(jogosDoGrupo: JogoComSelecoes[]): Rodada[] {
     jogos,
     deadline: jogos.reduce((min, j) =>
       new Date(j.data_hora) < new Date(min) ? j.data_hora : min,
-      jogos[0].data_hora,
+      jogos[0]!.data_hora,
     ),
   }));
 }
