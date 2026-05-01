@@ -43,12 +43,12 @@ SELECT
 FROM best b
 LEFT JOIN contagem c ON c.user_id = b.user_id;
 
-GRANT SELECT ON public.ranking_usuarios TO anon, authenticated;
+GRANT SELECT ON public.ranking_usuarios TO authenticated;
 
 -- 2. Tabela ranking_snapshots (histórico de posições para tendência)
 CREATE TABLE public.ranking_snapshots (
   id            uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id       uuid        NOT NULL REFERENCES auth.users(id),
+  user_id       uuid        NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   posicao       int         NOT NULL,
   pontos_totais int         NOT NULL,
   periodo       text        NOT NULL,
@@ -74,11 +74,10 @@ ALTER TABLE public.ranking_signals ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "authenticated lê signal"
   ON public.ranking_signals FOR SELECT TO authenticated USING (true);
 
-GRANT SELECT ON public.ranking_signals TO authenticated;
-
 -- 4. Função + trigger em palpites → atualiza ranking_signals
 CREATE OR REPLACE FUNCTION public.notify_ranking_updated()
-RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER AS $$
+RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER
+SET search_path = public AS $$
 BEGIN
   UPDATE public.ranking_signals SET updated_at = now() WHERE id = 1;
   RETURN NULL;
