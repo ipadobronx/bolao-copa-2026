@@ -37,7 +37,7 @@ afterEach(() => {
 });
 
 describe('<DashboardNav/>', () => {
-  it('renderiza 8 itens — Dashboard, Comprar tabela e Ranking como links reais, 5 disabled', () => {
+  it('renderiza 8 itens — todos os links reais habilitados, 2 disabled restantes', () => {
     usePathnameMock.mockReturnValue('/dashboard');
     render(<DashboardNav />);
     expect(screen.getByRole('link', { name: /^dashboard$/i })).toHaveAttribute(
@@ -48,15 +48,21 @@ describe('<DashboardNav/>', () => {
       'href',
       '/comprar',
     );
+    expect(screen.getByRole('link', { name: /meus palpites/i })).toHaveAttribute(
+      'href',
+      '/palpites',
+    );
+    expect(screen.getByRole('link', { name: /^bônus$/i })).toHaveAttribute(
+      'href',
+      '/palpites?tab=bonus',
+    );
+    expect(screen.getByRole('link', { name: /minhas tabelas/i })).toHaveAttribute(
+      'href',
+      '/minhas-tabelas',
+    );
     expect(screen.getByRole('link', { name: /^ranking$/i })).toHaveAttribute('href', '/ranking');
 
-    const disabledLabels = [
-      'Meus Palpites',
-      'Bônus',
-      'Minhas Tabelas',
-      'Cashback',
-      'Configurações',
-    ];
+    const disabledLabels = ['Cashback', 'Configurações'];
     for (const label of disabledLabels) {
       const span = screen.getByText(new RegExp(`^\\s*${label}\\s*$`));
       const wrapper = span.closest('[aria-disabled="true"]');
