@@ -1,13 +1,14 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { RankingTabGeral } from '../RankingTabGeral'
-import type { RankingRowData } from '../RankingRow'
 
 vi.mock('next/link', () => ({
   default: ({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) => (
     <a href={href} className={className}>{children}</a>
   ),
 }))
+
+import { RankingTabGeral } from '../RankingTabGeral'
+import type { RankingRowData } from '../RankingRow'
 
 const rows: RankingRowData[] = [
   { userId: 'u1', nome: 'Marco', posicao: 1, pontosTotais: 472, acertosExatos: 18, acertosParciais: 34, totalBilhetes: 5, tendencia: null, isCurrentUser: false },
