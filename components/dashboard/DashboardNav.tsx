@@ -29,14 +29,14 @@ type NavLink = {
 
 const PRINCIPAL: NavLink[] = [
   { label: 'Dashboard', icon: Home, href: '/dashboard' },
-  { label: 'Meus Palpites', icon: Trophy, disabledHint: 'Em breve (F7)' },
+  { label: 'Meus Palpites', icon: Trophy, href: '/palpites' },
   { label: 'Ranking', icon: Award, disabledHint: 'Em breve (F8)' },
-  { label: 'Bônus', icon: Target, disabledHint: 'Em breve (F7)' },
+  { label: 'Bônus', icon: Target, href: '/palpites?tab=bonus' },
 ];
 
 const CONTA: NavLink[] = [
   { label: 'Comprar tabela', icon: ShoppingCart, href: '/comprar' },
-  { label: 'Minhas Tabelas', icon: Ticket, disabledHint: 'Em breve (F7)' },
+  { label: 'Minhas Tabelas', icon: Ticket, href: '/minhas-tabelas' },
   { label: 'Cashback', icon: DollarSign, disabledHint: 'Em breve (F11)' },
   { label: 'Configurações', icon: Settings, disabledHint: 'Em breve' },
 ];
