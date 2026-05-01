@@ -34,21 +34,22 @@ export async function GET() {
     if (!lastSnap.has(s.user_id)) lastSnap.set(s.user_id, s.posicao)
   }
 
-  const geral = (rankingData ?? []).map((r) => {
-    const userId = r.user_id ?? ''
-    const snapPos = lastSnap.get(userId) ?? null
-    return {
-      userId,
-      nome: r.nome ?? '',
-      posicao: r.posicao ?? 0,
-      pontosTotais: r.pontos_totais ?? 0,
-      acertosExatos: r.acertos_exatos ?? 0,
-      acertosParciais: r.acertos_parciais ?? 0,
-      totalBilhetes: r.total_bilhetes ?? 1,
-      tendencia: snapPos !== null ? snapPos - (r.posicao ?? 0) : null,
-      isCurrentUser: userId === user.id,
-    }
-  })
+  const geral = (rankingData ?? [])
+    .filter((r): r is typeof r & { user_id: string } => r.user_id !== null && r.user_id !== undefined)
+    .map((r) => {
+      const snapPos = lastSnap.get(r.user_id) ?? null
+      return {
+        userId: r.user_id,
+        nome: r.nome ?? '',
+        posicao: r.posicao ?? 0,
+        pontosTotais: r.pontos_totais ?? 0,
+        acertosExatos: r.acertos_exatos ?? 0,
+        acertosParciais: r.acertos_parciais ?? 0,
+        totalBilhetes: r.total_bilhetes ?? 1,
+        tendencia: snapPos !== null ? snapPos - (r.posicao ?? 0) : null,
+        isCurrentUser: r.user_id === user.id,
+      }
+    })
 
   let periodoRows: typeof geral = []
   if (periodo) {
