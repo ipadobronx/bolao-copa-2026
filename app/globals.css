@@ -117,3 +117,114 @@
     animation: none;
   }
 }
+
+/* ============================================================
+   Ranking (F8)
+   ============================================================ */
+.ranking-table-panel {
+  @apply bg-bg-card border-border rounded-xl border overflow-hidden;
+}
+.ranking-table {
+  @apply w-full border-collapse;
+}
+.ranking-table thead tr {
+  @apply bg-bg-dark border-border border-b;
+}
+.ranking-table th {
+  @apply px-4 py-2.5 text-left text-[10px] text-text-muted uppercase tracking-wider font-semibold;
+}
+.ranking-table th:last-child { @apply text-right; }
+.ranking-table td {
+  @apply px-4 py-3 border-b border-[#1e1e1e] align-middle;
+}
+.ranking-table tr:last-child td { @apply border-b-0; }
+.rank-row-me td { @apply bg-[rgba(250,204,21,0.04)]; }
+
+.rank-pos {
+  @apply w-8 h-8 rounded-lg flex items-center justify-center font-bold text-[13px];
+}
+.rank-pos-gold   { @apply bg-[rgba(250,204,21,0.15)] text-accent; }
+.rank-pos-silver { @apply bg-[rgba(156,163,175,0.15)] text-[#9ca3af]; }
+.rank-pos-bronze { @apply bg-[rgba(205,124,46,0.15)] text-[#cd7c2e]; }
+.rank-pos-normal { @apply bg-[#252525] text-text-muted; }
+
+.rank-user  { @apply flex items-center gap-2.5; }
+.rank-avatar {
+  @apply w-[34px] h-[34px] rounded-full flex items-center justify-center
+         font-bold text-xs text-bg-dark shrink-0;
+}
+.rank-name  { @apply font-semibold text-[13px]; }
+.rank-meta  { @apply text-[11px] text-text-muted; }
+.rank-you-badge {
+  @apply ml-1.5 text-[10px] bg-[rgba(250,204,21,0.15)] text-accent
+         px-1.5 py-0.5 rounded font-semibold;
+}
+.rank-acertos { @apply text-text-muted text-xs; }
+.rank-acertos strong { @apply text-text-default; }
+.rank-trend   { @apply text-xs font-semibold; }
+.trend-up     { @apply text-green-400; }
+.trend-down   { @apply text-red-400; }
+.trend-same   { @apply text-text-muted; }
+.rank-pts     { @apply text-base font-bold text-accent text-right tabular-nums; }
+
+/* Pódio */
+.podio-section {
+  @apply flex gap-3 mb-6 items-end justify-center;
+}
+.podio-card {
+  @apply bg-bg-card border-border rounded-xl p-4 text-center flex-1 max-w-[180px]
+         relative border;
+}
+.podio-pos-1 {
+  @apply border-accent bg-gradient-to-b from-[rgba(250,204,21,0.08)] to-bg-card -translate-y-2 pt-5;
+}
+.podio-pos-2 { @apply border-[#9ca3af]; }
+.podio-pos-3 { @apply border-[#cd7c2e]; }
+.podio-medal { @apply text-2xl mb-2; }
+.podio-avatar {
+  @apply w-11 h-11 rounded-full mx-auto mb-2 flex items-center justify-center
+         font-bold text-base text-bg-dark;
+}
+.podio-nome  { @apply text-[13px] font-semibold mb-0.5 truncate; }
+.podio-meta  { @apply text-[11px] text-text-muted mb-2; }
+.podio-pts   { @apply text-xl font-bold text-accent tabular-nums; }
+.podio-pts-label { @apply text-[10px] text-text-muted; }
+
+/* Estado vazio */
+.ranking-empty {
+  @apply flex flex-col items-center justify-center py-16 gap-3 text-center;
+}
+.ranking-empty-icon  { @apply text-4xl; }
+.ranking-empty-title { @apply text-lg font-semibold; }
+.ranking-empty-sub   { @apply text-text-muted text-sm max-w-xs; }
+
+/* Período banner (tab Rodada) */
+.periodo-banner {
+  @apply flex items-center gap-2.5 bg-[rgba(250,204,21,0.07)]
+         border border-[rgba(250,204,21,0.15)] rounded-lg px-3.5 py-2.5 mb-4 text-[13px];
+}
+.periodo-banner-label { @apply text-accent font-semibold; }
+
+/* Live dot */
+.live-dot {
+  @apply inline-block w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5
+         animate-pulse align-middle;
+}
+
+/* Perfil público */
+.perfil-publico { @apply max-w-lg mx-auto; }
+.perfil-header  { @apply flex items-center gap-4 mb-6; }
+.perfil-avatar  {
+  @apply w-16 h-16 rounded-full flex items-center justify-center
+         font-bold text-xl text-bg-dark shrink-0;
+}
+.perfil-nome    { @apply text-xl font-bold; }
+.perfil-meta    { @apply text-text-muted text-sm; }
+.perfil-kpis    { @apply grid grid-cols-3 gap-3 mb-6; }
+.kpi            { @apply bg-bg-card border-border rounded-xl border p-4 text-center; }
+.kpi-value      { @apply block text-2xl font-bold text-accent tabular-nums; }
+.kpi-label      { @apply block text-[11px] text-text-muted mt-1 uppercase tracking-wide; }
+.perfil-cashback {
+  @apply bg-bg-card border-border rounded-xl border p-4 text-sm;
+}
+.perfil-cashback-valor { @apply text-text-muted; }
