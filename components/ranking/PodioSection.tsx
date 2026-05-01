@@ -12,7 +12,8 @@ export type PodioEntry = {
 export function PodioSection({ entries }: { entries: PodioEntry[] }) {
   if (entries.length === 0) return null
   // Ordem visual: 2° à esquerda, 1° ao centro, 3° à direita
-  const ordered = [entries[1], entries[0], entries[2]].filter(Boolean) as PodioEntry[]
+  const ordered = ([entries[1], entries[0], entries[2]] as (PodioEntry | undefined)[])
+    .filter((e): e is PodioEntry => e !== undefined)
   return (
     <div className="podio-section">
       {ordered.map((e) => (

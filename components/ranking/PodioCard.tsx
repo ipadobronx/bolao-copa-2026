@@ -6,7 +6,7 @@ const MEDAL = { 1: '🥇', 2: '🥈', 3: '🥉' } as const
 export function PodioCard({ entry }: { entry: PodioEntry }) {
   const { userId, nome, posicao, pontosTotais, totalBilhetes, isCurrentUser } = entry
   return (
-    <div className={`podio-card podio-pos-${posicao}`}>
+    <div className={`podio-card podio-pos-${posicao}`} aria-label={`${posicao}º lugar`}>
       <div className="podio-medal" aria-hidden="true">
         {MEDAL[posicao as 1 | 2 | 3] ?? ''}
       </div>
