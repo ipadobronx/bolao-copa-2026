@@ -30,7 +30,7 @@ type NavLink = {
 const PRINCIPAL: NavLink[] = [
   { label: 'Dashboard', icon: Home, href: '/dashboard' },
   { label: 'Meus Palpites', icon: Trophy, href: '/palpites' },
-  { label: 'Ranking', icon: Award, disabledHint: 'Em breve (F8)' },
+  { label: 'Ranking', icon: Award, href: '/ranking' },
   { label: 'Bônus', icon: Target, href: '/palpites?tab=bonus' },
 ];
 

@@ -37,7 +37,7 @@ afterEach(() => {
 });
 
 describe('<DashboardNav/>', () => {
-  it('renderiza 8 itens — links reais habilitados + 3 disabled restantes', () => {
+  it('renderiza 8 itens — todos os links reais habilitados, 2 disabled restantes', () => {
     usePathnameMock.mockReturnValue('/dashboard');
     render(<DashboardNav />);
     expect(screen.getByRole('link', { name: /^dashboard$/i })).toHaveAttribute(
@@ -60,8 +60,9 @@ describe('<DashboardNav/>', () => {
       'href',
       '/minhas-tabelas',
     );
+    expect(screen.getByRole('link', { name: /^ranking$/i })).toHaveAttribute('href', '/ranking');
 
-    const disabledLabels = ['Ranking', 'Cashback', 'Configurações'];
+    const disabledLabels = ['Cashback', 'Configurações'];
     for (const label of disabledLabels) {
       const span = screen.getByText(new RegExp(`^\\s*${label}\\s*$`));
       const wrapper = span.closest('[aria-disabled="true"]');
