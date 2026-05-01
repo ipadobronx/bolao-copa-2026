@@ -11,7 +11,7 @@ const GRADIENTS = [
 
 export function avatarColor(userId: string): string {
   const hash = userId.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
-  return GRADIENTS[hash % GRADIENTS.length]
+  return GRADIENTS[hash % GRADIENTS.length] ?? GRADIENTS[0]
 }
 
 export function avatarInitials(nome: string): string {
@@ -19,6 +19,6 @@ export function avatarInitials(nome: string): string {
     .split(' ')
     .filter(Boolean)
     .slice(0, 2)
-    .map((w) => w[0].toUpperCase())
+    .map((w) => (w[0] ?? '').toUpperCase())
     .join('')
 }

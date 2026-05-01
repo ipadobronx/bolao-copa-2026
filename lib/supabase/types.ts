@@ -393,34 +393,10 @@ export type Database = {
         }
         Relationships: []
       }
-      selecoes: {
-        Row: {
-          bandeira_emoji: string
-          cashback_multiplicador: number
-          codigo_iso: string
-          created_at: string
-          grupo: string
-          id: number
-          nome: string
-        }
-        Insert: {
-          bandeira_emoji: string
-          cashback_multiplicador?: number
-          codigo_iso: string
-          created_at?: string
-          grupo: string
-          id?: number
-          nome: string
-        }
-        Update: {
-          bandeira_emoji?: string
-          cashback_multiplicador?: number
-          codigo_iso?: string
-          created_at?: string
-          grupo?: string
-          id?: number
-          nome?: string
-        }
+      ranking_signals: {
+        Row: { id: number; updated_at: string }
+        Insert: { id?: number; updated_at?: string }
+        Update: { id?: number; updated_at?: string }
         Relationships: []
       }
       ranking_snapshots: {
@@ -450,10 +426,34 @@ export type Database = {
         }
         Relationships: []
       }
-      ranking_signals: {
-        Row: { id: number; updated_at: string }
-        Insert: { id?: number; updated_at?: string }
-        Update: { id?: number; updated_at?: string }
+      selecoes: {
+        Row: {
+          bandeira_emoji: string
+          cashback_multiplicador: number
+          codigo_iso: string
+          created_at: string
+          grupo: string
+          id: number
+          nome: string
+        }
+        Insert: {
+          bandeira_emoji: string
+          cashback_multiplicador?: number
+          codigo_iso: string
+          created_at?: string
+          grupo: string
+          id?: number
+          nome: string
+        }
+        Update: {
+          bandeira_emoji?: string
+          cashback_multiplicador?: number
+          codigo_iso?: string
+          created_at?: string
+          grupo?: string
+          id?: number
+          nome?: string
+        }
         Relationships: []
       }
     }
