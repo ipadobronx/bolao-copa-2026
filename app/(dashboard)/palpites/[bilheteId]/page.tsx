@@ -47,8 +47,8 @@ export default async function PalpitesBilhetePage({
         `id, numero_jogo, fase, data_hora, finalizado,
          gols_casa, gols_fora, selecao_casa_id, selecao_fora_id,
          placeholder_casa, placeholder_fora,
-         selecao_casa:selecoes!selecao_casa_id(id, nome, bandeira_emoji, grupo),
-         selecao_fora:selecoes!selecao_fora_id(id, nome, bandeira_emoji, grupo)`,
+         selecao_casa:selecoes!selecao_casa_id(id, nome, bandeira_emoji, codigo_iso, grupo),
+         selecao_fora:selecoes!selecao_fora_id(id, nome, bandeira_emoji, codigo_iso, grupo)`,
       )
       .order('numero_jogo', { ascending: true }),
 
@@ -64,7 +64,7 @@ export default async function PalpitesBilhetePage({
 
     supabase
       .from('selecoes')
-      .select('id, nome, bandeira_emoji, grupo')
+      .select('id, nome, bandeira_emoji, codigo_iso, grupo')
       .order('grupo', { ascending: true })
       .order('nome', { ascending: true }),
   ]);

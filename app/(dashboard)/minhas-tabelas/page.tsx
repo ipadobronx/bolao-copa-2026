@@ -37,7 +37,7 @@ export default async function MinhasTabelasPage() {
   const { data: selecoes } = cashbackIds.length
     ? await supabase
         .from('selecoes')
-        .select('id, nome, bandeira_emoji, grupo')
+        .select('id, nome, bandeira_emoji, codigo_iso, grupo')
         .in('id', cashbackIds)
     : { data: [] };
 

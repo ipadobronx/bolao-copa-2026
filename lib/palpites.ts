@@ -21,6 +21,7 @@ export type SelecaoBasica = {
   id: number;
   nome: string;
   bandeira_emoji: string;
+  codigo_iso?: string | null;
   grupo: string | null;
 };
 

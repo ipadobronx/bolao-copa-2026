@@ -65,8 +65,8 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
 
   const nomeCasa = jogo.selecao_casa?.nome ?? jogo.placeholder_casa ?? '?';
   const nomeFora = jogo.selecao_fora?.nome ?? jogo.placeholder_fora ?? '?';
-  const flagCasa = jogo.selecao_casa?.bandeira_emoji ?? '🏆';
-  const flagFora = jogo.selecao_fora?.bandeira_emoji ?? '🏆';
+  const isoCasa = jogo.selecao_casa?.codigo_iso ?? null;
+  const isoFora = jogo.selecao_fora?.codigo_iso ?? null;
 
   const dataHora = new Date(jogo.data_hora);
   const dateStr = dataHora.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
@@ -91,7 +91,7 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
 
       {/* Casa */}
       <div className="flex items-center gap-1.5 text-sm font-semibold">
-        <span className="text-lg">{flagCasa}</span>
+        <FlagImg iso={isoCasa} nome={nomeCasa} />
         <span className={cn('hidden sm:inline', isReadonly && 'text-text-secondary')}>
           {nomeCasa}
         </span>
@@ -126,7 +126,7 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
         <span className={cn('hidden sm:inline', isReadonly && 'text-text-secondary')}>
           {nomeFora}
         </span>
-        <span className="text-lg">{flagFora}</span>
+        <FlagImg iso={isoFora} nome={nomeFora} />
       </div>
 
       {/* Chip */}
@@ -134,6 +134,19 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
         <StatusChip estado={estado} saveState={saveState} pts={palpiteSalvo?.pontos_calculados ?? null} />
       </div>
     </div>
+  );
+}
+
+function FlagImg({ iso, nome }: { iso: string | null; nome: string }) {
+  if (!iso) return <span className="text-xl">🏆</span>;
+  return (
+    <img
+      src={`https://flagcdn.com/w40/${iso.toLowerCase()}.png`}
+      alt={nome}
+      width={28}
+      height={21}
+      className="rounded-sm object-cover"
+    />
   );
 }
 
