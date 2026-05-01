@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: vi.fn() }));
 
-import { upsertBonusSchema, upsertPalpiteSchema } from '../actions';
+import { upsertBonusSchema, upsertPalpiteSchema } from '../schemas';
 
 describe('upsertPalpiteSchema', () => {
   it('aceita dados válidos', () => {
