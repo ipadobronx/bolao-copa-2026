@@ -1,12 +1,14 @@
 'use client';
 
-type Props = { grupos: string[] };
+import { cn } from '@/lib/utils';
 
-export function GrupoNav({ grupos }: Props) {
-  function scrollTo(grupo: string) {
-    document.getElementById(`grupo-${grupo}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+type Props = {
+  grupos: string[];
+  activeGrupo: string;
+  onSelect: (grupo: string) => void;
+};
 
+export function GrupoNav({ grupos, activeGrupo, onSelect }: Props) {
   return (
     <div className="mb-5 overflow-x-auto pb-1">
       <div className="flex gap-1.5">
@@ -14,8 +16,13 @@ export function GrupoNav({ grupos }: Props) {
           <button
             key={g}
             type="button"
-            onClick={() => scrollTo(g)}
-            className="bg-bg-elevated border-border text-text-secondary hover:text-text-primary hover:border-accent/60 min-w-[2.25rem] rounded-lg border px-3 py-1.5 font-mono text-xs font-bold transition-colors"
+            onClick={() => onSelect(g)}
+            className={cn(
+              'min-w-[2.25rem] rounded-lg border px-3 py-1.5 font-mono text-xs font-bold transition-colors',
+              activeGrupo === g
+                ? 'bg-accent border-accent text-bg-dark'
+                : 'bg-bg-elevated border-border text-text-secondary hover:text-text-primary hover:border-accent/60',
+            )}
           >
             {g}
           </button>

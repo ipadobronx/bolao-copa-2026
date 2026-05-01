@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import { GroupSection } from './GroupSection';
 import { GrupoNav } from './GrupoNav';
 import { groupGamesByGrupo } from '@/lib/palpites';
@@ -12,19 +15,19 @@ type Props = {
 export function GruposTab({ bilheteId, jogos, palpitesSalvos }: Props) {
   const byGrupo = groupGamesByGrupo(jogos);
   const grupos = [...byGrupo.keys()];
+  const [activeGrupo, setActiveGrupo] = useState(grupos[0] ?? 'A');
+
+  const jogosGrupo = byGrupo.get(activeGrupo) ?? [];
 
   return (
     <div>
-      <GrupoNav grupos={grupos} />
-      {[...byGrupo.entries()].map(([grupo, jogosGrupo]) => (
-        <GroupSection
-          key={grupo}
-          bilheteId={bilheteId}
-          grupo={grupo}
-          jogos={jogosGrupo}
-          palpitesSalvos={palpitesSalvos}
-        />
-      ))}
+      <GrupoNav grupos={grupos} activeGrupo={activeGrupo} onSelect={setActiveGrupo} />
+      <GroupSection
+        bilheteId={bilheteId}
+        grupo={activeGrupo}
+        jogos={jogosGrupo}
+        palpitesSalvos={palpitesSalvos}
+      />
     </div>
   );
 }
