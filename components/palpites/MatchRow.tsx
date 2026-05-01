@@ -65,8 +65,8 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
 
   const nomeCasa = jogo.selecao_casa?.nome ?? jogo.placeholder_casa ?? '?';
   const nomeFora = jogo.selecao_fora?.nome ?? jogo.placeholder_fora ?? '?';
-  const isoCasa = jogo.selecao_casa?.codigo_iso ?? null;
-  const isoFora = jogo.selecao_fora?.codigo_iso ?? null;
+  const flagEmojiCasa = jogo.selecao_casa?.bandeira_emoji ?? null;
+  const flagEmojiFora = jogo.selecao_fora?.bandeira_emoji ?? null;
 
   const dataHora = new Date(jogo.data_hora);
   const dateStr = dataHora.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
@@ -91,7 +91,7 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
 
       {/* Casa */}
       <div className="flex items-center gap-1.5 text-sm font-semibold">
-        <FlagImg iso={isoCasa} nome={nomeCasa} />
+        <FlagImg emoji={flagEmojiCasa} nome={nomeCasa} />
         <span className={cn('hidden sm:inline', isReadonly && 'text-text-secondary')}>
           {nomeCasa}
         </span>
@@ -126,7 +126,7 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
         <span className={cn('hidden sm:inline', isReadonly && 'text-text-secondary')}>
           {nomeFora}
         </span>
-        <FlagImg iso={isoFora} nome={nomeFora} />
+        <FlagImg emoji={flagEmojiFora} nome={nomeFora} />
       </div>
 
       {/* Chip */}
@@ -137,11 +137,19 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
   );
 }
 
-function FlagImg({ iso, nome }: { iso: string | null; nome: string }) {
-  if (!iso) return <span className="text-xl">🏆</span>;
+// Flag emoji = 2 regional indicator codepoints starting at U+1F1E6 ('A')
+function emojiToISO2(emoji: string): string | null {
+  const points = [...emoji].map((c) => c.codePointAt(0)!);
+  if (points.length !== 2 || points[0]! < 0x1f1e6 || points[0]! > 0x1f1ff) return null;
+  return points.map((p) => String.fromCharCode(p - 0x1f1e6 + 65)).join('').toLowerCase();
+}
+
+function FlagImg({ emoji, nome }: { emoji: string | null; nome: string }) {
+  const iso2 = emoji ? emojiToISO2(emoji) : null;
+  if (!iso2) return <span className="text-xl">🏆</span>;
   return (
     <img
-      src={`https://flagcdn.com/w40/${iso.toLowerCase()}.png`}
+      src={`https://flagcdn.com/w40/${iso2}.png`}
       alt={nome}
       width={28}
       height={21}
