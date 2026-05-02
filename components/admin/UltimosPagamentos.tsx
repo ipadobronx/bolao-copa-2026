@@ -1,4 +1,5 @@
 import { tempoAtras } from '@/lib/format/tempo-atras'
+import { formatBRL } from '@/lib/format/brl'
 
 export type PagamentoRow = {
   id: string
@@ -50,8 +51,7 @@ export function UltimosPagamentos({ rows, agora }: { rows: PagamentoRow[]; agora
         </thead>
         <tbody>
           {rows.map((row) => {
-            const statusKey = row.status_pagamento as keyof typeof STATUS_LABEL
-            const status = STATUS_LABEL[statusKey] ?? STATUS_LABEL.pendente as typeof STATUS_LABEL[keyof typeof STATUS_LABEL]
+            const status = STATUS_LABEL[row.status_pagamento] ?? STATUS_LABEL['pendente']!
             const timestamp = row.pago_em ?? row.created_at
             const cashbackInfo = row.bandeira_emoji
               ? `${row.bandeira_emoji} ${row.selecao_nome}`
@@ -71,7 +71,7 @@ export function UltimosPagamentos({ rows, agora }: { rows: PagamentoRow[]; agora
                   </div>
                 </td>
                 <td className="px-4 py-3 font-mono font-semibold">
-                  R$ {row.valor_pago.toFixed(2).replace('.', ',')}
+                  {formatBRL(row.valor_pago)}
                 </td>
                 <td className="px-4 py-3">
                   <span
