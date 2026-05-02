@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { tempoAtras } from '../format/tempo-atras'
+import { tempoAtras } from '@/lib/format/tempo-atras'
 
 function t(segundosAtras: number) {
   const agora = new Date('2026-06-01T12:00:00Z')
@@ -37,5 +37,10 @@ describe('tempoAtras', () => {
   it('aceita string de data', () => {
     const agora = new Date('2026-06-01T12:00:00Z')
     expect(tempoAtras('2026-06-01T11:58:00Z', agora)).toBe('2 min')
+  })
+
+  it('data no futuro retorna "agora"', () => {
+    const agora = new Date('2026-06-01T12:00:00Z')
+    expect(tempoAtras('2026-06-01T13:00:00Z', agora)).toBe('agora')
   })
 })
