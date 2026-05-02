@@ -29,7 +29,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <AdminSidebar className="hidden md:flex md:flex-col" />
 
       {/* Main content */}
-      <main className="flex-1 p-5 md:p-8">
+      <main className="p-5 md:p-8">
         {children}
       </main>
     </div>
