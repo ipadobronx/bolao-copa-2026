@@ -21,7 +21,9 @@ async function postSnapshot(periodo: string, force: boolean) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ periodo, force }),
   })
-  return { status: res.status, data: await res.json() as unknown }
+  let data: unknown = null
+  try { data = await res.json() } catch { /* non-JSON body */ }
+  return { status: res.status, data }
 }
 
 export function SnapshotRanking() {
@@ -89,7 +91,7 @@ export function SnapshotRanking() {
       {pendingOverwrite && (
         <div className="border-border bg-bg-elevated mt-4 rounded-lg border p-4">
           <p className="text-text-primary mb-3 text-sm font-medium">
-            Já existe um snapshot para <span className="text-accent font-mono">{pendingOverwrite}</span>.
+            Já existe um snapshot para <span className="text-accent font-mono">{PERIODOS.find(p => p.value === pendingOverwrite)?.label ?? pendingOverwrite}</span>.
             Sobrescrever?
           </p>
           <div className="flex gap-2">
