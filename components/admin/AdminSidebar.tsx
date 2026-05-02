@@ -1,6 +1,6 @@
 'use client'
 
-import { BarChart2, CreditCard, Gift, LogOut, Swords, Users } from 'lucide-react'
+import { BarChart2, CreditCard, Gift, LogOut, Swords, Users, type LucideIcon } from 'lucide-react'
 import type { Route } from 'next'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
@@ -10,7 +10,7 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/browser'
 
 type NavItem = {
   label: string
-  icon: React.ElementType
+  icon: LucideIcon
   href?: string
   comingSoon?: boolean
 }
@@ -70,6 +70,7 @@ export function AdminSidebar({ className }: { className?: string }) {
             return (
               <span
                 key={item.label}
+                aria-disabled="true"
                 className="sidebar-item sidebar-item-disabled flex items-center justify-between"
                 title="Em breve"
               >
@@ -99,7 +100,7 @@ export function AdminSidebar({ className }: { className?: string }) {
       </div>
 
       {/* Sign out */}
-      <button type="button" onClick={handleSignOut} className="sign-out-btn mt-auto">
+      <button type="button" onClick={handleSignOut} className="sign-out-btn">
         <LogOut className="size-4" aria-hidden="true" /> Sair
       </button>
     </nav>
