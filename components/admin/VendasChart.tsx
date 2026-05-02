@@ -8,7 +8,6 @@ import {
   type TooltipContentProps,
   XAxis,
 } from 'recharts'
-import { type ValueType, type NameType } from 'recharts/types/component/DefaultTooltipContent'
 import { formatBRL } from '@/lib/format/brl'
 
 export type VendaDia = {
@@ -18,7 +17,7 @@ export type VendaDia = {
   label: string   // SEG, TER, etc — pré-calculado no server
 }
 
-function CustomTooltip({ active, payload }: TooltipContentProps<ValueType, NameType>) {
+function CustomTooltip({ active, payload }: TooltipContentProps) {
   if (!active || !payload?.length || !payload[0]) return null
   const { date, tabelas, receita } = payload[0].payload as VendaDia
   return (
