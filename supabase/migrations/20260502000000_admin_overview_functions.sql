@@ -14,14 +14,15 @@ RETURNS TABLE(
   pendentes        bigint
 )
 LANGUAGE sql
+SET search_path = public, pg_temp
 SECURITY DEFINER
 STABLE
 AS $$
   SELECT
-    COUNT(*)              FILTER (WHERE status_pagamento = 'confirmado')::bigint AS tabelas_vendidas,
-    COUNT(DISTINCT user_id) FILTER (WHERE status_pagamento = 'confirmado')::bigint AS apostadores,
-    COALESCE(SUM(valor_pago) FILTER (WHERE status_pagamento = 'confirmado'), 0) AS arrecadado,
-    COUNT(*)              FILTER (WHERE status_pagamento = 'pendente')::bigint AS pendentes
+    (COUNT(*)               FILTER (WHERE status_pagamento = 'confirmado'))::bigint AS tabelas_vendidas,
+    (COUNT(DISTINCT user_id) FILTER (WHERE status_pagamento = 'confirmado'))::bigint AS apostadores,
+    COALESCE(SUM(valor_pago) FILTER (WHERE status_pagamento = 'confirmado'), 0)      AS arrecadado,
+    (COUNT(*)               FILTER (WHERE status_pagamento = 'pendente'))::bigint     AS pendentes
   FROM public.bilhetes
 $$;
 
@@ -43,6 +44,7 @@ RETURNS TABLE(
   total_bilhetes_usuario bigint
 )
 LANGUAGE sql
+SET search_path = public, pg_temp
 SECURITY DEFINER
 STABLE
 AS $$
@@ -63,7 +65,7 @@ AS $$
         AND b2.status_pagamento = 'confirmado'
     )::bigint AS total_bilhetes_usuario
   FROM public.bilhetes b
-  JOIN public.profiles p ON p.id = b.user_id
+  LEFT JOIN public.profiles p ON p.id = b.user_id
   LEFT JOIN public.selecoes s ON s.id = b.selecao_cashback_id
   ORDER BY COALESCE(b.pago_em, b.created_at) DESC
   LIMIT lim
@@ -80,8 +82,9 @@ RETURNS TABLE(
   receita numeric
 )
 LANGUAGE sql
+SET search_path = public, pg_temp
 SECURITY DEFINER
-STABLE
+VOLATILE
 AS $$
   SELECT
     DATE(COALESCE(pago_em, created_at))::text AS date,
