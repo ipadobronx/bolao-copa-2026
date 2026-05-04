@@ -1,5 +1,6 @@
 // components/ranking/PerfilPublico.tsx
 import { avatarColor, avatarInitials } from '@/lib/format/avatar-color'
+import { BandeiraImg } from '@/components/ui/BandeiraImg'
 
 export type PerfilPublicoProps = {
   userId: string
@@ -62,7 +63,7 @@ export function PerfilPublico(props: PerfilPublicoProps) {
 
       {selecaoCashback && (
         <div className="perfil-cashback">
-          <span aria-hidden="true">{selecaoCashback.bandeira}</span>{' '}
+          <BandeiraImg emoji={selecaoCashback.bandeira} nome={selecaoCashback.nome} size={24} />{' '}
           <strong>{selecaoCashback.nome}</strong>
           {valorPago !== null && (
             <span className="perfil-cashback-valor">

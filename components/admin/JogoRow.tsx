@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { RefreshCw } from 'lucide-react'
 import { PlaceholderSelect } from './PlaceholderSelect'
+import { BandeiraImg } from '@/components/ui/BandeiraImg'
 
 export type SelecaoBasica = {
   id: number
@@ -156,8 +157,6 @@ export function JogoRow({ jogo, selecoes, jogoByNumero, onAtualizado }: Props) {
 
   const nomeCasa = jogo.selecao_casa?.nome ?? jogo.placeholder_casa ?? '?'
   const nomeForaa = jogo.selecao_fora?.nome ?? jogo.placeholder_fora ?? '?'
-  const bandeiraC = jogo.selecao_casa?.bandeira_emoji ?? '🏳'
-  const bandeiraF = jogo.selecao_fora?.bandeira_emoji ?? '🏳'
 
   return (
     <div className="border-border grid grid-cols-[auto_1fr_auto_1fr_auto_auto] items-center gap-3 border-b px-4 py-3 last:border-b-0 md:gap-4">
@@ -178,7 +177,10 @@ export function JogoRow({ jogo, selecoes, jogoByNumero, onAtualizado }: Props) {
             className="w-full max-w-[160px]"
           />
         ) : (
-          <span>{bandeiraC} {nomeCasa}</span>
+          <span className="flex items-center gap-1.5">
+            <BandeiraImg emoji={jogo.selecao_casa?.bandeira_emoji ?? null} nome={nomeCasa} size={20} />
+            {nomeCasa}
+          </span>
         )}
         {placeholderCasaPendente && (() => {
           const sug = sugerirVencedor(jogo.placeholder_casa)
@@ -254,7 +256,10 @@ export function JogoRow({ jogo, selecoes, jogoByNumero, onAtualizado }: Props) {
             />
           </>
         ) : (
-          <span>{nomeForaa} {bandeiraF}</span>
+          <span className="flex items-center justify-end gap-1.5">
+            {nomeForaa}
+            <BandeiraImg emoji={jogo.selecao_fora?.bandeira_emoji ?? null} nome={nomeForaa} size={20} />
+          </span>
         )}
       </div>
 

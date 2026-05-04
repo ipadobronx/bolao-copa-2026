@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Route } from 'next';
 import { formatDataRelativa } from '@/lib/format/data-relativa';
 import type { Database } from '@/lib/supabase/types';
+import { BandeiraImg } from '@/components/ui/BandeiraImg';
 
 type FaseEnum = Database['public']['Enums']['fase_jogo'];
 
@@ -44,9 +45,7 @@ export function JogoRow({ jogo, agora = new Date() }: JogoRowProps) {
       <div className="flex items-center justify-center gap-3 font-semibold md:justify-start">
         {jogo.casa ? (
           <>
-            <span aria-hidden="true" className="text-[28px] leading-none">
-              {jogo.casa.bandeira_emoji}
-            </span>
+            <BandeiraImg emoji={jogo.casa.bandeira_emoji} nome={jogo.casa.nome} size={28} />
             <span>{jogo.casa.nome}</span>
           </>
         ) : (
@@ -62,9 +61,7 @@ export function JogoRow({ jogo, agora = new Date() }: JogoRowProps) {
         {jogo.fora ? (
           <>
             <span>{jogo.fora.nome}</span>
-            <span aria-hidden="true" className="text-[28px] leading-none">
-              {jogo.fora.bandeira_emoji}
-            </span>
+            <BandeiraImg emoji={jogo.fora.bandeira_emoji} nome={jogo.fora.nome} size={28} />
           </>
         ) : (
           <span className="text-text-muted font-mono text-sm">

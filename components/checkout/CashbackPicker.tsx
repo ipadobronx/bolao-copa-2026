@@ -1,6 +1,7 @@
 'use client';
 
 import { calcularValorCashback, type CashbackMultiplicador } from '@/lib/cashback';
+import { BandeiraImg } from '@/components/ui/BandeiraImg';
 
 export type SelecaoElegivel = {
   id: number;
@@ -94,7 +95,7 @@ export function CashbackPicker({
                         : 'border-zinc-800 bg-zinc-900 hover:border-zinc-700'
                     }`}
                   >
-                    <span className="text-2xl">{s.bandeira_emoji}</span>
+                    <BandeiraImg emoji={s.bandeira_emoji} nome={s.nome} size={28} />
                     <div className="flex-1 font-semibold text-zinc-100">{s.nome}</div>
                     <span
                       className={`rounded px-2 py-0.5 font-mono text-xs font-bold ${BADGE_COLORS[mult]}`}

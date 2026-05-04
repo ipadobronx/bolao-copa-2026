@@ -6,6 +6,7 @@ import { upsertPalpite } from '@/app/(dashboard)/palpites/actions';
 import { computeMatchEstado } from '@/lib/palpites';
 import type { JogoComSelecoes, PalpiteSalvo } from '@/lib/palpites';
 import { cn } from '@/lib/utils';
+import { BandeiraImg } from '@/components/ui/BandeiraImg';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
@@ -91,7 +92,7 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
 
       {/* Casa */}
       <div className="flex items-center gap-1.5 text-sm font-semibold">
-        <FlagImg emoji={flagEmojiCasa} nome={nomeCasa} />
+        <BandeiraImg emoji={flagEmojiCasa} nome={nomeCasa} />
         <span className={cn('hidden sm:inline', isReadonly && 'text-text-secondary')}>
           {nomeCasa}
         </span>
@@ -126,7 +127,7 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
         <span className={cn('hidden sm:inline', isReadonly && 'text-text-secondary')}>
           {nomeFora}
         </span>
-        <FlagImg emoji={flagEmojiFora} nome={nomeFora} />
+        <BandeiraImg emoji={flagEmojiFora} nome={nomeFora} />
       </div>
 
       {/* Chip */}
@@ -134,27 +135,6 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
         <StatusChip estado={estado} saveState={saveState} pts={palpiteSalvo?.pontos_calculados ?? null} />
       </div>
     </div>
-  );
-}
-
-// Flag emoji = 2 regional indicator codepoints starting at U+1F1E6 ('A')
-function emojiToISO2(emoji: string): string | null {
-  const points = [...emoji].map((c) => c.codePointAt(0)!);
-  if (points.length !== 2 || points[0]! < 0x1f1e6 || points[0]! > 0x1f1ff) return null;
-  return points.map((p) => String.fromCharCode(p - 0x1f1e6 + 65)).join('').toLowerCase();
-}
-
-function FlagImg({ emoji, nome }: { emoji: string | null; nome: string }) {
-  const iso2 = emoji ? emojiToISO2(emoji) : null;
-  if (!iso2) return <span className="text-xl">🏆</span>;
-  return (
-    <img
-      src={`https://flagcdn.com/w40/${iso2}.png`}
-      alt={nome}
-      width={28}
-      height={21}
-      className="rounded-sm object-cover"
-    />
   );
 }
 

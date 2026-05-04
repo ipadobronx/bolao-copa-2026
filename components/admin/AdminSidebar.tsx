@@ -20,7 +20,7 @@ const ITEMS: NavItem[] = [
   { label: 'Apostadores', icon: Users, comingSoon: true },
   { label: 'Pagamentos', icon: CreditCard, comingSoon: true },
   { label: 'Jogos & Resultados', icon: Swords, href: '/admin/jogos' },
-  { label: 'Cashbacks', icon: Gift, comingSoon: true },
+  { label: 'Cashbacks', icon: Gift, href: '/admin/cashbacks' },
 ]
 
 export function AdminSidebar({ className }: { className?: string }) {
