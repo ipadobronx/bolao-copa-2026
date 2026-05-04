@@ -5,7 +5,7 @@ import type { JogoComSelecoes, SelecaoBasica } from '@/components/admin/JogoRow'
 export default async function AdminJogosPage() {
   const admin = createSupabaseAdminClient()
 
-  const [jogosRes, selecoesRes, copaRes] = await Promise.all([
+  const [jogosRes, selecoesRes, copaRes, syncRes, mapeadosRes] = await Promise.all([
     admin
       .from('jogos')
       .select(`
@@ -26,6 +26,16 @@ export default async function AdminJogosPage() {
       .select('*')
       .eq('id', 1)
       .maybeSingle(),
+    (admin as any)
+      .from('sync_jogos_log')
+      .select('iniciado_em, finalizado_em, jogos_atualizados, status')
+      .order('iniciado_em', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    admin
+      .from('jogos')
+      .select('*', { count: 'exact', head: true })
+      .not('external_id', 'is', null),
   ])
 
   const jogos = (jogosRes.data ?? []) as unknown as JogoComSelecoes[]
@@ -40,6 +50,13 @@ export default async function AdminJogosPage() {
     revelacao_id: null,
     finalizada: false,
   }
+  const ultimoSync = (syncRes.data ?? null) as {
+    iniciado_em: string
+    finalizado_em: string | null
+    jogos_atualizados: number
+    status: string
+  } | null
+  const totalMapeados = (mapeadosRes.count ?? 0) as number
 
   const proximoJogo = jogos.find((j) => !j.finalizado)
   const initialTab = proximoJogo?.fase ?? 'grupos'
@@ -57,6 +74,8 @@ export default async function AdminJogosPage() {
         selecoes={selecoes}
         copaResultados={copaResultados}
         initialTab={initialTab}
+        ultimoSync={ultimoSync}
+        totalMapeados={totalMapeados}
       />
     </section>
   )
