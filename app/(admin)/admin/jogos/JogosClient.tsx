@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { BonusForm } from '@/components/admin/BonusForm'
 import { JogoRow } from '@/components/admin/JogoRow'
 import type { JogoComSelecoes, SelecaoBasica } from '@/components/admin/JogoRow'
+import { SyncStatus } from '@/components/admin/SyncStatus'
 
 type CopaResultados = {
   id: number
@@ -21,6 +22,13 @@ type Props = {
   selecoes: SelecaoBasica[]
   copaResultados: CopaResultados
   initialTab: string
+  ultimoSync: {
+    iniciado_em: string
+    finalizado_em: string | null
+    jogos_atualizados: number
+    status: string
+  } | null
+  totalMapeados: number
 }
 
 const TABS = [
@@ -38,7 +46,7 @@ const FASES_MATA_MATA = ['16avos', 'oitavas', 'quartas', 'semis', 'disputa_terce
 
 type StatusFiltro = 'todos' | 'pendentes' | 'finalizados'
 
-export function JogosClient({ jogos: initialJogos, selecoes, copaResultados, initialTab }: Props) {
+export function JogosClient({ jogos: initialJogos, selecoes, copaResultados, initialTab, ultimoSync, totalMapeados }: Props) {
   const [jogos, setJogos] = useState<JogoComSelecoes[]>(initialJogos)
   const [activeTab, setActiveTab] = useState(initialTab)
   const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>('todos')
@@ -71,6 +79,7 @@ export function JogosClient({ jogos: initialJogos, selecoes, copaResultados, ini
 
   return (
     <div>
+      <SyncStatus ultimoSync={ultimoSync} totalMapeados={totalMapeados} />
       {/* Tabs */}
       <div className="border-border mb-6 flex overflow-x-auto border-b">
         {TABS.map((tab) => (
