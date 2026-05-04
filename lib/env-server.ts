@@ -5,12 +5,16 @@ const schema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   MERCADOPAGO_ACCESS_TOKEN: z.string().min(1),
   MERCADOPAGO_WEBHOOK_SECRET: z.string().min(1),
+  API_FOOTBALL_KEY: z.string().min(1),
+  CRON_SECRET: z.string().min(1),
 });
 
 const parsed = schema.safeParse({
   SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
   MERCADOPAGO_ACCESS_TOKEN: process.env.MERCADOPAGO_ACCESS_TOKEN,
   MERCADOPAGO_WEBHOOK_SECRET: process.env.MERCADOPAGO_WEBHOOK_SECRET,
+  API_FOOTBALL_KEY: process.env.API_FOOTBALL_KEY,
+  CRON_SECRET: process.env.CRON_SECRET,
 });
 
 if (!parsed.success) {
