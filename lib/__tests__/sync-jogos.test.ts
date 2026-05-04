@@ -126,14 +126,14 @@ describe('calcularResolucoesPlaceholder', () => {
     const r = calcularResolucoesPlaceholder(makeJogoFinalizado(45, 2, 1), [dep], null)
     expect(r.updates).toHaveLength(0)
     expect(r.warnings).toHaveLength(1)
-    expect(r.warnings[0].motivo).toMatch(/não reconhecido/i)
+    expect(r.warnings[0]?.motivo).toMatch(/não reconhecido/i)
   })
 
   it('empate sem pênaltis → warning por jogo dependente', () => {
     const dep = makeDependent(49, 'Vencedor Jogo 45', null)
     const r = calcularResolucoesPlaceholder(makeJogoFinalizado(45, 1, 1), [dep], null)
     expect(r.updates).toHaveLength(0)
-    expect(r.warnings[0].motivo).toMatch(/empate/i)
+    expect(r.warnings[0]?.motivo).toMatch(/empate/i)
   })
 
   it('jogo diferente no placeholder → skip silencioso', () => {
