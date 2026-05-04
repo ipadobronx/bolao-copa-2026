@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       bilhetes: {
@@ -290,6 +265,13 @@ export type Database = {
             referencedColumns: ["bilhete_id"]
           },
           {
+            foreignKeyName: "palpites_bilhete_id_fkey"
+            columns: ["bilhete_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_usuarios"
+            referencedColumns: ["melhor_bilhete_id"]
+          },
+          {
             foreignKeyName: "palpites_jogo_id_fkey"
             columns: ["jogo_id"]
             isOneToOne: false
@@ -352,6 +334,13 @@ export type Database = {
             referencedColumns: ["bilhete_id"]
           },
           {
+            foreignKeyName: "palpites_bonus_bilhete_id_fkey"
+            columns: ["bilhete_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_usuarios"
+            referencedColumns: ["melhor_bilhete_id"]
+          },
+          {
             foreignKeyName: "palpites_bonus_selecao_id_fkey"
             columns: ["selecao_id"]
             isOneToOne: false
@@ -393,74 +382,91 @@ export type Database = {
         }
         Relationships: []
       }
-      recalculo_jobs: {
+      ranking_signals: {
         Row: {
-          id: string
-          escopo: 'jogo' | 'bonus' | 'global'
-          jogo_id: number | null
-          bonus_tipos: string[] | null
-          status: 'processando' | 'concluido' | 'erro'
-          total_processados: number | null
-          erro_msg: string | null
-          started_at: string
-          finished_at: string | null
+          id: number
+          updated_at: string
         }
         Insert: {
-          id?: string
-          escopo: 'jogo' | 'bonus' | 'global'
-          jogo_id?: number | null
-          bonus_tipos?: string[] | null
-          status?: 'processando' | 'concluido' | 'erro'
-          total_processados?: number | null
-          erro_msg?: string | null
-          started_at?: string
-          finished_at?: string | null
+          id?: number
+          updated_at?: string
         }
         Update: {
-          id?: string
-          escopo?: 'jogo' | 'bonus' | 'global'
-          jogo_id?: number | null
-          bonus_tipos?: string[] | null
-          status?: 'processando' | 'concluido' | 'erro'
-          total_processados?: number | null
-          erro_msg?: string | null
-          started_at?: string
-          finished_at?: string | null
+          id?: number
+          updated_at?: string
         }
-        Relationships: []
-      }
-      ranking_signals: {
-        Row: { id: number; updated_at: string }
-        Insert: { id?: number; updated_at?: string }
-        Update: { id?: number; updated_at?: string }
         Relationships: []
       }
       ranking_snapshots: {
         Row: {
           id: string
-          user_id: string
-          posicao: number
-          pontos_totais: number
           periodo: string
+          pontos_totais: number
+          posicao: number
           snapshot_at: string
+          user_id: string
         }
         Insert: {
           id?: string
-          user_id: string
-          posicao: number
-          pontos_totais: number
           periodo: string
+          pontos_totais: number
+          posicao: number
           snapshot_at?: string
+          user_id: string
         }
         Update: {
           id?: string
-          user_id?: string
-          posicao?: number
-          pontos_totais?: number
           periodo?: string
+          pontos_totais?: number
+          posicao?: number
           snapshot_at?: string
+          user_id?: string
         }
         Relationships: []
+      }
+      recalculo_jobs: {
+        Row: {
+          bonus_tipos: string[] | null
+          erro_msg: string | null
+          escopo: string
+          finished_at: string | null
+          id: string
+          jogo_id: number | null
+          started_at: string
+          status: string
+          total_processados: number | null
+        }
+        Insert: {
+          bonus_tipos?: string[] | null
+          erro_msg?: string | null
+          escopo: string
+          finished_at?: string | null
+          id?: string
+          jogo_id?: number | null
+          started_at?: string
+          status?: string
+          total_processados?: number | null
+        }
+        Update: {
+          bonus_tipos?: string[] | null
+          erro_msg?: string | null
+          escopo?: string
+          finished_at?: string | null
+          id?: string
+          jogo_id?: number | null
+          started_at?: string
+          status?: string
+          total_processados?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recalculo_jobs_jogo_id_fkey"
+            columns: ["jogo_id"]
+            isOneToOne: false
+            referencedRelation: "jogos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       selecoes: {
         Row: {
@@ -578,22 +584,54 @@ export type Database = {
       }
       ranking_usuarios: {
         Row: {
-          user_id: string | null
-          nome: string | null
-          melhor_bilhete_id: string | null
-          melhor_numero_bilhete: number | null
-          pontos_totais: number | null
           acertos_exatos: number | null
           acertos_parciais: number | null
-          pontos_mata_mata: number | null
           acertou_campeao: boolean | null
-          total_bilhetes: number | null
+          melhor_bilhete_id: string | null
+          melhor_numero_bilhete: number | null
+          nome: string | null
+          pontos_mata_mata: number | null
+          pontos_totais: number | null
           posicao: number | null
+          total_bilhetes: number | null
+          user_id: string | null
         }
         Relationships: []
       }
     }
     Functions: {
+      admin_overview_kpis: {
+        Args: never
+        Returns: {
+          apostadores: number
+          arrecadado: number
+          pendentes: number
+          tabelas_vendidas: number
+        }[]
+      }
+      admin_ultimos_pagamentos: {
+        Args: { lim?: number }
+        Returns: {
+          bandeira_emoji: string
+          created_at: string
+          id: string
+          nome: string
+          numero_bilhete: number
+          pago_em: string
+          selecao_nome: string
+          status_pagamento: string
+          total_bilhetes_usuario: number
+          valor_pago: number
+        }[]
+      }
+      admin_vendas_diarias: {
+        Args: never
+        Returns: {
+          date: string
+          receita: number
+          tabelas: number
+        }[]
+      }
       is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
@@ -738,9 +776,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       fase_jogo: [
