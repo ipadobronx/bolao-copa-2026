@@ -6,6 +6,7 @@ import { upsertBonus } from '@/app/(dashboard)/palpites/actions';
 import { SelectionPicker } from './SelectionPicker';
 import type { BonusSalvo, SelecaoBasica, TipoBonus } from '@/lib/palpites';
 import { cn } from '@/lib/utils';
+import { BandeiraImg } from '@/components/ui/BandeiraImg';
 
 const TIPO_META: Record<TipoBonus, { label: string; pts: number; isText?: boolean }> = {
   campeao:    { label: '🥇 Campeão',   pts: 50 },
@@ -59,7 +60,7 @@ export function BonusCard({ bilheteId, tipo, selecoes, bonusSalvo, deadlinePasse
 
       {!meta.isText && selectedSelecao && (
         <div className="mb-3 flex items-center gap-2.5">
-          <span className="text-3xl">{selectedSelecao.bandeira_emoji}</span>
+          <BandeiraImg emoji={selectedSelecao.bandeira_emoji} nome={selectedSelecao.nome} size={40} />
           <div>
             <div className="text-[15px] font-bold">{selectedSelecao.nome}</div>
             <div className="font-mono text-accent text-[11px]">
