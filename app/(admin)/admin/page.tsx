@@ -1,4 +1,5 @@
 import { KpiCard } from '@/components/admin/KpiCard'
+import { RecalculoGlobalStatus } from '@/components/admin/RecalculoGlobalStatus'
 import { SnapshotRanking } from '@/components/admin/SnapshotRanking'
 import { UltimosPagamentos, type PagamentoRow } from '@/components/admin/UltimosPagamentos'
 import { VendasChart, type VendaDia } from '@/components/admin/VendasChart'
@@ -128,6 +129,10 @@ export default async function AdminPage() {
         </div>
         <div className="p-6">
           <SnapshotRanking />
+          <div className="border-border mt-6 border-t pt-6">
+            <p className="text-text-primary mb-3 text-sm font-semibold">Recálculo global de pontos</p>
+            <RecalculoGlobalStatus />
+          </div>
         </div>
       </div>
     </section>

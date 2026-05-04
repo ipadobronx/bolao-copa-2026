@@ -19,7 +19,7 @@ const ITEMS: NavItem[] = [
   { label: 'Overview', icon: BarChart2, href: '/admin' },
   { label: 'Apostadores', icon: Users, comingSoon: true },
   { label: 'Pagamentos', icon: CreditCard, comingSoon: true },
-  { label: 'Jogos & Resultados', icon: Swords, comingSoon: true },
+  { label: 'Jogos & Resultados', icon: Swords, href: '/admin/jogos' },
   { label: 'Cashbacks', icon: Gift, comingSoon: true },
 ]
 
