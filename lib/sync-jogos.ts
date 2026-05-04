@@ -37,7 +37,7 @@ export function calcularUpdateJogo(
   parsed: ParsedFixture | null,
 ): JogoUpdate | null {
   if (parsed === null) return null
-  if (jogo.finalizado) return null
+  if (jogo.finalizado) return null // once finalized, score is authoritative — API corrections require manual admin intervention
 
   const novosGolsCasa = parsed.gols_casa ?? jogo.gols_casa
   const novosGolsFora = parsed.gols_fora ?? jogo.gols_fora
