@@ -1,23 +1,37 @@
-import { redirect } from 'next/navigation';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation'
+import { AdminSidebar } from '@/components/admin/AdminSidebar'
+import { createSupabaseAdminClient } from '@/lib/supabase/admin'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  // Guard de auth (F4). Guard de is_admin entra na F9.
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/admin');
+  const supabase = await createSupabaseServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login?next=/admin')
+
+  const admin = createSupabaseAdminClient()
+  const { data: profile } = await admin
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', user.id)
+    .single()
+  if (!profile?.is_admin) redirect('/')
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-border bg-bg-elevated border-b px-6 py-4">
-        <span className="font-display text-danger text-xl tracking-wide">ADMIN</span>
-        <span className="text-text-muted ml-2 font-mono text-xs">
-          (guard de is_admin entra na Feature 9)
+    <div className="min-h-screen md:grid md:grid-cols-[240px_1fr]">
+      {/* Mobile header */}
+      <header className="border-border bg-bg-elevated border-b px-5 py-4 md:hidden">
+        <span className="font-display text-danger text-xl tracking-wide">
+          ADMIN<span className="text-accent">26</span>
         </span>
       </header>
-      <main className="flex-1 p-6">{children}</main>
+
+      {/* Desktop sidebar */}
+      <AdminSidebar className="hidden md:flex md:flex-col" />
+
+      {/* Main content */}
+      <main className="p-5 md:p-8">
+        {children}
+      </main>
     </div>
-  );
+  )
 }
