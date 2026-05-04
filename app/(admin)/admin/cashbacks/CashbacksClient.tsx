@@ -29,6 +29,7 @@ type Selecao = {
   id: number
   nome: string
   codigo_iso: string
+  bandeira_emoji: string | null
   cashback_multiplicador: number
 }
 

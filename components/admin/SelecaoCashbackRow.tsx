@@ -5,6 +5,7 @@ import { ChevronDown, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 import { exposicaoSelecao } from '@/lib/cashback-pagamento'
 import { formatBRL } from '@/lib/format/brl'
+import { BandeiraImg } from '@/components/ui/BandeiraImg'
 import { ApostadorCashbackRow } from './ApostadorCashbackRow'
 
 type Bilhete = {
@@ -22,6 +23,7 @@ type Selecao = {
   id: number
   nome: string
   codigo_iso: string
+  bandeira_emoji: string | null
   cashback_multiplicador: number
 }
 
@@ -113,13 +115,7 @@ export function SelecaoCashbackRow({
         ) : (
           <ChevronRight className="text-text-muted size-4 shrink-0" />
         )}
-        <img
-          src={`https://flagcdn.com/24x18/${selecao.codigo_iso.toLowerCase()}.png`}
-          alt={selecao.nome}
-          className="h-4"
-          width={24}
-          height={18}
-        />
+        <BandeiraImg emoji={selecao.bandeira_emoji} nome={selecao.nome} size={20} />
         <span className="text-text-primary font-semibold">{selecao.nome}</span>
         <span className="text-accent font-mono text-xs">{selecao.cashback_multiplicador}×</span>
         <span className="text-text-muted text-xs">

@@ -18,7 +18,7 @@ export default async function CashbacksPage() {
       .order('numero_bilhete', { ascending: true }),
     admin
       .from('selecoes')
-      .select('id, nome, codigo_iso, cashback_multiplicador')
+      .select('id, nome, codigo_iso, bandeira_emoji, cashback_multiplicador')
       .gt('cashback_multiplicador', 0)
       .order('cashback_multiplicador', { ascending: true }),
     admin.from('copa_resultados').select('finalizada, campeao_id').eq('id', 1).single(),
