@@ -103,4 +103,36 @@ describe('parseFixture', () => {
       penaltyWinnerSide: null,
     })
   })
+
+  it('PEN com penalty null → ainda não finalizado (dados API indisponíveis)', () => {
+    const f = makeFixture({
+      fixture: { id: 1008, date: '', status: { short: 'PEN' } },
+      goals: { home: 1, away: 1 },
+      score: { penalty: { home: null, away: null } },
+    })
+    const r = parseFixture(f)
+    expect(r?.finalizado).toBe(false)
+    expect(r?.penaltyWinnerSide).toBeNull()
+  })
+
+  it('PEN — away vence (completo) → finalizado=true, penaltyWinnerSide=away', () => {
+    const f = makeFixture({
+      fixture: { id: 1009, date: '', status: { short: 'PEN' } },
+      goals: { home: 0, away: 0 },
+      score: { penalty: { home: 3, away: 5 } },
+    })
+    const r = parseFixture(f)
+    expect(r?.finalizado).toBe(true)
+    expect(r?.penaltyWinnerSide).toBe('away')
+  })
+
+  it('ET (prorrogação ao vivo) → finalizado=false', () => {
+    const f = makeFixture({
+      fixture: { id: 1010, date: '', status: { short: 'ET' } },
+      goals: { home: 1, away: 1 },
+    })
+    const r = parseFixture(f)
+    expect(r?.finalizado).toBe(false)
+    expect(r?.penaltyWinnerSide).toBeNull()
+  })
 })

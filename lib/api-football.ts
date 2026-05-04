@@ -82,6 +82,11 @@ export const ROUND_FASE_MAP: Record<string, FaseJogo> = {
   'Final': 'final',
 }
 
+export function roundToFase(round: string): FaseJogo | null {
+  if (round.startsWith('Group Stage')) return 'grupos'
+  return ROUND_FASE_MAP[round] ?? null
+}
+
 const API_BASE = 'https://v3.football.api-sports.io'
 
 // serverEnv is imported lazily inside apiFetch so it is never evaluated during
@@ -94,8 +99,15 @@ async function apiFetch(path: string): Promise<ApiFixture[]> {
     cache: 'no-store',
   })
   if (!res.ok) throw new Error(`API-Football ${res.status}: ${await res.text()}`)
-  const json = (await res.json()) as { response: ApiFixture[] }
-  return json.response
+  const json = (await res.json()) as {
+    response: ApiFixture[]
+    errors: unknown[] | Record<string, unknown>
+  }
+  const hasErrors = Array.isArray(json.errors)
+    ? json.errors.length > 0
+    : Object.keys(json.errors ?? {}).length > 0
+  if (hasErrors) throw new Error(`API-Football business error: ${JSON.stringify(json.errors)}`)
+  return json.response ?? []
 }
 
 export async function fetchFixtures(externalIds: string[]): Promise<ApiFixture[]> {
@@ -124,9 +136,19 @@ export function parseFixture(fixture: ApiFixture): ParsedFixture {
   let penaltyWinnerSide: 'home' | 'away' | null = null
 
   if (status === 'PEN') {
-    const ph = fixture.score.penalty.home ?? 0
-    const pa = fixture.score.penalty.away ?? 0
-    penaltyWinnerSide = ph >= pa ? 'home' : 'away'
+    const ph = fixture.score.penalty.home
+    const pa = fixture.score.penalty.away
+    if (ph === null || pa === null) {
+      // Penalty data not yet available from API — treat as still live
+      return {
+        externalId: String(fixture.fixture.id),
+        finalizado: false,
+        gols_casa: fixture.goals.home,
+        gols_fora: fixture.goals.away,
+        penaltyWinnerSide: null,
+      }
+    }
+    penaltyWinnerSide = ph > pa ? 'home' : 'away'
   }
 
   return {
