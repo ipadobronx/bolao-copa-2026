@@ -15,7 +15,7 @@ export function DashboardShell({ nome, email, children }: DashboardShellProps) {
       <DashboardNav className="hidden md:flex" />
       <div className="flex flex-col">
         <main className="flex-1 px-5 pt-20 pb-10 md:p-8 md:pt-8">
-          <DashboardHeader nome={nome} email={email} />
+          <DashboardHeader nome={nome} email={email} subtitle="Sua primeira tabela ainda não está no jogo. Disponível em breve." />
           {children}
         </main>
       </div>
