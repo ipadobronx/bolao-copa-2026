@@ -1,4 +1,4 @@
-import { createSupabaseAdminClient } from '@/lib/supabase/admin'
+import type { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { fetchFixtures, fetchFixturesByDate, parseFixture, TEAM_NAME_MAP } from './api-football'
 import { calcularUpdateJogo, calcularResolucoesPlaceholder } from './sync-jogos'
 import { calcularUpdatesPalpites } from './recalculo'

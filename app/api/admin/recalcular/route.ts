@@ -97,9 +97,9 @@ async function recalcularBonus(
 
   const updates = calcularUpdateBonus(bonusRows, resultados, bonusTipos)
   if (updates.length > 0) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: updateErr } = await admin
       .from('palpites_bonus')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .upsert(updates as any, { onConflict: 'id' })
     if (updateErr) return { total: 0, error: updateErr.message }
   }
@@ -253,9 +253,9 @@ export async function POST(req: Request) {
 
     const updates = calcularUpdatesPalpites(palpites, jogo)
     if (updates.length > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: updateErr } = await admin
         .from('palpites')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .upsert(updates as any, { onConflict: 'id' })
       if (updateErr) {
         return NextResponse.json({ error: updateErr.message }, { status: 500 })

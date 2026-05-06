@@ -46,9 +46,9 @@ export async function PATCH(
   const updateFields = Object.fromEntries(
     Object.entries(parsed.data).filter(([, v]) => v !== undefined),
   )
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await auth.admin
     .from('jogos')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .update(updateFields as any)
     .eq('id', jogoId)
 

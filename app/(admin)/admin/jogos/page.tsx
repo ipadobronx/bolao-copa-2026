@@ -26,6 +26,7 @@ export default async function AdminJogosPage() {
       .select('*')
       .eq('id', 1)
       .maybeSingle(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (admin as any)
       .from('sync_jogos_log')
       .select('iniciado_em, finalizado_em, jogos_atualizados, status')
