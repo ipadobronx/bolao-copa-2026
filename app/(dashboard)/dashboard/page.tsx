@@ -102,6 +102,9 @@ export default async function DashboardPage() {
   const palpitesCount = (palpitesCountRes.data as number | null) ?? 0
   const jogosFinalizadosCount = jogoFinRes.count ?? 0
   const jogosErrored = !!jogosFutRes.error
+  const totalBilhetesConfirmados = bilhetesRaw.filter(
+    (b) => b.effective_status === 'confirmado',
+  ).length
 
   // Determinar estado preliminar pra decidir se precisamos de fase 2
   const estadoBase = determinarEstadoDashboard({
@@ -162,7 +165,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <DashboardHeader nome={nome} email={email} subtitle={subtitle} />
+      <DashboardHeader nome={nome} email={email} subtitle={subtitle} totalBilhetes={totalBilhetesConfirmados} />
 
       {estado.kind === 'sem-bilhete' && <DashboardEmptyHero />}
 

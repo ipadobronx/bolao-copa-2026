@@ -3,11 +3,16 @@ import { iniciais } from '@/lib/format/iniciais';
 export type UserBadgeProps = {
   nome: string;
   email: string;
+  totalBilhetes?: number;
 };
 
-export function UserBadge({ nome, email }: UserBadgeProps) {
+export function UserBadge({ nome, email, totalBilhetes }: UserBadgeProps) {
   const handle = email.split('@')[0]?.toLowerCase() ?? 'apostador';
   const nomeExibido = nome.trim() || 'Apostador';
+  const tabelasSuffix =
+    totalBilhetes === undefined
+      ? ''
+      : ` · ${totalBilhetes} tabela${totalBilhetes === 1 ? '' : 's'}`;
   return (
     <div className="bg-bg-card border-border flex items-center gap-2.5 rounded-full border px-3.5 py-2">
       <div
@@ -18,7 +23,9 @@ export function UserBadge({ nome, email }: UserBadgeProps) {
       </div>
       <div className="text-[13px] leading-tight">
         <div className="font-semibold">{nomeExibido}</div>
-        <div className="text-text-muted font-mono text-[11px]">@{handle} · 0 tabelas</div>
+        <div className="text-text-muted font-mono text-[11px]">
+          @{handle}{tabelasSuffix}
+        </div>
       </div>
     </div>
   );

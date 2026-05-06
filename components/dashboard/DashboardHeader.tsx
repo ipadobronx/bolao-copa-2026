@@ -5,6 +5,7 @@ export type DashboardHeaderProps = {
   nome: string;
   email: string;
   subtitle: string;
+  totalBilhetes?: number;
 };
 
 function primeiroNome(nome: string): string {
@@ -13,7 +14,7 @@ function primeiroNome(nome: string): string {
   return trimmed.split(/\s+/)[0]!;
 }
 
-export function DashboardHeader({ nome, email, subtitle }: DashboardHeaderProps) {
+export function DashboardHeader({ nome, email, subtitle, totalBilhetes }: DashboardHeaderProps) {
   return (
     <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
       <div>
@@ -22,7 +23,7 @@ export function DashboardHeader({ nome, email, subtitle }: DashboardHeaderProps)
         </h1>
         <p className="font-body text-text-secondary mt-2 text-sm">{subtitle}</p>
       </div>
-      <UserBadge nome={nome} email={email} />
+      <UserBadge nome={nome} email={email} {...(totalBilhetes !== undefined && { totalBilhetes })} />
     </header>
   );
 }
