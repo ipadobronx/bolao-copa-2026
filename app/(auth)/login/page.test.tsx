@@ -1,30 +1,32 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-// LoginForm uses Supabase browser client at module load (via createSupabaseBrowserClient).
-// We don't exercise it in the page smoke test, but the import path must not throw.
-vi.mock('@/lib/supabase/browser', () => ({
-  createSupabaseBrowserClient: () => ({ auth: { signInWithOtp: vi.fn() } }),
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
 }));
+
+vi.mock('@/lib/supabase/browser', () => ({
+  createSupabaseBrowserClient: () => ({
+    auth: { signInWithPassword: vi.fn(), signUp: vi.fn() },
+  }),
+}));
+
+vi.mock('@/lib/validators/next', () => ({ safeNext: (v: unknown) => v ?? '/dashboard' }));
+vi.mock('sonner', () => ({ toast: { error: vi.fn(), info: vi.fn() } }));
 
 import LoginPage from './page';
 
 describe('LoginPage', () => {
-  it('renderiza h1 "Entrar" e os 2 inputs do form', () => {
+  it('renderiza h1 e toggle de modos', () => {
     render(<LoginPage searchParams={{}} />);
-    expect(screen.getByRole('heading', { level: 1, name: /entrar/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/nome/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /receber link/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /entrar/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /criar conta/i })).toBeInTheDocument();
   });
 
-  it('NÃO mostra banner de erro quando searchParams.error está ausente', () => {
+  it('modo login mostra campos email e senha', () => {
     render(<LoginPage searchParams={{}} />);
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-  });
-
-  it('mostra banner de erro quando searchParams.error === "link-invalido"', () => {
-    render(<LoginPage searchParams={{ error: 'link-invalido' }} />);
-    expect(screen.getByRole('alert')).toHaveTextContent(/link expirou ou já foi usado/i);
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
+    expect(screen.getByLabelText('Senha')).toBeInTheDocument();
   });
 });
