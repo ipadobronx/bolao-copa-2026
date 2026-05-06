@@ -71,12 +71,12 @@ export function determinarEstadoDashboard(input: DeterminarEstadoInput): Dashboa
   const confirmados = input.bilhetes.filter((b) => b.effective_status === 'confirmado')
   const pendentesArr = input.bilhetes.filter((b) => b.effective_status === 'pendente')
 
-  const tem_confirmado = confirmados.length > 0
-  const tem_pendente = pendentesArr.length > 0
-  const copa_comecou = input.jogosFinalizadosCount > 0
+  const temConfirmado = confirmados.length > 0
+  const temPendente = pendentesArr.length > 0
+  const copaComecou = input.jogosFinalizadosCount > 0
 
   // Estado A
-  if (!tem_confirmado && !tem_pendente) {
+  if (!temConfirmado && !temPendente) {
     return { kind: 'sem-bilhete' }
   }
 
@@ -98,9 +98,9 @@ export function determinarEstadoDashboard(input: DeterminarEstadoInput): Dashboa
         })()
 
   // Estado B — pendente puro
-  if (!tem_confirmado) {
-    // pendente é definitivamente !== null aqui (porque tem_pendente && !tem_confirmado)
-    return { kind: 'pendente-puro', pendente: pendente! }
+  if (!temConfirmado) {
+    if (!pendente) throw new Error('[estado] invariant violation: temPendente=true but pendente=null')
+    return { kind: 'pendente-puro', pendente }
   }
 
   // Calcula progresso (apenas confirmados contam)
@@ -114,7 +114,7 @@ export function determinarEstadoDashboard(input: DeterminarEstadoInput): Dashboa
 
   // Estado C — pre-copa
   // Edge graceful: se ranking_usuarios vazio (race), degrada pra pre-copa.
-  if (!copa_comecou || input.ranking === null) {
+  if (!copaComecou || input.ranking === null) {
     return {
       kind: 'pre-copa',
       pendente,
