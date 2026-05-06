@@ -162,4 +162,18 @@ describe('determinarEstadoDashboard', () => {
     expect(r.kind).toBe('pendente-puro')
     // Não há progresso quando user só tem pendente; estado é determinado antes de progresso ser computado.
   })
+
+  it('Progresso: porcentagem clamp em 100 (defesa contra overflow)', () => {
+    const r = determinarEstadoDashboard(
+      baseInput({
+        bilhetes: [
+          { id: 'b1', numero_bilhete: 100, valor_pago: 20, effective_status: 'confirmado', created_at: '2026-05-06T10:00:00Z' },
+        ],
+        ranking: { melhor_bilhete_id: 'b1', melhor_numero_bilhete: 100, pontos_totais: 0, posicao: 1, total_bilhetes: 1 },
+        palpitesCount: 200,    // mais palpites que possível (104) — bug hipotético
+      }),
+    )
+    if (r.kind !== 'pre-copa') throw new Error('expected pre-copa')
+    expect(r.progresso.porcentagem).toBe(100)
+  })
 })

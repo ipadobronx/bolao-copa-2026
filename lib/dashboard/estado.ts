@@ -99,10 +99,11 @@ export function determinarEstadoDashboard(input: DeterminarEstadoInput): Dashboa
 
   // Calcula progresso (apenas confirmados contam)
   const total = confirmados.length * 104
+  const porcentagemRaw = total === 0 ? 0 : Math.round((input.palpitesCount / total) * 100)
   const progresso: ProgressoInfo = {
     preenchidos: input.palpitesCount,
     total,
-    porcentagem: total === 0 ? 0 : Math.round((input.palpitesCount / total) * 100),
+    porcentagem: Math.max(0, Math.min(100, porcentagemRaw)),
     totalBilhetes: confirmados.length,
   }
 
