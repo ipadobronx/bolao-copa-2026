@@ -118,6 +118,40 @@
   }
 }
 
+@keyframes prize-glow {
+  0%,
+  100% {
+    text-shadow:
+      0 0 20px rgba(250, 204, 21, 0.4),
+      0 0 40px rgba(250, 204, 21, 0.2);
+  }
+  50% {
+    text-shadow:
+      0 0 40px rgba(250, 204, 21, 0.75),
+      0 0 80px rgba(250, 204, 21, 0.35),
+      0 0 120px rgba(250, 204, 21, 0.15);
+  }
+}
+
+@utility animate-prize-glow {
+  animation: prize-glow 3s ease-in-out infinite;
+}
+
+@utility how-it-works-card {
+  @apply bg-bg-elevated border-border rounded-2xl border p-6 transition-all hover:-translate-y-1 hover:border-success/50 hover:shadow-[0_0_24px_rgba(16,185,129,0.12)];
+}
+
+@utility how-it-works-card-accent {
+  @apply border-success/25 bg-success/[0.03];
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-prize-glow {
+    animation: none;
+    text-shadow: 0 0 20px rgba(250, 204, 21, 0.4);
+  }
+}
+
 /* Remove number input spinners globally */
 input[type='number'] {
   -moz-appearance: textfield;

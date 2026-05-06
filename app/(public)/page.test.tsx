@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import PublicLayout from './layout';
 import HomePage from './page';
@@ -18,52 +18,55 @@ describe('Landing page', () => {
     expect(screen.getByRole('contentinfo')).toBeInTheDocument();
   });
 
-  it('hero exibe título e CTA principal apontando pra /comprar', () => {
+  it('hero exibe prize R$10.000 e CTA principal apontando pra /login', () => {
     renderLanding();
-    expect(
-      screen.getByRole('heading', {
-        level: 1,
-        name: /Palpite\.\s*Pontue\.\s*Leve R\$ 10 mil pra casa\./i,
-      }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Comprar minha tabela/i })).toHaveAttribute(
-      'href',
-      '/comprar',
-    );
+    expect(screen.getByLabelText(/R\$ 10\.000 em prêmios/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /Copa 2026/i })).toBeInTheDocument();
+    const ctaPrimario = screen.getAllByRole('link', { name: /Quero participar/i })[0];
+    expect(ctaPrimario).toHaveAttribute('href', '/login');
   });
 
-  it('seção features tem id correto e renderiza 4 cards', () => {
+  it('seção how-it-works tem id correto e renderiza 5 cards', () => {
     const { container } = renderLanding();
-    expect(container.querySelector('#features')).toBeInTheDocument();
+    const section = container.querySelector('#how-it-works') as HTMLElement;
+    expect(section).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 2, name: /Como funciona/i })).toBeInTheDocument();
-    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(4);
+    expect(within(section).getAllByRole('heading', { level: 3 })).toHaveLength(5);
   });
 
-  it('seção cashback tem id correto e CTA aponta pra /comprar', () => {
+  it('seção cashback tem id correto e CTA aponta pra /login', () => {
     const { container } = renderLanding();
     expect(container.querySelector('#cashback')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Garantir meu cashback/i })).toHaveAttribute(
       'href',
-      '/comprar',
+      '/login',
     );
+  });
+
+  it('seção pontuacao existe com id correto', () => {
+    const { container } = renderLanding();
+    expect(container.querySelector('#pontuacao')).toBeInTheDocument();
+  });
+
+  it('seção premios existe com id correto', () => {
+    const { container } = renderLanding();
+    expect(container.querySelector('#premios')).toBeInTheDocument();
   });
 
   it('header tem links de âncora e CTA Entrar', () => {
     renderLanding();
-    // Regexes ancoradas pra desambiguar:
-    // - "Cashback" sem ^$ casaria também o "Garantir meu cashback" do promo
-    // - "Entrar" sem ^$ poderia casar variantes do CTA principal
-    expect(screen.getByRole('link', { name: /^Como funciona$/i })).toHaveAttribute(
+    const nav = screen.getByRole('navigation', { name: /Principal/i });
+    expect(within(nav).getByRole('link', { name: /^Como funciona$/i })).toHaveAttribute(
       'href',
-      '#features',
+      '#how-it-works',
     );
-    expect(screen.getByRole('link', { name: /^Cashback$/i })).toHaveAttribute('href', '#cashback');
-    expect(screen.getByRole('link', { name: /^Entrar$/i })).toHaveAttribute('href', '/login');
+    expect(within(nav).getByRole('link', { name: /^Cashback$/i })).toHaveAttribute('href', '#cashback');
+    expect(within(nav).getByRole('link', { name: /^Entrar$/i })).toHaveAttribute('href', '/login');
   });
 
   it('footer mostra copyright e disclaimer', () => {
     renderLanding();
-    expect(screen.getByText(/©\s*2026 Bolão Copa 2026/)).toBeInTheDocument();
+    expect(screen.getByText(/©\s*2026 Mala na Copa/)).toBeInTheDocument();
     expect(
       screen.getByText(/Não afiliado à FIFA\. Competição entre conhecidos\./i),
     ).toBeInTheDocument();
