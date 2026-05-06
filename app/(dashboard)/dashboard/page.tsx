@@ -25,6 +25,34 @@ export const dynamic = 'force-dynamic'
 
 const COPA_INICIO = new Date('2026-06-11T00:00:00Z')
 
+function toRankingInput(
+  row: {
+    melhor_bilhete_id: string | null
+    melhor_numero_bilhete: number | null
+    pontos_totais: number | null
+    posicao: number | null
+    total_bilhetes: number | null
+  } | null,
+): RankingUsuarioInput {
+  if (!row) return null
+  if (
+    row.melhor_bilhete_id === null ||
+    row.melhor_numero_bilhete === null ||
+    row.pontos_totais === null ||
+    row.posicao === null ||
+    row.total_bilhetes === null
+  ) {
+    return null
+  }
+  return {
+    melhor_bilhete_id: row.melhor_bilhete_id,
+    melhor_numero_bilhete: row.melhor_numero_bilhete,
+    pontos_totais: row.pontos_totais,
+    posicao: row.posicao,
+    total_bilhetes: row.total_bilhetes,
+  }
+}
+
 export default async function DashboardPage() {
   const supabase = await createSupabaseServerClient()
   const {
@@ -46,7 +74,7 @@ export default async function DashboardPage() {
   const [bilhetesRes, rankingRes, palpitesCountRes, jogosFutRes, jogoFinRes] = await Promise.all([
     supabase
       .from('bilhetes_view')
-      .select('id, numero_bilhete, valor_pago, mp_payment_id, effective_status, created_at')
+      .select('id, numero_bilhete, valor_pago, effective_status, created_at')
       .eq('user_id', user.id),
     supabase
       .from('ranking_usuarios')
@@ -70,9 +98,10 @@ export default async function DashboardPage() {
   ])
 
   const bilhetesRaw = (bilhetesRes.data ?? []) as BilheteEstadoInput[]
-  const ranking = (rankingRes.data ?? null) as RankingUsuarioInput
+  const ranking = toRankingInput(rankingRes.data)
   const palpitesCount = (palpitesCountRes.data as number | null) ?? 0
   const jogosFinalizadosCount = jogoFinRes.count ?? 0
+  const jogosErrored = !!jogosFutRes.error
 
   // Determinar estado preliminar pra decidir se precisamos de fase 2
   const estadoBase = determinarEstadoDashboard({
@@ -140,7 +169,7 @@ export default async function DashboardPage() {
       {estado.kind === 'pendente-puro' && (
         <>
           <DashboardPendentePix pendente={estado.pendente} variant="hero" />
-          <ProximosJogosPanel jogos={jogos} />
+          <ProximosJogosPanel jogos={jogos} errored={jogosErrored} />
         </>
       )}
 
@@ -158,7 +187,7 @@ export default async function DashboardPage() {
               totalBilhetes={estado.progresso.totalBilhetes}
             />
           </div>
-          <ProximosJogosPanel jogos={jogos} />
+          <ProximosJogosPanel jogos={jogos} errored={jogosErrored} />
           {estado.progresso.porcentagem < 100 && (
             <Link
               href={'/palpites' as Route}
@@ -194,7 +223,7 @@ export default async function DashboardPage() {
               totalBilhetes={estado.progresso.totalBilhetes}
             />
           </div>
-          <ProximosJogosPanel jogos={jogos} />
+          <ProximosJogosPanel jogos={jogos} errored={jogosErrored} />
           <div className="mt-4 flex flex-wrap gap-4">
             <Link href={'/ranking' as Route} className="text-accent inline-flex items-center gap-1 text-sm hover:underline">
               Ver ranking completo <ArrowRight className="size-3" />
