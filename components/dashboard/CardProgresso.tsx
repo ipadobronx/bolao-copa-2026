@@ -16,6 +16,7 @@ export function CardProgresso({ porcentagem, preenchidos, total, totalBilhetes }
       <div
         className="bg-bg-elevated mt-3 h-2 overflow-hidden rounded-full"
         role="progressbar"
+        aria-label="Palpites preenchidos"
         aria-valuenow={porcentagem}
         aria-valuemin={0}
         aria-valuemax={100}

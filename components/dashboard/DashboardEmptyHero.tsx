@@ -4,10 +4,13 @@ import { Lock, ArrowRight } from 'lucide-react'
 
 export function DashboardEmptyHero() {
   return (
-    <section className="panel border-accent/40 from-bg-card to-bg-card/50 relative overflow-hidden bg-gradient-to-b p-10 text-center md:p-16">
+    <section
+      aria-labelledby="empty-hero-heading"
+      className="panel border-accent/40 from-bg-card to-bg-card/50 relative overflow-hidden bg-gradient-to-b p-10 text-center md:p-16"
+    >
       <div aria-hidden="true" className="bg-accent/5 pointer-events-none absolute inset-0 blur-3xl" />
       <Lock className="text-accent relative mx-auto mb-6 size-16" strokeWidth={1.5} />
-      <h2 className="font-display relative text-3xl tracking-wide md:text-5xl">
+      <h2 id="empty-hero-heading" className="font-display relative text-3xl tracking-wide md:text-5xl">
         Sua participação na <span className="text-accent">Copa 2026</span> começa aqui
       </h2>
       <p className="font-body text-text-secondary relative mx-auto mt-3 max-w-md text-sm md:text-base">
