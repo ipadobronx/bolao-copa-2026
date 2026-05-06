@@ -1,6 +1,6 @@
 # F16 — Dashboard inteligente · Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Substituir `/dashboard` (atualmente só lista próximos jogos) por um Server Component que discrimina o estado do user (sem bilhete / pendente puro / pré-Copa / em-andamento) e renderiza UI específica pra cada estado, com banner aditivo de PIX pendente quando o user já tem confirmado.
 
@@ -54,7 +54,7 @@
 **Files:**
 - Create: `supabase/migrations/20260506000000_f16_count_palpites.sql`
 
-- [ ] **Step 1: Criar arquivo da migration**
+- [x] **Step 1: Criar arquivo da migration**
 
 ```sql
 -- supabase/migrations/20260506000000_f16_count_palpites.sql
@@ -80,7 +80,7 @@ COMMENT ON FUNCTION public.count_palpites_confirmados(uuid) IS
   'F16: count de palpites do user em bilhetes confirmados. Security invoker — RLS de palpites/bilhetes enforça acesso. Usado pelo dashboard pra calcular % preenchido.';
 ```
 
-- [ ] **Step 2: Aplicar migration no Supabase via MCP**
+- [x] **Step 2: Aplicar migration no Supabase via MCP**
 
 Use a ferramenta `mcp__supabase-medina__apply_migration` (já configurada no projeto):
 
@@ -89,7 +89,7 @@ name: f16_count_palpites
 query: <conteúdo do arquivo .sql acima>
 ```
 
-- [ ] **Step 3: Testar a RPC manualmente via SQL**
+- [x] **Step 3: Testar a RPC manualmente via SQL**
 
 Use `mcp__supabase-medina__execute_sql` com:
 
@@ -107,7 +107,7 @@ SELECT public.count_palpites_confirmados('00000000-0000-0000-0000-000000000000':
 
 Expected: retorna um inteiro ≥ 0 (count de palpites do user nesses bilhetes).
 
-- [ ] **Step 4: Regenerar tipos TS do Supabase**
+- [x] **Step 4: Regenerar tipos TS do Supabase**
 
 ```bash
 pnpm supabase:types
@@ -115,7 +115,7 @@ pnpm supabase:types
 
 Expected: `lib/supabase/types.ts` agora tem entrada pra `count_palpites_confirmados` em `Functions`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add supabase/migrations/20260506000000_f16_count_palpites.sql lib/supabase/types.ts
@@ -130,7 +130,7 @@ git commit -m "feat(F16): RPC count_palpites_confirmados — count de palpites d
 - Create: `lib/dashboard/countdown.ts`
 - Create: `lib/dashboard/countdown.test.ts`
 
-- [ ] **Step 1: Escrever testes failing**
+- [x] **Step 1: Escrever testes failing**
 
 ```ts
 // lib/dashboard/countdown.test.ts
@@ -169,7 +169,7 @@ describe('formatDiasHoras', () => {
 })
 ```
 
-- [ ] **Step 2: Rodar pra verificar fail**
+- [x] **Step 2: Rodar pra verificar fail**
 
 ```bash
 pnpm test:run lib/dashboard/countdown.test.ts
@@ -177,7 +177,7 @@ pnpm test:run lib/dashboard/countdown.test.ts
 
 Expected: 5 falhas com erro de import "Cannot find module './countdown'".
 
-- [ ] **Step 3: Implementar mínimo**
+- [x] **Step 3: Implementar mínimo**
 
 ```ts
 // lib/dashboard/countdown.ts
@@ -189,7 +189,7 @@ export function formatDiasHoras(de: Date, ate: Date): { dias: number; horas: num
 }
 ```
 
-- [ ] **Step 4: Rodar pra verificar pass**
+- [x] **Step 4: Rodar pra verificar pass**
 
 ```bash
 pnpm test:run lib/dashboard/countdown.test.ts
@@ -197,7 +197,7 @@ pnpm test:run lib/dashboard/countdown.test.ts
 
 Expected: 5 testes passando.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/dashboard/countdown.ts lib/dashboard/countdown.test.ts
@@ -214,7 +214,7 @@ git commit -m "feat(F16): formatDiasHoras — helper puro pra countdown da Copa"
 
 Esta é a função pura central da feature. Testes cobrem todos os branches da cascata + colisão "confirmado + pendente" + edge "ranking vazio com confirmado".
 
-- [ ] **Step 1: Escrever tipos primeiro (sem implementação)**
+- [x] **Step 1: Escrever tipos primeiro (sem implementação)**
 
 ```ts
 // lib/dashboard/estado.ts
@@ -290,7 +290,7 @@ export function determinarEstadoDashboard(_input: DeterminarEstadoInput): Dashbo
 }
 ```
 
-- [ ] **Step 2: Escrever bateria de testes**
+- [x] **Step 2: Escrever bateria de testes**
 
 ```ts
 // lib/dashboard/estado.test.ts
@@ -459,7 +459,7 @@ describe('determinarEstadoDashboard', () => {
 })
 ```
 
-- [ ] **Step 3: Rodar pra verificar fail**
+- [x] **Step 3: Rodar pra verificar fail**
 
 ```bash
 pnpm test:run lib/dashboard/estado.test.ts
@@ -467,7 +467,7 @@ pnpm test:run lib/dashboard/estado.test.ts
 
 Expected: todos os testes falham com `Error: not implemented`.
 
-- [ ] **Step 4: Implementar a função**
+- [x] **Step 4: Implementar a função**
 
 Substituir o corpo da função `determinarEstadoDashboard` em `lib/dashboard/estado.ts`:
 
@@ -545,7 +545,7 @@ export function determinarEstadoDashboard(input: DeterminarEstadoInput): Dashboa
 }
 ```
 
-- [ ] **Step 5: Rodar pra verificar pass**
+- [x] **Step 5: Rodar pra verificar pass**
 
 ```bash
 pnpm test:run lib/dashboard/estado.test.ts
@@ -553,7 +553,7 @@ pnpm test:run lib/dashboard/estado.test.ts
 
 Expected: 10 testes passando.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add lib/dashboard/estado.ts lib/dashboard/estado.test.ts
@@ -567,7 +567,7 @@ git commit -m "feat(F16): determinarEstadoDashboard — máquina de estados pura
 **Files:**
 - Create: `components/dashboard/TrendIndicator.tsx`
 
-- [ ] **Step 1: Escrever o componente**
+- [x] **Step 1: Escrever o componente**
 
 ```tsx
 // components/dashboard/TrendIndicator.tsx
@@ -616,7 +616,7 @@ export function TrendIndicator({ delta, unit, className }: TrendIndicatorProps) 
 }
 ```
 
-- [ ] **Step 2: Rodar typecheck**
+- [x] **Step 2: Rodar typecheck**
 
 ```bash
 pnpm typecheck
@@ -624,7 +624,7 @@ pnpm typecheck
 
 Expected: 0 errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/dashboard/TrendIndicator.tsx
@@ -638,7 +638,7 @@ git commit -m "feat(F16): TrendIndicator — indicador ▲▼━ inline com unid
 **Files:**
 - Create: `components/dashboard/DashboardStatCard.tsx`
 
-- [ ] **Step 1: Escrever o componente**
+- [x] **Step 1: Escrever o componente**
 
 ```tsx
 // components/dashboard/DashboardStatCard.tsx
@@ -691,7 +691,7 @@ export function DashboardStatCard({
 }
 ```
 
-- [ ] **Step 2: Rodar typecheck**
+- [x] **Step 2: Rodar typecheck**
 
 ```bash
 pnpm typecheck
@@ -699,7 +699,7 @@ pnpm typecheck
 
 Expected: 0 errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/dashboard/DashboardStatCard.tsx
@@ -716,7 +716,7 @@ git commit -m "feat(F16): DashboardStatCard composicional — base dos 4 cards d
 - Create: `components/dashboard/CardProgresso.tsx`
 - Create: `components/dashboard/CardCountdown.tsx`
 
-- [ ] **Step 1: `CardPontos.tsx`**
+- [x] **Step 1: `CardPontos.tsx`**
 
 ```tsx
 // components/dashboard/CardPontos.tsx
@@ -747,7 +747,7 @@ export function CardPontos({ pontos, numeroBilhete, totalBilhetes, tendencia }: 
 }
 ```
 
-- [ ] **Step 2: `CardPosicao.tsx`**
+- [x] **Step 2: `CardPosicao.tsx`**
 
 ```tsx
 // components/dashboard/CardPosicao.tsx
@@ -776,7 +776,7 @@ export function CardPosicao({ posicao, totalParticipantes, tendencia }: CardPosi
 }
 ```
 
-- [ ] **Step 3: `CardProgresso.tsx`**
+- [x] **Step 3: `CardProgresso.tsx`**
 
 ```tsx
 // components/dashboard/CardProgresso.tsx
@@ -815,7 +815,7 @@ export function CardProgresso({ porcentagem, preenchidos, total, totalBilhetes }
 }
 ```
 
-- [ ] **Step 4: `CardCountdown.tsx`**
+- [x] **Step 4: `CardCountdown.tsx`**
 
 ```tsx
 // components/dashboard/CardCountdown.tsx
@@ -848,7 +848,7 @@ export function CardCountdown({ copaInicio, agora = new Date() }: CardCountdownP
 }
 ```
 
-- [ ] **Step 5: Rodar typecheck**
+- [x] **Step 5: Rodar typecheck**
 
 ```bash
 pnpm typecheck
@@ -856,7 +856,7 @@ pnpm typecheck
 
 Expected: 0 errors.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add components/dashboard/CardPontos.tsx components/dashboard/CardPosicao.tsx components/dashboard/CardProgresso.tsx components/dashboard/CardCountdown.tsx
@@ -870,7 +870,7 @@ git commit -m "feat(F16): 4 wrappers de DashboardStatCard — Pontos, Posicao, P
 **Files:**
 - Create: `components/dashboard/DashboardEmptyHero.tsx`
 
-- [ ] **Step 1: Escrever o componente**
+- [x] **Step 1: Escrever o componente**
 
 ```tsx
 // components/dashboard/DashboardEmptyHero.tsx
@@ -899,7 +899,7 @@ export function DashboardEmptyHero() {
 }
 ```
 
-- [ ] **Step 2: Rodar typecheck**
+- [x] **Step 2: Rodar typecheck**
 
 ```bash
 pnpm typecheck
@@ -907,7 +907,7 @@ pnpm typecheck
 
 Expected: 0 errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/dashboard/DashboardEmptyHero.tsx
@@ -921,7 +921,7 @@ git commit -m "feat(F16): DashboardEmptyHero — Estado A (sem bilhete) com CTA 
 **Files:**
 - Create: `components/dashboard/DashboardPendentePix.tsx`
 
-- [ ] **Step 1: Escrever o componente com 2 variants**
+- [x] **Step 1: Escrever o componente com 2 variants**
 
 ```tsx
 // components/dashboard/DashboardPendentePix.tsx
@@ -991,7 +991,7 @@ export function DashboardPendentePix({ pendente, variant }: DashboardPendentePix
 }
 ```
 
-- [ ] **Step 2: Rodar typecheck**
+- [x] **Step 2: Rodar typecheck**
 
 ```bash
 pnpm typecheck
@@ -999,7 +999,7 @@ pnpm typecheck
 
 Expected: 0 errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/dashboard/DashboardPendentePix.tsx
@@ -1013,7 +1013,7 @@ git commit -m "feat(F16): DashboardPendentePix — Estado B hero + banner aditiv
 **Files:**
 - Modify: `components/dashboard/DashboardHeader.tsx`
 
-- [ ] **Step 1: Substituir conteúdo do arquivo**
+- [x] **Step 1: Substituir conteúdo do arquivo**
 
 ```tsx
 // components/dashboard/DashboardHeader.tsx
@@ -1046,7 +1046,7 @@ export function DashboardHeader({ nome, email, subtitle }: DashboardHeaderProps)
 }
 ```
 
-- [ ] **Step 2: Verificar que não há outros consumidores**
+- [x] **Step 2: Verificar que não há outros consumidores**
 
 ```bash
 pnpm exec grep -rln "DashboardHeader" app/ components/ | grep -v node_modules
@@ -1056,7 +1056,7 @@ Expected: arquivos listados são apenas `components/dashboard/DashboardHeader.ts
 
 > Se aparecer outro arquivo (ex: `app/(dashboard)/layout.tsx`), atualizar o consumer pra passar `subtitle` apropriado.
 
-- [ ] **Step 3: Rodar typecheck**
+- [x] **Step 3: Rodar typecheck**
 
 ```bash
 pnpm typecheck
@@ -1066,7 +1066,7 @@ Expected: erros apenas em `app/(dashboard)/dashboard/page.tsx` (consumidor antig
 
 > ⚠️ Se houver erros em arquivos NÃO relacionados (ex: `layout.tsx`), o consumer precisa ser atualizado nesta task antes de prosseguir.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add components/dashboard/DashboardHeader.tsx
@@ -1082,7 +1082,7 @@ git commit -m "refactor(F16): DashboardHeader aceita prop subtitle — copy vari
 
 Esta é a integração final. O Server Component faz fetch paralelo, chama o helper puro, e despacha pra UI por estado.
 
-- [ ] **Step 1: Substituir conteúdo do arquivo**
+- [x] **Step 1: Substituir conteúdo do arquivo**
 
 ```tsx
 // app/(dashboard)/dashboard/page.tsx
@@ -1300,7 +1300,7 @@ export default async function DashboardPage() {
 }
 ```
 
-- [ ] **Step 2: Rodar typecheck**
+- [x] **Step 2: Rodar typecheck**
 
 ```bash
 pnpm typecheck
@@ -1308,7 +1308,7 @@ pnpm typecheck
 
 Expected: 0 errors. Se aparecer erro de tipo nos resultados das queries (ex: shape diferente do esperado em `bilhetes_view`), conferir `lib/supabase/types.ts` (foi regenerado na Task 1) e ajustar `BilheteEstadoInput` ou o cast.
 
-- [ ] **Step 3: Rodar lint**
+- [x] **Step 3: Rodar lint**
 
 ```bash
 pnpm lint
@@ -1316,7 +1316,7 @@ pnpm lint
 
 Expected: 0 warnings na page e nos novos componentes.
 
-- [ ] **Step 4: Subir dev server e fazer smoke visual**
+- [x] **Step 4: Subir dev server e fazer smoke visual**
 
 Termo de aceitação: cada estado renderiza sem console errors. QA detalhado fica pra Task 11; aqui só validamos que o page.tsx compila e renderiza algo.
 
@@ -1326,7 +1326,7 @@ pnpm dev
 
 Abrir `http://localhost:3000/dashboard` autenticado. Esperado: ver alguma versão da nova página (qual estado depende dos dados do user de teste).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/(dashboard)/dashboard/page.tsx
@@ -1340,7 +1340,7 @@ git commit -m "feat(F16): reescrever /dashboard como Server Component com switch
 **Files:**
 - nenhum (validação cross-cutting)
 
-- [ ] **Step 1: Suite completa de testes**
+- [x] **Step 1: Suite completa de testes**
 
 ```bash
 pnpm test:run
@@ -1348,7 +1348,7 @@ pnpm test:run
 
 Expected: todos os testes passam (incluindo os 2 novos arquivos de helper). Nenhuma regressão em F1–F15.
 
-- [ ] **Step 2: Typecheck completo**
+- [x] **Step 2: Typecheck completo**
 
 ```bash
 pnpm typecheck
@@ -1356,7 +1356,7 @@ pnpm typecheck
 
 Expected: 0 errors no projeto inteiro.
 
-- [ ] **Step 3: Lint completo**
+- [x] **Step 3: Lint completo**
 
 ```bash
 pnpm lint
@@ -1364,7 +1364,7 @@ pnpm lint
 
 Expected: 0 warnings.
 
-- [ ] **Step 4: Build de produção**
+- [x] **Step 4: Build de produção**
 
 ```bash
 pnpm build
