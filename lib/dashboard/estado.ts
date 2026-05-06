@@ -45,13 +45,7 @@ export type ProgressoInfo = {
   totalBilhetes: number
 }
 
-export type RankingUsuarioInfo = {
-  melhor_bilhete_id: string
-  melhor_numero_bilhete: number
-  pontos_totais: number
-  posicao: number
-  total_bilhetes: number
-}
+export type RankingUsuarioInfo = NonNullable<RankingUsuarioInput>
 
 export type DashboardEstado =
   | { kind: 'sem-bilhete' }

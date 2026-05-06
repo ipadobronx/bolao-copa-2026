@@ -47,7 +47,7 @@ describe('determinarEstadoDashboard', () => {
       }),
     )
     expect(r.kind).toBe('pendente-puro')
-    if (r.kind !== 'pendente-puro') return
+    if (r.kind !== 'pendente-puro') throw new Error('expected pendente-puro')
     expect(r.pendente.bilhete_id).toBe('b2')           // mais recente
     expect(r.pendente.numero_bilhete).toBe(101)
     expect(r.pendente.valor_total_pendente).toBe(60)   // 20 + 40
@@ -65,7 +65,7 @@ describe('determinarEstadoDashboard', () => {
       }),
     )
     expect(r.kind).toBe('pre-copa')
-    if (r.kind !== 'pre-copa') return
+    if (r.kind !== 'pre-copa') throw new Error('expected pre-copa')
     expect(r.pendente).toBeNull()
     expect(r.progresso).toEqual({ preenchidos: 50, total: 104, porcentagem: 48, totalBilhetes: 1 })
   })
@@ -82,7 +82,7 @@ describe('determinarEstadoDashboard', () => {
       }),
     )
     expect(r.kind).toBe('pre-copa')
-    if (r.kind !== 'pre-copa') return
+    if (r.kind !== 'pre-copa') throw new Error('expected pre-copa')
     expect(r.pendente).not.toBeNull()
     expect(r.pendente!.bilhete_id).toBe('b2')
     expect(r.pendente!.qtd_pendentes).toBe(1)
@@ -103,7 +103,7 @@ describe('determinarEstadoDashboard', () => {
       }),
     )
     expect(r.kind).toBe('em-andamento')
-    if (r.kind !== 'em-andamento') return
+    if (r.kind !== 'em-andamento') throw new Error('expected em-andamento')
     expect(r.tendenciaPontos).toBe(34)        // 234 - 200
     expect(r.tendenciaPosicao).toBe(8)        // 50 - 42 (subiu 8)
     expect(r.totalParticipantes).toBe(500)
@@ -151,7 +151,7 @@ describe('determinarEstadoDashboard', () => {
     expect(r).toEqual({ kind: 'sem-bilhete' })
   })
 
-  it('Progresso: porcentagem zero quando total = 0', () => {
+  it('Pendente-puro tem precedência sobre cálculo de progresso (sem confirmados)', () => {
     const r = determinarEstadoDashboard(
       baseInput({
         bilhetes: [
@@ -159,6 +159,7 @@ describe('determinarEstadoDashboard', () => {
         ],
       }),
     )
-    expect(r.kind).toBe('pendente-puro')   // sem stats; progresso não consultado
+    expect(r.kind).toBe('pendente-puro')
+    // Não há progresso quando user só tem pendente; estado é determinado antes de progresso ser computado.
   })
 })
