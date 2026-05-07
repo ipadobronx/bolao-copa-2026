@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Política de Privacidade · Mala na Copa',
+  title: 'Política de Privacidade',
   description: 'Como tratamos seus dados pessoais no bolão Mala na Copa, conforme a LGPD.',
 };
 

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Termos de Uso · Mala na Copa',
+  title: 'Termos de Uso',
   description: 'Termos de uso do bolão Mala na Copa — Copa do Mundo 2026.',
 };
 
