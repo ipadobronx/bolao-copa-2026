@@ -9,11 +9,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
   } = await supabase.auth.getUser();
   if (!user) redirect('/login?next=/dashboard');
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('nome, email')
-    .eq('id', user.id)
-    .single();
+  const [profileRes, bilhetesCountRes] = await Promise.all([
+    supabase.from('profiles').select('nome, email').eq('id', user.id).single(),
+    supabase
+      .from('bilhetes_view')
+      .select('id', { head: true, count: 'exact' })
+      .eq('user_id', user.id)
+      .eq('effective_status', 'confirmado'),
+  ]);
+  const profile = profileRes.data;
+  const totalBilhetes = bilhetesCountRes.count ?? 0;
 
   if (!profile?.nome) {
     console.warn(
@@ -24,7 +29,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   }
 
   return (
-    <DashboardShell nome={profile?.nome ?? ''} email={user.email!}>
+    <DashboardShell nome={profile?.nome ?? ''} email={user.email!} totalBilhetes={totalBilhetes}>
       {children}
     </DashboardShell>
   );
