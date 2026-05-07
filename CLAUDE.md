@@ -19,7 +19,7 @@ Sistema web de bolão da Copa do Mundo 2026 (FIFA, 11/06/2026 a 19/07/2026, sedi
 **Modelo de negócio:**
 
 - R$ 20,00 por tabela (1 tabela = 1 conjunto de palpites)
-- Prêmio total R$ 10.000, dividido entre os 10 primeiros do ranking
+- Prêmio total R$ 10.000, dividido entre os 3 primeiros do ranking (1º R$ 7k · 2º R$ 2k · 3º R$ 1k)
 - Promoção cashback diferenciado: comprou ≥ R$ 100 → escolhe 1 seleção dentre 13 elegíveis; se ela for campeã, recebe `valor_pago × multiplicador` de volta no PIX. Multiplicador varia por tier (100% pra favoritas até 500% pra azarões — ver §3.3).
 - **Sem limite de vagas por seleção:** qualquer número de bilhetes pode escolher a mesma seleção. A proteção financeira agora vem da curadoria do pool de 13 elegíveis (não da limitação de vagas).
 
@@ -106,12 +106,13 @@ Estas regras devem virar testes automatizados sempre que tocadas. Qualquer featu
 
 ### 3.2 Distribuição de prêmios
 
-Total: R$ 10.000.
+Total: R$ 10.000, distribuído entre os **3 primeiros colocados** (top-3).
 
-- 1º → R$ 5.000
-- 2º → R$ 2.500
-- 3º → R$ 1.500
-- 4º a 10º → R$ 1.000 dividido igualmente (~R$ 142,86 cada)
+- 1º → R$ 7.000
+- 2º → R$ 2.000
+- 3º → R$ 1.000
+
+> **Histórico:** versão anterior previa top-10 (R$ 5.000 / R$ 2.500 / R$ 1.500 / R$ 1.000 dividido entre 4º–10º). Alterado em 07/05/2026 (consolidação F15 + F17) — landing redesenhada e Termos de Uso publicados refletem top-3.
 
 ### 3.3 Cashback (multiplicador por seleção)
 
