@@ -1,6 +1,6 @@
 'use client'
 
-import { BarChart2, CreditCard, Gift, LogOut, Swords, Users, type LucideIcon } from 'lucide-react'
+import { BarChart2, Gift, Handshake, LogOut, Swords, type LucideIcon } from 'lucide-react'
 import type { Route } from 'next'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
@@ -11,16 +11,14 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/browser'
 type NavItem = {
   label: string
   icon: LucideIcon
-  href?: string
-  comingSoon?: boolean
+  href: string
 }
 
 const ITEMS: NavItem[] = [
   { label: 'Overview', icon: BarChart2, href: '/admin' },
-  { label: 'Apostadores', icon: Users, comingSoon: true },
-  { label: 'Pagamentos', icon: CreditCard, comingSoon: true },
   { label: 'Jogos & Resultados', icon: Swords, href: '/admin/jogos' },
   { label: 'Cashbacks', icon: Gift, href: '/admin/cashbacks' },
+  { label: 'Afiliados', icon: Handshake, href: '/admin/afiliados' },
 ]
 
 export function AdminSidebar({ className }: { className?: string }) {
@@ -66,24 +64,6 @@ export function AdminSidebar({ className }: { className?: string }) {
         </div>
         {ITEMS.map((item) => {
           const Icon = item.icon
-          if (item.comingSoon) {
-            return (
-              <span
-                key={item.label}
-                aria-disabled="true"
-                className="sidebar-item sidebar-item-disabled flex items-center justify-between"
-                title="Em breve"
-              >
-                <span className="flex items-center gap-2.5">
-                  <Icon className="size-4" aria-hidden="true" />
-                  {item.label}
-                </span>
-                <span className="text-text-muted rounded bg-white/5 px-1.5 py-0.5 font-mono text-[9px] tracking-wide uppercase">
-                  em breve
-                </span>
-              </span>
-            )
-          }
           const active = pathname === item.href
           return (
             <Link

@@ -10,6 +10,12 @@ import { elegivelCashback } from '@/lib/cashback';
 const schema = z.object({
   qty: z.number().int().min(1).max(50),
   selecao_cashback_id: z.number().int().positive().nullable(),
+  // Código do afiliado vindo do localStorage (last-click). Mesmo regex do banco.
+  afiliado_codigo: z
+    .string()
+    .regex(/^[a-z0-9_-]{3,30}$/)
+    .nullable()
+    .optional(),
 });
 
 export type CriarCheckoutResult =
@@ -49,7 +55,7 @@ export async function criarCheckout(input: unknown): Promise<CriarCheckoutResult
   if (!parsed.success) {
     return { ok: false, error: 'validation', mensagem: 'Dados inválidos.' };
   }
-  const { qty, selecao_cashback_id } = parsed.data;
+  const { qty, selecao_cashback_id, afiliado_codigo } = parsed.data;
   const valor_total = qty * 20;
 
   // 3. Rate limit (5 chamadas/min do mesmo user)
@@ -74,17 +80,34 @@ export async function criarCheckout(input: unknown): Promise<CriarCheckoutResult
 
   // 5. TX1 — INSERT N bilhetes (admin client bypassa RLS + protect trigger)
   const admin = createSupabaseAdminClient();
+
+  // Resolve afiliado_id (best-effort: código inválido ou inativo → null, sem erro)
+  // Cast: types Supabase auto-gerados ainda não conhecem `afiliados` (tabela criada em F21).
+  let afiliado_id: string | null = null;
+  if (afiliado_codigo) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: afiliado } = await (admin as any)
+      .from('afiliados')
+      .select('id')
+      .eq('codigo', afiliado_codigo)
+      .eq('ativo', true)
+      .maybeSingle();
+    afiliado_id = (afiliado?.id as string | undefined) ?? null;
+  }
+
   const expira_provisional = new Date(Date.now() + 30 * 60_000).toISOString();
   const rows = Array.from({ length: qty }, (_, i) => ({
     user_id: user.id,
     valor_pago: i === 0 ? valor_total : 0,
     selecao_cashback_id: i === 0 ? selecao_cashback_id : null,
+    afiliado_id,
     expira_em: expira_provisional,
     status_pagamento: 'pendente' as const,
   }));
 
-  const { data: inserted, error: insErr } = await admin
-    .from('bilhetes')
+  // Cast: tipo de Insert ainda não inclui afiliado_id (column adicionada em F21).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: inserted, error: insErr } = await (admin.from('bilhetes') as any)
     .insert(rows)
     .select('id, numero_bilhete, selecao_cashback_id');
 
@@ -128,7 +151,8 @@ export async function criarCheckout(input: unknown): Promise<CriarCheckoutResult
       .update({ status_pagamento: 'cancelado' })
       .in(
         'id',
-        inserted.map((r) => r.id),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        inserted.map((r: any) => r.id as string),
       );
     return { ok: false, error: 'mp_failure', mensagem: 'Falha no Mercado Pago. Tenta de novo.' };
   }
@@ -139,7 +163,8 @@ export async function criarCheckout(input: unknown): Promise<CriarCheckoutResult
     .update({ mp_payment_id: mp.id, expira_em: mp.date_of_expiration })
     .in(
       'id',
-      inserted.map((r) => r.id),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      inserted.map((r: any) => r.id as string),
     );
 
   if (updErr) {

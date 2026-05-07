@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Bebas_Neue, Archivo, JetBrains_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
+import { AffiliateRefCapture } from '@/components/afiliados/AffiliateRefCapture';
 import './globals.css';
 
 const bebasNeue = Bebas_Neue({
@@ -69,6 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${bebasNeue.variable} ${archivo.variable} ${jetBrainsMono.variable}`}
     >
       <body>
+        <AffiliateRefCapture />
         {children}
         <Toaster
           theme="dark"

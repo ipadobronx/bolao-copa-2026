@@ -7,6 +7,7 @@ import { Stepper } from './Stepper';
 import { CashbackPicker, type SelecaoElegivel } from './CashbackPicker';
 import { criarCheckout } from '@/app/(dashboard)/comprar/actions';
 import { CASHBACK_VALOR_MINIMO } from '@/lib/cashback';
+import { getAffiliateRef } from '@/lib/afiliados/track';
 
 type FormulaCheckoutProps = {
   selecoes: SelecaoElegivel[];
@@ -44,6 +45,7 @@ export function FormulaCheckout({
       const result = await criarCheckout({
         qty,
         selecao_cashback_id: cashbackEfetivo,
+        afiliado_codigo: getAffiliateRef(),
       });
       if (result.ok) {
         router.push(`/comprar/${result.bilhete_principal_id}/pix`);
