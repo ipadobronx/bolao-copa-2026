@@ -47,3 +47,6 @@ yarn-error.log*
 pnpm-debug.log*
 
 .vercel
+
+# Claude Code local config (per-machine)
+.claude/
