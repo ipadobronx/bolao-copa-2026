@@ -1,6 +1,7 @@
 'use client';
 
 import { Loader2 } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -88,6 +89,14 @@ export function LoginForm({ defaultNext }: LoginFormProps) {
           <Field label="Email" name="email" type="email" autoComplete="email" disabled={loading} />
           <Field label="Senha" name="password" type="password" autoComplete="current-password" disabled={loading} />
           <SubmitBtn loading={loading}>Entrar</SubmitBtn>
+          <div className="text-center">
+            <Link
+              href="/login/recuperar-senha"
+              className="font-body text-text-secondary hover:text-text-primary text-sm underline"
+            >
+              Esqueci a senha
+            </Link>
+          </div>
         </form>
       ) : (
         <form onSubmit={handleSignup} className="space-y-4" noValidate>
