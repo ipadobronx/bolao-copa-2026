@@ -122,10 +122,12 @@ function Field({
 }: {
   label: string; name: string; type: string; autoComplete: string; disabled: boolean;
 }) {
+  const id = `login-field-${name}`;
   return (
     <div className="space-y-1.5">
-      <label className="font-body text-text-secondary text-sm">{label}</label>
+      <label htmlFor={id} className="font-body text-text-secondary text-sm">{label}</label>
       <input
+        id={id}
         name={name}
         type={type}
         autoComplete={autoComplete}

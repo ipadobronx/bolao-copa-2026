@@ -48,7 +48,7 @@ export type DashboardNavProps = {
   // mobile drawer (TopbarMobile) so the user knows whose account is open
   // while the dashboard header is hidden by the drawer overlay. Desktop
   // sidebar doesn't pass it because the dash-header already shows UserBadge.
-  showUser?: { nome: string; email: string };
+  showUser?: { nome: string; email: string; totalBilhetes?: number };
 };
 
 export function DashboardNav({ className, onItemClick, showUser }: DashboardNavProps) {
@@ -86,7 +86,13 @@ export function DashboardNav({ className, onItemClick, showUser }: DashboardNavP
 
       {showUser ? (
         <div className="border-border mb-6 border-b pb-6">
-          <UserBadge nome={showUser.nome} email={showUser.email} />
+          <UserBadge
+            nome={showUser.nome}
+            email={showUser.email}
+            {...(showUser.totalBilhetes !== undefined && {
+              totalBilhetes: showUser.totalBilhetes,
+            })}
+          />
         </div>
       ) : null}
 

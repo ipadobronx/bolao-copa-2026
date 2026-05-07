@@ -25,6 +25,25 @@ vi.mock('sonner', () => ({ toast: { error: vi.fn(), info: vi.fn() } }));
 
 beforeEach(() => { vi.clearAllMocks(); });
 
+// Há 2 botões com texto "Entrar" e (após toggle) 2 com "Criar conta":
+// o ModeBtn (type=button) e o SubmitBtn (type=submit). Os helpers abaixo
+// disambiguam por tipo, evitando ambiguidade do getByRole.
+function clickSubmit(name: RegExp) {
+  const submit = screen
+    .getAllByRole('button', { name })
+    .find((b) => (b as HTMLButtonElement).type === 'submit');
+  if (!submit) throw new Error(`Submit button matching ${name} não encontrado`);
+  fireEvent.click(submit);
+}
+
+function clickToggle(name: RegExp) {
+  const toggle = screen
+    .getAllByRole('button', { name })
+    .find((b) => (b as HTMLButtonElement).type === 'button');
+  if (!toggle) throw new Error(`Toggle button matching ${name} não encontrado`);
+  fireEvent.click(toggle);
+}
+
 describe('LoginForm — modo login', () => {
   it('chama signInWithPassword e redireciona no sucesso', async () => {
     mockSignIn.mockResolvedValue({ error: null });
@@ -32,7 +51,7 @@ describe('LoginForm — modo login', () => {
 
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@b.com' } });
     fireEvent.change(screen.getByLabelText('Senha'), { target: { value: '123456' } });
-    fireEvent.click(screen.getByRole('button', { name: /^entrar$/i }));
+    clickSubmit(/^entrar$/i);
 
     await waitFor(() => expect(mockSignIn).toHaveBeenCalledWith({ email: 'a@b.com', password: '123456' }));
     expect(mockPush).toHaveBeenCalled();
@@ -45,7 +64,7 @@ describe('LoginForm — modo login', () => {
 
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@b.com' } });
     fireEvent.change(screen.getByLabelText('Senha'), { target: { value: '123456' } });
-    fireEvent.click(screen.getByRole('button', { name: /^entrar$/i }));
+    clickSubmit(/^entrar$/i);
 
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Email ou senha incorretos.'));
   });
@@ -56,11 +75,11 @@ describe('LoginForm — modo signup', () => {
     mockSignUp.mockResolvedValue({ data: { session: { user: {} } }, error: null });
     render(<LoginForm />);
 
-    fireEvent.click(screen.getByRole('button', { name: /criar conta/i }));
+    clickToggle(/^criar conta$/i);
     fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'João' } });
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@b.com' } });
     fireEvent.change(screen.getByLabelText('Senha'), { target: { value: '123456' } });
-    fireEvent.click(screen.getByRole('button', { name: /criar conta/i }));
+    clickSubmit(/^criar conta$/i);
 
     await waitFor(() => expect(mockSignUp).toHaveBeenCalled());
     expect(mockPush).toHaveBeenCalled();

@@ -71,10 +71,17 @@ export function CashbackPicker({
 
             <div
               data-testid={`callout-${Math.round(mult)}`}
-              className={`flex items-center gap-2 rounded-lg border px-3 py-2 font-mono text-sm ${TIER_COLORS[mult]}`}
+              className={`flex flex-col gap-0.5 rounded-lg border px-3 py-2 font-mono text-sm sm:flex-row sm:items-center sm:gap-2 ${TIER_COLORS[mult]}`}
             >
-              💸 {formatBRL(valor_pago)} × {Math.round(mult)}× ={' '}
-              <strong>{formatBRL(retorno)}</strong> de volta no PIX
+              <span>
+                💸 {formatBRL(valor_pago)} × {Math.round(mult)}×
+              </span>
+              <span aria-hidden="true" className="hidden sm:inline">
+                =
+              </span>
+              <span>
+                <strong>{formatBRL(retorno)}</strong> de volta no PIX
+              </span>
             </div>
 
             <div className="space-y-1.5">

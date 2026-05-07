@@ -20,8 +20,10 @@ describe('LoginPage', () => {
   it('renderiza h1 e toggle de modos', () => {
     render(<LoginPage searchParams={{}} />);
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /entrar/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /criar conta/i })).toBeInTheDocument();
+    // Em modo login: 2 botões "Entrar" (toggle + submit) e 1 "Criar conta" (toggle).
+    // Asserta que ambos os labels do toggle existem, sem cair em ambiguidade.
+    expect(screen.getAllByRole('button', { name: /^entrar$/i }).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole('button', { name: /^criar conta$/i })).toBeInTheDocument();
   });
 
   it('modo login mostra campos email e senha', () => {

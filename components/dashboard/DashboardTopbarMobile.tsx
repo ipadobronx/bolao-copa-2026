@@ -8,9 +8,10 @@ import { DashboardNav } from '@/components/dashboard/DashboardNav';
 export type DashboardTopbarMobileProps = {
   nome: string;
   email: string;
+  totalBilhetes?: number;
 };
 
-export function DashboardTopbarMobile({ nome, email }: DashboardTopbarMobileProps) {
+export function DashboardTopbarMobile({ nome, email, totalBilhetes }: DashboardTopbarMobileProps) {
   const [open, setOpen] = useState(false);
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
@@ -44,7 +45,10 @@ export function DashboardTopbarMobile({ nome, email }: DashboardTopbarMobileProp
           <Dialog.Description className="sr-only">
             Navegação do painel do apostador
           </Dialog.Description>
-          <DashboardNav onItemClick={() => setOpen(false)} showUser={{ nome, email }} />
+          <DashboardNav
+            onItemClick={() => setOpen(false)}
+            showUser={{ nome, email, ...(totalBilhetes !== undefined && { totalBilhetes }) }}
+          />
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
