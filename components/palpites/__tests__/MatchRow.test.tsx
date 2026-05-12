@@ -65,6 +65,43 @@ describe('MatchRow — estado open', () => {
     expect(screen.getByText('Argentina')).toBeInTheDocument();
   });
 
+  it('renderiza bandeira como <img> (não fallback 🏆) quando seleção tem dados', () => {
+    render(<MatchRow bilheteId="abc" jogo={JOGO_ABERTO} palpiteSalvo={null} />);
+    const flagCasa = screen.getByAltText('Brasil');
+    const flagFora = screen.getByAltText('Argentina');
+    expect(flagCasa.tagName).toBe('IMG');
+    expect(flagFora.tagName).toBe('IMG');
+    expect(flagCasa).toHaveAttribute('src', expect.stringContaining('flagcdn.com/w40/br.png'));
+    expect(flagFora).toHaveAttribute('src', expect.stringContaining('flagcdn.com/w40/ar.png'));
+  });
+
+  it('nome das seleções é visível no mobile (sem class hidden)', () => {
+    // Regressão F22: layout antigo escondia nome no mobile via `hidden sm:inline`,
+    // somado a grid-cols-[70px_1fr_auto_1fr_100px] que comprimia o flag a ~0px.
+    // O mobile precisa exibir nome+bandeira.
+    render(<MatchRow bilheteId="abc" jogo={JOGO_ABERTO} palpiteSalvo={null} />);
+    const brasilSpan = screen.getByText('Brasil');
+    const argentinaSpan = screen.getByText('Argentina');
+    expect(brasilSpan.className).not.toMatch(/\bhidden\b/);
+    expect(argentinaSpan.className).not.toMatch(/\bhidden\b/);
+  });
+
+  it('cai pra fallback (sem <img>) se selecao_casa e selecao_fora são null', () => {
+    const jogoTBD: JogoComSelecoes = {
+      ...JOGO_ABERTO,
+      selecao_casa_id: null,
+      selecao_fora_id: null,
+      selecao_casa: null,
+      selecao_fora: null,
+      placeholder_casa: 'Vencedor A',
+      placeholder_fora: 'Vencedor B',
+    };
+    render(<MatchRow bilheteId="abc" jogo={jogoTBD} palpiteSalvo={null} />);
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.getByText('Vencedor A')).toBeInTheDocument();
+    expect(screen.getByText('Vencedor B')).toBeInTheDocument();
+  });
+
   it('mostra chip "Pendente" quando sem palpite salvo', () => {
     render(<MatchRow bilheteId="abc" jogo={JOGO_ABERTO} palpiteSalvo={null} />);
     expect(screen.getByText(/pendente/i)).toBeInTheDocument();

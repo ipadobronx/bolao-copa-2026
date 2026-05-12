@@ -29,6 +29,10 @@
     font-family: var(--font-body);
     line-height: 1.5;
     min-height: 100vh;
+    /* Impede pan horizontal acidental no mobile se algum filho estourar a viewport.
+       Scrolls horizontais legítimos (PalpitesTabs, GrupoNav) usam overflow-x-auto
+       no próprio container e não dependem do body. */
+    overflow-x: hidden;
   }
 
   html {

@@ -70,7 +70,10 @@ export function DashboardNav({ className, onItemClick, showUser }: DashboardNavP
   return (
     <nav
       aria-label="Navegação do painel"
-      className={cn('bg-bg-card border-border flex h-full flex-col border-r p-6', className)}
+      className={cn(
+        'bg-bg-card border-border flex h-full flex-col overflow-y-auto border-r p-6',
+        className,
+      )}
     >
       <div className="font-display mb-8 flex items-center gap-2.5 px-2 text-2xl tracking-[2px]">
         <span

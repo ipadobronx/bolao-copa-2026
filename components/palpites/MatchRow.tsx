@@ -76,63 +76,61 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
   return (
     <div
       className={cn(
-        'bg-bg-card border-border grid items-center gap-2 rounded-xl border p-3.5 transition-colors sm:gap-3',
-        'grid-cols-[70px_1fr_auto_1fr_100px]',
+        'bg-bg-card border-border rounded-xl border p-3.5 transition-colors',
         estado === 'open' && saveState === 'saved' && 'border-green-500/25',
         estado === 'finalized' && 'border-accent/15',
         estado === 'locked' && 'opacity-70',
       )}
     >
-      {/* Meta */}
-      <div className="font-mono text-text-muted text-[10px] leading-relaxed">
-        Jogo {jogo.numero_jogo}
-        <br />
-        {dateStr} · {timeStr}
-      </div>
-
-      {/* Casa */}
-      <div className="flex items-center gap-1.5 text-sm font-semibold">
-        <BandeiraImg emoji={flagEmojiCasa} nome={nomeCasa} />
-        <span className={cn('hidden sm:inline', isReadonly && 'text-text-secondary')}>
-          {nomeCasa}
+      {/* Header: meta + chip lado-a-lado (sempre visível) */}
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="font-mono text-text-muted text-[10px] leading-relaxed">
+          Jogo {jogo.numero_jogo} · {dateStr} {timeStr}
         </span>
-      </div>
-
-      {/* Score */}
-      <div className="flex flex-col items-center gap-0.5">
-        <div className="flex items-center gap-1.5">
-          <ScoreInput
-            value={estado === 'finalized' ? String(jogo.gols_casa ?? '') : golsCasa}
-            onChange={(v) => handleChange('casa', v)}
-            readonly={isReadonly}
-            variant={estado === 'finalized' ? 'result' : 'normal'}
-          />
-          <span className="font-mono text-text-muted text-sm">×</span>
-          <ScoreInput
-            value={estado === 'finalized' ? String(jogo.gols_fora ?? '') : golsFora}
-            onChange={(v) => handleChange('fora', v)}
-            readonly={isReadonly}
-            variant={estado === 'finalized' ? 'result' : 'normal'}
-          />
-        </div>
-        {estado === 'finalized' && palpiteSalvo && (
-          <span className="font-mono text-text-muted text-[9px]">
-            meu: {palpiteSalvo.gols_casa}×{palpiteSalvo.gols_fora}
-          </span>
-        )}
-      </div>
-
-      {/* Fora */}
-      <div className="flex items-center justify-end gap-1.5 text-sm font-semibold">
-        <span className={cn('hidden sm:inline', isReadonly && 'text-text-secondary')}>
-          {nomeFora}
-        </span>
-        <BandeiraImg emoji={flagEmojiFora} nome={nomeFora} />
-      </div>
-
-      {/* Chip */}
-      <div className="text-right">
         <StatusChip estado={estado} saveState={saveState} pts={palpiteSalvo?.pontos_calculados ?? null} />
+      </div>
+
+      {/* Match row: casa | score | fora */}
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-3">
+        {/* Casa */}
+        <div className="flex min-w-0 items-center gap-1.5 text-sm font-semibold">
+          <BandeiraImg emoji={flagEmojiCasa} nome={nomeCasa} />
+          <span className={cn('truncate', isReadonly && 'text-text-secondary')}>
+            {nomeCasa}
+          </span>
+        </div>
+
+        {/* Score */}
+        <div className="flex flex-col items-center gap-0.5">
+          <div className="flex items-center gap-1.5">
+            <ScoreInput
+              value={estado === 'finalized' ? String(jogo.gols_casa ?? '') : golsCasa}
+              onChange={(v) => handleChange('casa', v)}
+              readonly={isReadonly}
+              variant={estado === 'finalized' ? 'result' : 'normal'}
+            />
+            <span className="font-mono text-text-muted text-sm">×</span>
+            <ScoreInput
+              value={estado === 'finalized' ? String(jogo.gols_fora ?? '') : golsFora}
+              onChange={(v) => handleChange('fora', v)}
+              readonly={isReadonly}
+              variant={estado === 'finalized' ? 'result' : 'normal'}
+            />
+          </div>
+          {estado === 'finalized' && palpiteSalvo && (
+            <span className="font-mono text-text-muted text-[9px]">
+              meu: {palpiteSalvo.gols_casa}×{palpiteSalvo.gols_fora}
+            </span>
+          )}
+        </div>
+
+        {/* Fora */}
+        <div className="flex min-w-0 items-center justify-end gap-1.5 text-sm font-semibold">
+          <span className={cn('truncate', isReadonly && 'text-text-secondary')}>
+            {nomeFora}
+          </span>
+          <BandeiraImg emoji={flagEmojiFora} nome={nomeFora} />
+        </div>
       </div>
     </div>
   );
