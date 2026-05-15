@@ -5,14 +5,22 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Stepper } from './Stepper';
 import { CashbackPicker, type SelecaoElegivel } from './CashbackPicker';
+import { PalpiteNeymar } from './PalpiteNeymar';
 import { criarCheckout } from '@/app/(dashboard)/comprar/actions';
 import { CASHBACK_VALOR_MINIMO } from '@/lib/cashback';
 import { getAffiliateRef } from '@/lib/afiliados/track';
+
+type PalpiteNeymarProps = {
+  palpiteAtual: boolean | null;
+  deadline: string;
+  pergunta: string;
+};
 
 type FormulaCheckoutProps = {
   selecoes: SelecaoElegivel[];
   qtyInicial?: number;
   cashbackInicial?: number | null;
+  palpiteNeymar?: PalpiteNeymarProps | null;
 };
 
 const formatBRL = (v: number) =>
@@ -22,6 +30,7 @@ export function FormulaCheckout({
   selecoes,
   qtyInicial = 1,
   cashbackInicial = null,
+  palpiteNeymar = null,
 }: FormulaCheckoutProps) {
   const [qty, setQty] = useState(qtyInicial);
   const [selecaoCashbackId, setSelecaoCashbackId] = useState<number | null>(cashbackInicial);
@@ -66,6 +75,14 @@ export function FormulaCheckout({
         <h2 className="mb-3 font-display text-lg uppercase tracking-wide">Quantas tabelas?</h2>
         <Stepper qty={qty} onChange={onChangeQty} />
       </section>
+
+      {palpiteNeymar && (
+        <PalpiteNeymar
+          palpiteAtual={palpiteNeymar.palpiteAtual}
+          deadline={palpiteNeymar.deadline}
+          pergunta={palpiteNeymar.pergunta}
+        />
+      )}
 
       {cashbackHabilitado && (
         <section>

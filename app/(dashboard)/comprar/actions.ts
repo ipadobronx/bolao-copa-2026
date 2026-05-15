@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
@@ -181,4 +182,65 @@ export async function criarCheckout(input: unknown): Promise<CriarCheckoutResult
     expira_em: mp.date_of_expiration,
     valor_total,
   };
+}
+
+// ============================================================================
+// Palpite especial: "Neymar vai ser convocado?"
+//
+// Brincadeira promocional. 1 resposta por user, editável até deadline.
+// Vencedor recebe bilhete grátis via SQL manual após a convocação oficial.
+// ============================================================================
+
+const palpiteNeymarSchema = z.object({
+  resposta: z.boolean(),
+});
+
+export type SalvarPalpiteNeymarResult =
+  | { ok: true }
+  | {
+      ok: false;
+      error: 'unauthenticated' | 'validation' | 'deadline' | 'unknown';
+      mensagem: string;
+    };
+
+export async function salvarPalpiteNeymar(input: unknown): Promise<SalvarPalpiteNeymarResult> {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { ok: false, error: 'unauthenticated', mensagem: 'Faça login pra palpitar.' };
+  }
+
+  const parsed = palpiteNeymarSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: 'validation', mensagem: 'Resposta inválida.' };
+  }
+
+  // Guard explícito (RLS também bloqueia; aqui é só pra dar mensagem clara)
+  // Cast: tabelas neymar_* ainda não estão nos types gerados.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: aberto } = await (supabase.rpc as any)('neymar_aberto');
+  if (aberto === false) {
+    return {
+      ok: false,
+      error: 'deadline',
+      mensagem: 'Janela de respostas encerrada.',
+    };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase.from('palpites_neymar' as any) as any).upsert({
+    user_id: user.id,
+    resposta: parsed.data.resposta,
+    updated_at: new Date().toISOString(),
+  });
+
+  if (error) {
+    console.error('palpites_neymar upsert falhou', error);
+    return { ok: false, error: 'unknown', mensagem: 'Não rolou salvar. Tenta de novo.' };
+  }
+
+  revalidatePath('/comprar');
+  return { ok: true };
 }
