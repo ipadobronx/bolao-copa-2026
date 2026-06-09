@@ -25,4 +25,14 @@ test('auto-save: preenche palpite, espera 1s, chip mostra ✓ Salvo', async ({ p
 
   // Server action makes 4 Supabase roundtrips to a remote host; allow up to 15s
   await expect(page.getByText('✓ Salvo').first()).toBeVisible({ timeout: 15_000 });
+
+  // Regressão: o palpite tem que SOBREVIVER ao reload. O bug original mostrava
+  // "✓ Salvo" mas voltava a zero ao recarregar (write fantasma).
+  await page.reload();
+  await expect(page.locator('text=Grupos')).toBeVisible();
+
+  const reloadedInputs = page.locator('input[type="number"]:not([readonly])');
+  await expect(reloadedInputs.first()).toBeVisible({ timeout: 10_000 });
+  await expect(reloadedInputs.nth(0)).toHaveValue('2');
+  await expect(reloadedInputs.nth(1)).toHaveValue('1');
 });
