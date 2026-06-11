@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { calcularUpdatesPalpites, calcularUpdateBonus } from '@/lib/recalculo'
+import { aplicarPontos } from '@/lib/aplicar-pontos'
 import type { TipoBonus, CopaResultadosInput } from '@/lib/pontuacao'
 import type { JogoFinalizado, PalpiteRow, BonusRow } from '@/lib/recalculo'
 
@@ -96,12 +97,10 @@ async function recalcularBonus(
   }))
 
   const updates = calcularUpdateBonus(bonusRows, resultados, bonusTipos)
-  if (updates.length > 0) {
-    const { error: updateErr } = await admin
-      .from('palpites_bonus')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .upsert(updates as any, { onConflict: 'id' })
-    if (updateErr) return { total: 0, error: updateErr.message }
+  try {
+    await aplicarPontos(admin, 'palpites_bonus', updates)
+  } catch (e) {
+    return { total: 0, error: e instanceof Error ? e.message : 'Erro ao gravar pontos' }
   }
 
   return { total: updates.length }
@@ -149,11 +148,8 @@ async function processarGlobal(
       }))
 
       const updates = calcularUpdatesPalpites(palpites, jogoInput)
-      if (updates.length > 0) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await admin.from('palpites').upsert(updates as any, { onConflict: 'id' })
-        total += updates.length
-      }
+      await aplicarPontos(admin, 'palpites', updates)
+      total += updates.length
     }
 
     const bonusResult = await recalcularBonus(admin)
@@ -252,14 +248,10 @@ export async function POST(req: Request) {
     }))
 
     const updates = calcularUpdatesPalpites(palpites, jogo)
-    if (updates.length > 0) {
-      const { error: updateErr } = await admin
-        .from('palpites')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .upsert(updates as any, { onConflict: 'id' })
-      if (updateErr) {
-        return NextResponse.json({ error: updateErr.message }, { status: 500 })
-      }
+    try {
+      await aplicarPontos(admin, 'palpites', updates)
+    } catch (e) {
+      return NextResponse.json({ error: e instanceof Error ? e.message : 'Erro ao gravar pontos' }, { status: 500 })
     }
 
     return NextResponse.json({ total: updates.length })
