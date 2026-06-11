@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 export default async function PalpitesRedirectPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; bilhete?: string }>;
 }) {
   const supabase = await createSupabaseServerClient();
   const {
@@ -24,10 +24,17 @@ export default async function PalpitesRedirectPage({
   const confirmed = bilhetes ?? [];
 
   if (confirmed.length === 0) redirect('/comprar');
+
+  const { tab, bilhete } = await searchParams;
+  const tabSuffix = tab ? `?tab=${tab}` : '';
+
+  // ?bilhete=<id> explícito (ex.: pós-checkout da 2ª tabela): vai direto pra ela,
+  // desde que seja um bilhete confirmado do próprio usuário.
+  if (bilhete && confirmed.some((b) => b.id === bilhete)) {
+    redirect(`/palpites/${bilhete}${tabSuffix}`);
+  }
+
   if (confirmed.length >= 2) redirect('/minhas-tabelas');
 
-  const { tab } = await searchParams;
-  const bilheteId = confirmed[0]!.id;
-  const dest = tab ? `/palpites/${bilheteId}?tab=${tab}` : `/palpites/${bilheteId}`;
-  redirect(dest);
+  redirect(`/palpites/${confirmed[0]!.id}${tabSuffix}`);
 }

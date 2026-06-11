@@ -94,6 +94,7 @@ export default async function PalpitesBilhetePage({
 
   return (
     <PalpitesShell
+      key={bilhete.id}
       bilhete={bilhete as BilheteResumo}
       jogos={jogos}
       palpitesSalvos={(palpitesRaw ?? []) as PalpiteSalvo[]}
