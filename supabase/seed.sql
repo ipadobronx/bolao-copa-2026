@@ -207,8 +207,8 @@ INSERT INTO jogos (numero_jogo, fase, data_hora, selecao_casa_id, selecao_fora_i
   (68, 'grupos', '2026-06-27 17:00:00-04', 40, 37, NULL, NULL), -- Jordânia x Argentina (J)
   (69, 'grupos', '2026-06-27 19:30:00-04', 47, 46, NULL, NULL), -- Gana x Croácia (L) -- TODO confirmar horário
   (70, 'grupos', '2026-06-27 19:30:00-04', 48, 45, NULL, NULL), -- Panamá x Inglaterra (L) -- TODO confirmar horário
-  (71, 'grupos', '2026-06-27 22:00:00-04', 42, 41, NULL, NULL), -- DR Congo x Portugal (K)
-  (72, 'grupos', '2026-06-27 22:00:00-04', 43, 44, NULL, NULL), -- Uzbequistão x Colômbia (K)
+  (71, 'grupos', '2026-06-27 22:00:00-04', 41, 44, NULL, NULL), -- Portugal x Colômbia (K)
+  (72, 'grupos', '2026-06-27 22:00:00-04', 42, 43, NULL, NULL), -- R.D. Congo x Uzbequistão (K)
 
   -- ---------------------------------------------------------------------------
   -- 16AVOS DE FINAL (28 jun - 3 jul) — 16 jogos
