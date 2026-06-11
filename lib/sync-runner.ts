@@ -2,6 +2,7 @@ import type { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { fetchFixtures, fetchFixturesByDate, parseFixture, TEAM_NAME_MAP } from './api-football'
 import { calcularUpdateJogo, calcularResolucoesPlaceholder } from './sync-jogos'
 import { calcularUpdatesPalpites } from './recalculo'
+import { aplicarPontos } from './aplicar-pontos'
 import type { JogoBanco, JogoUpdate } from './sync-jogos'
 import type { JogoFinalizado, PalpiteRow } from './recalculo'
 
@@ -180,10 +181,7 @@ async function recalcularJogo(admin: AdminClient, jogo: JogoBanco, update: JogoU
   }))
 
   const updates = calcularUpdatesPalpites(palpites, jogoFinalizado)
-  if (updates.length > 0) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await admin.from('palpites').upsert(updates as any, { onConflict: 'id' })
-  }
+  await aplicarPontos(admin, 'palpites', updates)
 }
 
 async function iniciarLog(admin: AdminClient, fonte: 'cron' | 'manual'): Promise<string> {
