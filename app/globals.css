@@ -180,11 +180,11 @@ input[type='number']::-webkit-inner-spin-button {
   @apply bg-bg-dark border-border border-b;
 }
 .ranking-table th {
-  @apply px-4 py-2.5 text-left text-[10px] text-text-muted uppercase tracking-wider font-semibold;
+  @apply px-2.5 sm:px-4 py-2.5 text-left text-[10px] text-text-muted uppercase tracking-wider font-semibold;
 }
 .ranking-table th:last-child { @apply text-right; }
 .ranking-table td {
-  @apply px-4 py-3 border-b border-[#1e1e1e] align-middle;
+  @apply px-2.5 sm:px-4 py-3 border-b border-[#1e1e1e] align-middle;
 }
 .ranking-table tr:last-child td { @apply border-b-0; }
 .rank-row-me td { @apply bg-[rgba(250,204,21,0.04)]; }

@@ -41,22 +41,27 @@ export function RankingRow({ data }: { data: RankingRowData }) {
           >
             {avatarInitials(nome)}
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="rank-name">
               {nome}
               {isCurrentUser && <span className="rank-you-badge">Você</span>}
             </div>
             <div className="rank-meta">
-              {totalBilhetes === 1 ? '1 tabela' : `${totalBilhetes} tabelas`}
+              <span>{totalBilhetes === 1 ? '1 tabela' : `${totalBilhetes} tabelas`}</span>
+              {/* Acertos só aparecem em coluna no desktop; no mobile entram aqui */}
+              <span className="sm:hidden">
+                {' · '}
+                <strong>{acertosExatos}</strong> ex · <strong>{acertosParciais}</strong> parc
+              </span>
             </div>
           </div>
         </div>
       </td>
-      <td className="rank-acertos">
+      <td className="rank-acertos hidden sm:table-cell">
         <strong>{acertosExatos}</strong> ex ·{' '}
         <strong>{acertosParciais}</strong> parc
       </td>
-      <td>
+      <td className="hidden sm:table-cell">
         <span className={`rank-trend ${trendClass}`}>{trendLabel}</span>
       </td>
       <td className="rank-pts">{pontosTotais}</td>
