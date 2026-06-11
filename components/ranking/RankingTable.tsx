@@ -8,8 +8,8 @@ export function RankingTable({ rows }: { rows: RankingRowData[] }) {
           <tr>
             <th>#</th>
             <th>Apostador</th>
-            <th>Acertos</th>
-            <th>Tend.</th>
+            <th className="hidden sm:table-cell">Acertos</th>
+            <th className="hidden sm:table-cell">Tend.</th>
             <th>Pontos</th>
           </tr>
         </thead>
