@@ -29,17 +29,23 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
     palpiteSalvo !== null ? 'saved' : 'idle',
   );
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const pendingRef = useRef(false);
   const golsCasaRef = useRef(golsCasa);
   const golsForaRef = useRef(golsFora);
+  const bilheteIdRef = useRef(bilheteId);
+  const jogoIdRef = useRef(jogo.id);
 
   useEffect(() => { golsCasaRef.current = golsCasa; }, [golsCasa]);
   useEffect(() => { golsForaRef.current = golsFora; }, [golsFora]);
+  useEffect(() => { bilheteIdRef.current = bilheteId; }, [bilheteId]);
+  useEffect(() => { jogoIdRef.current = jogo.id; }, [jogo.id]);
 
   const triggerSave = useCallback(() => {
     const c = parseInt(golsCasaRef.current);
     const f = parseInt(golsForaRef.current);
     if (isNaN(c) || isNaN(f)) return;
 
+    pendingRef.current = false;
     setSaveState('saving');
     upsertPalpite(bilheteId, jogo.id, c, f).then((result) => {
       if (result.ok) {
@@ -51,16 +57,48 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
     });
   }, [bilheteId, jogo.id]);
 
+  // Disparo cru, sem setState — seguro para unmount/pagehide (componente pode já
+  // ter saído). Garante que uma edição pendente seja gravada antes de navegar/recarregar.
+  const flushRaw = useCallback(() => {
+    if (!pendingRef.current) return;
+    pendingRef.current = false;
+    clearTimeout(debounceRef.current);
+    const c = parseInt(golsCasaRef.current);
+    const f = parseInt(golsForaRef.current);
+    if (isNaN(c) || isNaN(f)) return;
+    void upsertPalpite(bilheteIdRef.current, jogoIdRef.current, c, f);
+  }, []);
+
   function handleChange(field: 'casa' | 'fora', raw: string) {
     const value = raw.replace(/\D/g, '').slice(0, 2);
     if (field === 'casa') setGolsCasa(value);
     else setGolsFora(value);
 
+    pendingRef.current = true;
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(triggerSave, 1000);
   }
 
-  useEffect(() => () => clearTimeout(debounceRef.current), []);
+  // Commit imediato ao perder o foco do input.
+  function handleBlur() {
+    if (!pendingRef.current) return;
+    clearTimeout(debounceRef.current);
+    triggerSave();
+  }
+
+  // Flush em refresh/fechar aba (pagehide/visibilitychange) e no unmount (trocar de tabela).
+  useEffect(() => {
+    const onHide = () => flushRaw();
+    const onVis = () => { if (document.visibilityState === 'hidden') flushRaw(); };
+    window.addEventListener('pagehide', onHide);
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      window.removeEventListener('pagehide', onHide);
+      document.removeEventListener('visibilitychange', onVis);
+      flushRaw();
+      clearTimeout(debounceRef.current);
+    };
+  }, [flushRaw]);
 
   const isReadonly = estado !== 'open';
 
@@ -106,6 +144,7 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
             <ScoreInput
               value={estado === 'finalized' ? String(jogo.gols_casa ?? '') : golsCasa}
               onChange={(v) => handleChange('casa', v)}
+              onBlur={handleBlur}
               readonly={isReadonly}
               variant={estado === 'finalized' ? 'result' : 'normal'}
             />
@@ -113,6 +152,7 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
             <ScoreInput
               value={estado === 'finalized' ? String(jogo.gols_fora ?? '') : golsFora}
               onChange={(v) => handleChange('fora', v)}
+              onBlur={handleBlur}
               readonly={isReadonly}
               variant={estado === 'finalized' ? 'result' : 'normal'}
             />
@@ -139,11 +179,13 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
 function ScoreInput({
   value,
   onChange,
+  onBlur,
   readonly,
   variant,
 }: {
   value: string;
   onChange: (v: string) => void;
+  onBlur?: () => void;
   readonly: boolean;
   variant: 'normal' | 'result';
 }) {
@@ -155,6 +197,7 @@ function ScoreInput({
       max={99}
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      onBlur={onBlur}
       readOnly={readonly}
       placeholder="?"
       className={cn(
