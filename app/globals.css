@@ -283,7 +283,7 @@ input[type='number']::-webkit-inner-spin-button {
          rounded-full text-base font-bold text-bg-dark;
   box-shadow: 0 0 0 2px rgba(255,255,255,0.7), 0 2px 5px rgba(0,0,0,0.35);
 }
-.podio-nome  { @apply relative z-10 mb-0.5 truncate text-[13px] font-bold; color: #1b160c; }
+.podio-nome  { @apply relative z-10 mb-0.5 flex items-center justify-center text-[13px] font-bold; color: #1b160c; }
 .podio-meta  { @apply relative z-10 mb-2 text-[11px] font-medium; color: rgba(0,0,0,0.55); }
 .podio-pts   {
   @apply relative z-10 text-xl font-extrabold tabular-nums;

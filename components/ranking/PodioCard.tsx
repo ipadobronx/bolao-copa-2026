@@ -19,8 +19,8 @@ export function PodioCard({ entry }: { entry: PodioEntry }) {
         {avatarInitials(nome)}
       </div>
       <div className="podio-nome">
-        {nome}
-        {clube && <EscudoImg slug={clube} size={20} />}
+        <span className="min-w-0 truncate">{nome}</span>
+        {clube && <EscudoImg slug={clube} size={18} />}
         {isCurrentUser && <span className="rank-you-badge">Você</span>}
       </div>
       <div className="podio-meta">
