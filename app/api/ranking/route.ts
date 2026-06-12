@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
-import { calcularBadges, type UsuarioBadge } from '@/lib/ranking/badges'
+import { calcularBadges, calcularForma, type UsuarioBadge } from '@/lib/ranking/badges'
 import { determinarPeriodoAtual, type JogoParaPeriodo } from '@/lib/ranking'
 
 export async function GET() {
@@ -41,8 +41,9 @@ export async function GET() {
     .filter((r): r is typeof r & { user_id: string } => r.user_id !== null && r.user_id !== undefined)
     .map((r) => ({ userId: r.user_id, melhorBilheteId: r.melhor_bilhete_id ?? null }))
 
-  const [emojiMap, { data: perfis }] = await Promise.all([
+  const [emojiMap, formaMap, { data: perfis }] = await Promise.all([
     calcularBadges(admin, usuarios),
+    calcularForma(admin, usuarios),
     admin.from('profiles').select('id, clube').in('id', usuarios.map((u) => u.userId)),
   ])
   const clubeMap = new Map<string, string | null>(
@@ -65,6 +66,7 @@ export async function GET() {
         isCurrentUser: r.user_id === user.id,
         emoji: emojiMap.get(r.user_id) ?? null,
         clube: clubeMap.get(r.user_id) ?? null,
+        forma: formaMap.get(r.user_id) ?? null,
       }
     })
 
