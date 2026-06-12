@@ -4,7 +4,13 @@ import { RankingTable } from './RankingTable'
 import type { RankingRowData } from './RankingRow'
 import type { PodioEntry } from './PodioSection'
 
-export function RankingTabGeral({ rows }: { rows: RankingRowData[] }) {
+export function RankingTabGeral({
+  rows,
+  onAbrirPerfil,
+}: {
+  rows: RankingRowData[]
+  onAbrirPerfil?: (d: RankingRowData) => void
+}) {
   if (rows.length === 0) {
     return (
       <div className="ranking-empty">
@@ -33,7 +39,7 @@ export function RankingTabGeral({ rows }: { rows: RankingRowData[] }) {
   return (
     <>
       <PodioSection entries={top3} />
-      <RankingTable rows={rows} />
+      <RankingTable rows={rows} {...(onAbrirPerfil ? { onAbrirPerfil } : {})} />
     </>
   )
 }
