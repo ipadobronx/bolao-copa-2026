@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(
   _req: Request,
@@ -12,8 +11,7 @@ export async function GET(
   } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
 
-  const admin = createSupabaseAdminClient()
-  const { data: bonus } = await admin
+  const { data: bonus } = await supabase
     .from('palpites_bonus')
     .select('tipo, jogador_nome, selecao:selecoes!selecao_id(nome, bandeira_emoji)')
     .eq('bilhete_id', params.bilheteId)

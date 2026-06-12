@@ -93,7 +93,7 @@ export function RankingShell({
       ) : (
         <RankingTabRodada label={periodoLabel} rows={periodoRows} onAbrirPerfil={setPerfil} />
       )}
-      <PerfilModal entry={perfil} total={totalApostadores} onClose={() => setPerfil(null)} />
+      <PerfilModal entry={perfil} total={tab === 'geral' ? totalApostadores : periodoRows.length} onClose={() => setPerfil(null)} />
     </div>
   )
 }

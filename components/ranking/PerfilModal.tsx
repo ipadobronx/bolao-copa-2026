@@ -39,6 +39,9 @@ export function PerfilModal({
       .then((data: Bonus | null) => {
         if (!cancel) setBonus(data)
       })
+      .catch(() => {
+        if (!cancel) setBonus(null)
+      })
       .finally(() => {
         if (!cancel) setLoading(false)
       })
