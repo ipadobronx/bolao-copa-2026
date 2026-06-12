@@ -2,7 +2,7 @@
 import { notFound } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
-import { calcularBadges, type UsuarioBadge } from '@/lib/ranking/badges'
+import { calcularBadges, calcularForma, type UsuarioBadge } from '@/lib/ranking/badges'
 import { determinarPeriodoAtual } from '@/lib/ranking'
 import { RankingShell } from '@/components/ranking/RankingShell'
 import type { RankingRowData } from '@/components/ranking/RankingRow'
@@ -39,8 +39,9 @@ export default async function RankingPage() {
     .filter((r): r is typeof r & { user_id: string } => Boolean(r.user_id))
     .map((r) => ({ userId: r.user_id, melhorBilheteId: r.melhor_bilhete_id ?? null }))
 
-  const [emojiMap, { data: perfis }] = await Promise.all([
+  const [emojiMap, formaMap, { data: perfis }] = await Promise.all([
     calcularBadges(admin, usuarios),
+    calcularForma(admin, usuarios),
     admin.from('profiles').select('id, clube').in('id', usuarios.map((u) => u.userId)),
   ])
   const clubeMap = new Map<string, string | null>(
@@ -61,6 +62,7 @@ export default async function RankingPage() {
       isCurrentUser: r.user_id === user.id,
       emoji: emojiMap.get(r.user_id ?? '') ?? null,
       clube: clubeMap.get(r.user_id ?? '') ?? null,
+      forma: formaMap.get(r.user_id ?? '') ?? null,
     }
   })
 

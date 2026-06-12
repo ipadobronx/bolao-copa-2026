@@ -1,6 +1,7 @@
 import type { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { classificarPalpite, type ClassePalpite, type FaseJogo } from '@/lib/pontuacao'
 import { emojiDoResultado } from '@/lib/ranking/badge'
+import { corDaForma, type CorForma } from '@/lib/ranking/forma'
 
 type Admin = ReturnType<typeof createSupabaseAdminClient>
 
@@ -80,6 +81,65 @@ export async function calcularBadges(
     const classe = classePorBilhete.get(u.melhorBilheteId) ?? null
     const pts = pontosDia.get(u.melhorBilheteId) ?? 0
     result.set(u.userId, emojiDoResultado(classe, pts))
+  }
+  return result
+}
+
+/**
+ * Forma dos últimos 5 jogos finalizados (cronológico, antigo→recente) para o
+ * melhor bilhete de cada usuário. Retorna Map<userId, CorForma[]>.
+ */
+export async function calcularForma(
+  admin: Admin,
+  usuarios: UsuarioBadge[],
+): Promise<Map<string, CorForma[]>> {
+  const result = new Map<string, CorForma[]>()
+  const bilheteIds = usuarios
+    .map((u) => u.melhorBilheteId)
+    .filter((id): id is string => Boolean(id))
+  if (bilheteIds.length === 0) return result
+
+  const { data: ultimos } = await admin
+    .from('jogos')
+    .select('id, fase, gols_casa, gols_fora')
+    .eq('finalizado', true)
+    .order('data_hora', { ascending: false })
+    .limit(5)
+  if (!ultimos || ultimos.length === 0) return result
+  const jogos = [...ultimos].reverse() // antigo → recente (esquerda → direita)
+  const jogoIds = jogos.map((j) => j.id)
+
+  const { data: palps } = await admin
+    .from('palpites')
+    .select('bilhete_id, jogo_id, gols_casa, gols_fora')
+    .in('jogo_id', jogoIds)
+    .in('bilhete_id', bilheteIds)
+
+  const classePorChave = new Map<string, ClassePalpite>()
+  for (const p of palps ?? []) {
+    const jogo = jogos.find((j) => j.id === p.jogo_id)
+    if (!jogo || jogo.gols_casa === null || jogo.gols_fora === null) continue
+    classePorChave.set(
+      `${p.bilhete_id}:${p.jogo_id}`,
+      classificarPalpite(
+        { gols_casa: p.gols_casa, gols_fora: p.gols_fora },
+        {
+          fase: jogo.fase as FaseJogo,
+          finalizado: true,
+          gols_casa: jogo.gols_casa,
+          gols_fora: jogo.gols_fora,
+        },
+      ),
+    )
+  }
+
+  for (const u of usuarios) {
+    if (!u.melhorBilheteId) continue
+    const bid = u.melhorBilheteId
+    result.set(
+      u.userId,
+      jogos.map((j) => corDaForma(classePorChave.get(`${bid}:${j.id}`) ?? null)),
+    )
   }
   return result
 }

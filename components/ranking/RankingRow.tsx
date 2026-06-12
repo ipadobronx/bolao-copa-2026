@@ -1,5 +1,6 @@
 import { avatarColor, avatarInitials } from '@/lib/format/avatar-color'
 import { EscudoImg } from '@/components/ui/EscudoImg'
+import { FormaDots } from '@/components/ranking/FormaDots'
 
 export type RankingRowData = {
   userId: string
@@ -13,6 +14,7 @@ export type RankingRowData = {
   isCurrentUser: boolean
   emoji?: string | null
   clube?: string | null
+  forma?: string[] | null
 }
 
 const POS_CLASS: Record<number, string> = {
@@ -23,7 +25,7 @@ const POS_CLASS: Record<number, string> = {
 
 export function RankingRow({ data }: { data: RankingRowData }) {
   const { userId, nome, posicao, pontosTotais, acertosExatos, acertosParciais,
-          totalBilhetes, tendencia, isCurrentUser, emoji, clube } = data
+          totalBilhetes, tendencia, isCurrentUser, emoji, clube, forma } = data
 
   const posClass = POS_CLASS[posicao] ?? 'rank-pos-normal'
   const trendSign = tendencia === null || tendencia === 0 ? 0 : tendencia > 0 ? 1 : -1
@@ -58,6 +60,11 @@ export function RankingRow({ data }: { data: RankingRowData }) {
                 <strong>{acertosExatos}</strong> ex · <strong>{acertosParciais}</strong> parc
               </span>
             </div>
+            {forma && forma.length > 0 && (
+              <div className="mt-1">
+                <FormaDots forma={forma} />
+              </div>
+            )}
           </div>
         </div>
       </td>
