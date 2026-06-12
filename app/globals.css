@@ -215,10 +215,12 @@ input[type='number']::-webkit-inner-spin-button {
 .trend-down   { @apply text-red-400; }
 .trend-same   { @apply text-text-muted; }
 .rank-pts     { @apply text-base font-bold text-accent text-right tabular-nums whitespace-nowrap; }
-.rank-emoji   { @apply inline-block; animation: emoji-bob 1.5s ease-in-out infinite; }
-@keyframes emoji-bob {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50%      { transform: translateY(-1.5px) scale(1.18); }
+.rank-emoji   { @apply inline-block; transform-origin: center bottom; animation: emoji-wiggle 1.1s ease-in-out infinite; }
+@keyframes emoji-wiggle {
+  0%, 100% { transform: rotate(-7deg) translateY(0); }
+  25%      { transform: rotate(7deg)  translateY(-2px); }
+  50%      { transform: rotate(-5deg) translateY(0); }
+  75%      { transform: rotate(6deg)  translateY(-1px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .rank-emoji { animation: none; }
