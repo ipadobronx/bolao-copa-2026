@@ -12,6 +12,8 @@ const base: RankingRowData = {
   totalBilhetes: 3,
   tendencia: null,
   isCurrentUser: false,
+  emoji: null,
+  clube: null,
 }
 
 describe('<RankingRow />', () => {
@@ -106,5 +108,18 @@ describe('<RankingRow />', () => {
     render(<table><tbody><RankingRow data={{ ...base, posicao: 3, pontosTotais: 445 }} /></tbody></table>)
     const pos = screen.getByText('3')
     expect(pos).toHaveClass('rank-pos-bronze')
+  })
+
+  it('renderiza emoji quando presente', () => {
+    render(<table><tbody><RankingRow data={{ ...base, emoji: '🔥' }} /></tbody></table>)
+    expect(screen.getByText('🔥')).toBeInTheDocument()
+  })
+  it('renderiza escudo quando há clube', () => {
+    render(<table><tbody><RankingRow data={{ ...base, clube: 'nautico' }} /></tbody></table>)
+    expect(screen.getByAltText('Náutico')).toBeInTheDocument()
+  })
+  it('não renderiza escudo sem clube', () => {
+    render(<table><tbody><RankingRow data={base} /></tbody></table>)
+    expect(screen.queryByAltText('Náutico')).toBeNull()
   })
 })
