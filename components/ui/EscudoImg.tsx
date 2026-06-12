@@ -1,18 +1,19 @@
-const ESCUDOS: Record<string, string> = {
-  nautico: 'Náutico',
-  corinthians: 'Corinthians',
+const ESCUDOS: Record<string, { nome: string; file: string }> = {
+  nautico: { nome: 'Náutico', file: 'nautico.png' },
+  corinthians: { nome: 'Corinthians', file: 'corinthians.jpg' },
 }
 
 export function EscudoImg({ slug, size = 18 }: { slug: string | null | undefined; size?: number }) {
-  if (!slug || !(slug in ESCUDOS)) return null
+  const escudo = slug ? ESCUDOS[slug] : undefined
+  if (!escudo) return null
   return (
     <img
-      src={`/escudos/${slug}.svg`}
-      alt={ESCUDOS[slug]}
-      title={ESCUDOS[slug]}
+      src={`/escudos/${escudo.file}`}
+      alt={escudo.nome}
+      title={escudo.nome}
       width={size}
       height={size}
-      className="inline-block shrink-0 align-middle"
+      className="inline-block shrink-0 object-contain align-middle"
     />
   )
 }

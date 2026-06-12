@@ -214,7 +214,15 @@ input[type='number']::-webkit-inner-spin-button {
 .trend-up     { @apply text-green-400; }
 .trend-down   { @apply text-red-400; }
 .trend-same   { @apply text-text-muted; }
-.rank-pts     { @apply text-base font-bold text-accent text-right tabular-nums; }
+.rank-pts     { @apply text-base font-bold text-accent text-right tabular-nums whitespace-nowrap; }
+.rank-emoji   { @apply inline-block; animation: emoji-bob 1.5s ease-in-out infinite; }
+@keyframes emoji-bob {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-1.5px) scale(1.18); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rank-emoji { animation: none; }
+}
 
 /* Pódio */
 .podio-section {
