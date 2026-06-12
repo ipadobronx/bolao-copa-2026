@@ -313,6 +313,29 @@ input[type='number']::-webkit-inner-spin-button {
          animate-pulse align-middle;
 }
 
+/* Cabeçalho do ranking — premium minimalista (escopado pra não afetar o dashboard) */
+.ranking-shell-header {
+  @apply mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between;
+}
+.ranking-shell-header .dash-greeting {
+  @apply font-display text-3xl leading-none tracking-[0.04em] text-text-primary sm:text-[2.5rem];
+}
+.ranking-shell-header .dash-greeting span { @apply text-accent; }
+.ranking-shell-header .dash-subtitle {
+  @apply mt-2 flex items-center font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted;
+}
+.ranking-shell-header .tabs {
+  @apply inline-flex shrink-0 self-start rounded-full border border-[#1f1f23] bg-[#0b0b0d] p-1 sm:self-auto;
+}
+.ranking-shell-header .tab {
+  @apply rounded-full px-4 py-1.5 text-xs font-semibold text-text-muted transition-colors;
+}
+.ranking-shell-header .tab:hover { @apply text-text-primary; }
+.ranking-shell-header .tab-active,
+.ranking-shell-header .tab-active:hover {
+  @apply bg-accent text-bg-dark;
+}
+
 /* Perfil público */
 .perfil-publico { @apply max-w-lg mx-auto; }
 .perfil-header  { @apply flex items-center gap-4 mb-6; }
