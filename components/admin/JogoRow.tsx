@@ -159,13 +159,15 @@ export function JogoRow({ jogo, selecoes, jogoByNumero, onAtualizado }: Props) {
   const nomeForaa = jogo.selecao_fora?.nome ?? jogo.placeholder_fora ?? '?'
 
   return (
-    <div className="border-border grid grid-cols-[auto_1fr_auto_1fr_auto_auto] items-center gap-3 border-b px-4 py-3 last:border-b-0 md:gap-4">
+    <div className="border-border flex flex-col gap-2.5 border-b px-4 py-3 last:border-b-0 md:flex-row md:items-center md:gap-4">
       {/* Jogo + data */}
-      <div className="font-mono text-text-muted min-w-[90px] text-xs">
+      <div className="font-mono text-text-muted text-xs md:w-[90px] md:shrink-0">
         <div className="text-text-primary font-semibold">#{jogo.numero_jogo}</div>
         <div>{formatDataHora(jogo.data_hora)}</div>
       </div>
 
+      {/* Confronto: casa × placar × fora */}
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 md:flex-1 md:gap-3">
       {/* Time casa */}
       <div className="flex items-center gap-1.5 text-sm">
         {placeholderCasaPendente ? (
@@ -263,6 +265,10 @@ export function JogoRow({ jogo, selecoes, jogoByNumero, onAtualizado }: Props) {
         )}
       </div>
 
+      </div>
+
+      {/* Status + Ações (mobile: linha própria; desktop: vira colunas da row) */}
+      <div className="flex items-center justify-between gap-2 md:contents">
       {/* Status pill */}
       <div>
         {jogo.finalizado ? (
@@ -275,7 +281,7 @@ export function JogoRow({ jogo, selecoes, jogoByNumero, onAtualizado }: Props) {
       </div>
 
       {/* Ações */}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-end gap-2">
         {temPlaceholderPendente && (
           <button
             onClick={handleSalvarSelecoes}
@@ -306,6 +312,7 @@ export function JogoRow({ jogo, selecoes, jogoByNumero, onAtualizado }: Props) {
             {loadingRecalcular ? '…' : 'Recalcular'}
           </button>
         )}
+      </div>
       </div>
     </div>
   )

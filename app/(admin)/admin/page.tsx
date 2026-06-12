@@ -170,7 +170,7 @@ export default async function AdminPage({
         <h2 className="text-text-secondary mb-3 font-mono text-xs uppercase tracking-wider">
           Operacional
         </h2>
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <KpiCard
             label="Arrecadado"
             value={formatBRL(Number(kpis.arrecadado))}
@@ -204,7 +204,7 @@ export default async function AdminPage({
           Análise por período
         </h2>
         <DateRangePicker preset={preset} from={range.from} to={range.to} />
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <KpiCard
             label="Vendas no período"
             value={formatBRL(Number(periodo.vendas))}
