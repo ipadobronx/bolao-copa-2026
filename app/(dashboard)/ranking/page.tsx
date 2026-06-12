@@ -63,6 +63,7 @@ export default async function RankingPage() {
       emoji: emojiMap.get(r.user_id ?? '') ?? null,
       clube: clubeMap.get(r.user_id ?? '') ?? null,
       forma: formaMap.get(r.user_id ?? '') ?? null,
+      melhorBilheteId: r.melhor_bilhete_id ?? null,
     }
   })
 

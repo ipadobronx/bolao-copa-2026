@@ -1,6 +1,12 @@
 import { RankingRow, type RankingRowData } from './RankingRow'
 
-export function RankingTable({ rows }: { rows: RankingRowData[] }) {
+export function RankingTable({
+  rows,
+  onAbrirPerfil,
+}: {
+  rows: RankingRowData[]
+  onAbrirPerfil?: (d: RankingRowData) => void
+}) {
   return (
     <div className="ranking-table-panel">
       <table className="ranking-table" role="table">
@@ -15,7 +21,7 @@ export function RankingTable({ rows }: { rows: RankingRowData[] }) {
         </thead>
         <tbody>
           {rows.map((row) => (
-            <RankingRow key={row.userId} data={row} />
+            <RankingRow key={row.userId} data={row} {...(onAbrirPerfil ? { onAbrirPerfil } : {})} />
           ))}
         </tbody>
       </table>

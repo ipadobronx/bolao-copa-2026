@@ -4,9 +4,11 @@ import type { RankingRowData } from './RankingRow'
 export function RankingTabRodada({
   label,
   rows,
+  onAbrirPerfil,
 }: {
   label: string
   rows: RankingRowData[]
+  onAbrirPerfil?: (d: RankingRowData) => void
 }) {
   return (
     <div>
@@ -18,7 +20,7 @@ export function RankingTabRodada({
           Nenhum ponto registrado neste período ainda.
         </p>
       ) : (
-        <RankingTable rows={rows} />
+        <RankingTable rows={rows} {...(onAbrirPerfil ? { onAbrirPerfil } : {})} />
       )}
     </div>
   )

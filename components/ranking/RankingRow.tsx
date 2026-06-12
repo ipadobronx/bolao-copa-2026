@@ -15,6 +15,7 @@ export type RankingRowData = {
   emoji?: string | null
   clube?: string | null
   forma?: string[] | null
+  melhorBilheteId?: string | null
 }
 
 const POS_CLASS: Record<number, string> = {
@@ -23,7 +24,13 @@ const POS_CLASS: Record<number, string> = {
   3: 'rank-pos-bronze',
 }
 
-export function RankingRow({ data }: { data: RankingRowData }) {
+export function RankingRow({
+  data,
+  onAbrirPerfil,
+}: {
+  data: RankingRowData
+  onAbrirPerfil?: (d: RankingRowData) => void
+}) {
   const { userId, nome, posicao, pontosTotais, acertosExatos, acertosParciais,
           totalBilhetes, tendencia, isCurrentUser, emoji, clube, forma } = data
 
@@ -39,13 +46,15 @@ export function RankingRow({ data }: { data: RankingRowData }) {
       </td>
       <td>
         <div className="rank-user">
-          <div
+          <button
+            type="button"
             className="rank-avatar"
             style={{ background: avatarColor(userId) }}
-            aria-hidden="true"
+            onClick={() => onAbrirPerfil?.(data)}
+            aria-label={`Ver perfil de ${nome}`}
           >
             {avatarInitials(nome)}
-          </div>
+          </button>
           <div className="min-w-0">
             <div className="rank-name">
               {nome}
