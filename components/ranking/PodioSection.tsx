@@ -7,6 +7,7 @@ export type PodioEntry = {
   pontosTotais: number
   totalBilhetes: number
   isCurrentUser: boolean
+  clube?: string | null
 }
 
 export function PodioSection({ entries }: { entries: PodioEntry[] }) {
