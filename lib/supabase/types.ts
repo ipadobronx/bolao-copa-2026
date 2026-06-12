@@ -389,6 +389,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          clube: string | null
           cpf: string | null
           created_at: string
           email: string
@@ -399,6 +400,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          clube?: string | null
           cpf?: string | null
           created_at?: string
           email: string
@@ -409,6 +411,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          clube?: string | null
           cpf?: string | null
           created_at?: string
           email?: string
