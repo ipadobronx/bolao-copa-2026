@@ -15,6 +15,7 @@ export type RankingRowData = {
   emoji?: string | null
   clube?: string | null
   forma?: string[] | null
+  melhorBilheteId?: string | null
 }
 
 const POS_CLASS: Record<number, string> = {
