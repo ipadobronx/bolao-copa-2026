@@ -1,5 +1,5 @@
 const ESCUDOS: Record<string, { nome: string; file: string }> = {
-  nautico: { nome: 'Náutico', file: 'nautico.png' },
+  nautico: { nome: 'Náutico', file: 'nautico-cnc.png' },
   corinthians: { nome: 'Corinthians', file: 'corinthians.png' },
 }
 
