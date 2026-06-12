@@ -27,6 +27,7 @@ export function RankingTabGeral({ rows }: { rows: RankingRowData[] }) {
       pontosTotais: r.pontosTotais,
       totalBilhetes: r.totalBilhetes,
       isCurrentUser: r.isCurrentUser,
+      clube: r.clube ?? null,
     }))
 
   return (

@@ -1,10 +1,11 @@
 import { avatarColor, avatarInitials } from '@/lib/format/avatar-color'
+import { EscudoImg } from '@/components/ui/EscudoImg'
 import type { PodioEntry } from './PodioSection'
 
 const MEDAL = { 1: '🥇', 2: '🥈', 3: '🥉' } as const
 
 export function PodioCard({ entry }: { entry: PodioEntry }) {
-  const { userId, nome, posicao, pontosTotais, totalBilhetes, isCurrentUser } = entry
+  const { userId, nome, posicao, pontosTotais, totalBilhetes, isCurrentUser, clube } = entry
   return (
     <div className={`podio-card podio-pos-${posicao}`} aria-label={`${posicao}º lugar`}>
       <div className="podio-medal" aria-hidden="true">
@@ -19,6 +20,7 @@ export function PodioCard({ entry }: { entry: PodioEntry }) {
       </div>
       <div className="podio-nome">
         {nome}
+        {clube && <EscudoImg slug={clube} size={20} />}
         {isCurrentUser && <span className="rank-you-badge">Você</span>}
       </div>
       <div className="podio-meta">

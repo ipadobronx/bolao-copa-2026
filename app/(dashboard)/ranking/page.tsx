@@ -1,6 +1,8 @@
 // app/(dashboard)/ranking/page.tsx
 import { notFound } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { createSupabaseAdminClient } from '@/lib/supabase/admin'
+import { calcularBadges, type UsuarioBadge } from '@/lib/ranking/badges'
 import { determinarPeriodoAtual } from '@/lib/ranking'
 import { RankingShell } from '@/components/ranking/RankingShell'
 import type { RankingRowData } from '@/components/ranking/RankingRow'
@@ -32,6 +34,19 @@ export default async function RankingPage() {
     if (s.user_id && !lastSnap.has(s.user_id)) lastSnap.set(s.user_id, s.posicao)
   }
 
+  const admin = createSupabaseAdminClient()
+  const usuarios: UsuarioBadge[] = (rankingData ?? [])
+    .filter((r): r is typeof r & { user_id: string } => Boolean(r.user_id))
+    .map((r) => ({ userId: r.user_id, melhorBilheteId: r.melhor_bilhete_id ?? null }))
+
+  const [emojiMap, { data: perfis }] = await Promise.all([
+    calcularBadges(admin, usuarios),
+    admin.from('profiles').select('id, clube').in('id', usuarios.map((u) => u.userId)),
+  ])
+  const clubeMap = new Map<string, string | null>(
+    (perfis ?? []).map((p) => [p.id, p.clube ?? null]),
+  )
+
   const geral: RankingRowData[] = (rankingData ?? []).map((r) => {
     const snapPos = lastSnap.get(r.user_id ?? '') ?? null
     return {
@@ -44,6 +59,8 @@ export default async function RankingPage() {
       totalBilhetes: r.total_bilhetes ?? 1,
       tendencia: snapPos !== null ? snapPos - (r.posicao ?? 0) : null,
       isCurrentUser: r.user_id === user.id,
+      emoji: emojiMap.get(r.user_id ?? '') ?? null,
+      clube: clubeMap.get(r.user_id ?? '') ?? null,
     }
   })
 

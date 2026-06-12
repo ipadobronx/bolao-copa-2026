@@ -1,4 +1,5 @@
 import { avatarColor, avatarInitials } from '@/lib/format/avatar-color'
+import { EscudoImg } from '@/components/ui/EscudoImg'
 
 export type RankingRowData = {
   userId: string
@@ -10,6 +11,8 @@ export type RankingRowData = {
   totalBilhetes: number
   tendencia: number | null  // positivo = subiu, negativo = caiu, 0 ou null = igual
   isCurrentUser: boolean
+  emoji?: string | null
+  clube?: string | null
 }
 
 const POS_CLASS: Record<number, string> = {
@@ -20,7 +23,7 @@ const POS_CLASS: Record<number, string> = {
 
 export function RankingRow({ data }: { data: RankingRowData }) {
   const { userId, nome, posicao, pontosTotais, acertosExatos, acertosParciais,
-          totalBilhetes, tendencia, isCurrentUser } = data
+          totalBilhetes, tendencia, isCurrentUser, emoji, clube } = data
 
   const posClass = POS_CLASS[posicao] ?? 'rank-pos-normal'
   const trendSign = tendencia === null || tendencia === 0 ? 0 : tendencia > 0 ? 1 : -1
@@ -44,6 +47,7 @@ export function RankingRow({ data }: { data: RankingRowData }) {
           <div className="min-w-0">
             <div className="rank-name">
               {nome}
+              {clube && <EscudoImg slug={clube} />}
               {isCurrentUser && <span className="rank-you-badge">Você</span>}
             </div>
             <div className="rank-meta">
@@ -64,7 +68,10 @@ export function RankingRow({ data }: { data: RankingRowData }) {
       <td className="hidden sm:table-cell">
         <span className={`rank-trend ${trendClass}`}>{trendLabel}</span>
       </td>
-      <td className="rank-pts">{pontosTotais}</td>
+      <td className="rank-pts">
+        {emoji && <span className="mr-1" aria-hidden="true">{emoji}</span>}
+        {pontosTotais}
+      </td>
     </tr>
   )
 }
