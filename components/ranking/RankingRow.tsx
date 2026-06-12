@@ -69,7 +69,7 @@ export function RankingRow({ data }: { data: RankingRowData }) {
         <span className={`rank-trend ${trendClass}`}>{trendLabel}</span>
       </td>
       <td className="rank-pts">
-        {emoji && <span className="mr-1" aria-hidden="true">{emoji}</span>}
+        {emoji && <span className="rank-emoji mr-1.5" aria-hidden="true">{emoji}</span>}
         {pontosTotais}
       </td>
     </tr>
