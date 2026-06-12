@@ -171,13 +171,14 @@ input[type='number']::-webkit-inner-spin-button {
    Ranking (F8)
    ============================================================ */
 .ranking-table-panel {
-  @apply bg-bg-card border-border rounded-xl border overflow-hidden;
+  @apply bg-[#08080a] rounded-xl border border-[#1b1b1e] overflow-hidden;
+  box-shadow: 0 12px 32px -14px rgba(0, 0, 0, 0.85);
 }
 .ranking-table {
   @apply w-full border-collapse;
 }
 .ranking-table thead tr {
-  @apply bg-bg-dark border-border border-b;
+  @apply bg-[#050506] border-b border-[#1b1b1e];
 }
 .ranking-table th {
   @apply px-2.5 sm:px-4 py-2.5 text-left text-[10px] text-text-muted uppercase tracking-wider font-semibold;
@@ -224,64 +225,72 @@ input[type='number']::-webkit-inner-spin-button {
   .rank-emoji { animation: none; }
 }
 
-/* Pódio premium — preto & dourado, escalonado, profundidade por sombra/brilho */
+/* Pódio premium — placas metálicas (ouro/prata/bronze), escalonado */
 .podio-section {
   @apply mb-8 mt-1 flex items-end justify-center gap-2 sm:gap-3;
 }
 .podio-card {
   @apply relative min-w-0 max-w-[180px] flex-1 overflow-hidden rounded-2xl border
-         px-2.5 pt-4 pb-3 text-center transition-transform duration-200 sm:px-3
-         bg-gradient-to-b from-[#17171c] to-[#0e0e11];
+         px-2.5 pt-4 pb-3 text-center transition-transform duration-200 sm:px-3;
+  color: #1b160c;
 }
 .podio-card:hover { @apply md:-translate-y-0.5; }
 
+/* 1º — ouro */
 .podio-pos-1 {
-  @apply -translate-y-2 border-[#d4af37] pt-6 pb-4
-         bg-gradient-to-b from-[#1d1707] via-[#12111a] to-[#0c0c0e];
-  box-shadow: 0 0 26px -6px rgba(212, 175, 55, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  @apply -translate-y-2 border-[#8a6d1a] pt-6 pb-4;
+  background: linear-gradient(150deg, #fbf1c4 0%, #eccd63 26%, #cda730 52%, #a9831f 74%, #e7cd72 100%);
+  box-shadow: 0 14px 28px -10px rgba(0,0,0,0.65), 0 0 22px -8px rgba(212,175,55,0.55),
+              inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 6px rgba(120,90,10,0.35);
 }
+/* 2º — prata */
 .podio-pos-2 {
-  @apply border-[#c4c8d0];
-  box-shadow: 0 0 18px -8px rgba(196, 200, 208, 0.4);
+  @apply border-[#7f858d];
+  background: linear-gradient(150deg, #f7f8fa 0%, #d2d7de 26%, #b1b7bf 52%, #8f959d 74%, #dde1e6 100%);
+  box-shadow: 0 12px 24px -10px rgba(0,0,0,0.6),
+              inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -2px 6px rgba(90,95,100,0.3);
 }
+/* 3º — bronze */
 .podio-pos-3 {
-  @apply border-[#cd7c2e];
-  box-shadow: 0 0 18px -8px rgba(205, 124, 46, 0.4);
+  @apply border-[#7d4a23];
+  background: linear-gradient(150deg, #f2cda4 0%, #d99c67 26%, #bb7a40 52%, #95592a 74%, #dc9c66 100%);
+  box-shadow: 0 12px 24px -10px rgba(0,0,0,0.6),
+              inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -2px 6px rgba(80,45,18,0.35);
 }
 
-/* brilho que passa só no 1º */
-.podio-pos-1::before {
+/* brilho metálico que passa nas placas */
+.podio-card::before {
   content: '';
   @apply pointer-events-none absolute inset-0 z-0;
-  background: linear-gradient(115deg, transparent 32%, rgba(255, 255, 255, 0.16) 48%, transparent 64%);
+  background: linear-gradient(115deg, transparent 34%, rgba(255,255,255,0.45) 48%, transparent 62%);
   transform: translateX(-130%);
-  animation: podio-shine 3.6s ease-in-out infinite;
+  animation: podio-shine 4s ease-in-out infinite;
 }
+.podio-pos-2::before { animation-delay: 0.5s; }
+.podio-pos-3::before { animation-delay: 1s; }
 @keyframes podio-shine {
   0%        { transform: translateX(-130%); }
   55%, 100% { transform: translateX(130%); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .podio-pos-1::before { animation: none; opacity: 0; }
+  .podio-card::before { animation: none; opacity: 0; }
 }
 
-.podio-medal { @apply relative z-10 mb-2 text-2xl; }
+.podio-medal { @apply relative z-10 mb-2 text-2xl; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.35)); }
 .podio-pos-1 .podio-medal { @apply text-[28px]; }
 .podio-avatar {
   @apply relative z-10 mx-auto mb-2 flex h-11 w-11 items-center justify-center
          rounded-full text-base font-bold text-bg-dark;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.7), 0 2px 5px rgba(0,0,0,0.35);
 }
-.podio-pos-1 .podio-avatar { @apply ring-2 ring-[rgba(212,175,55,0.55)]; }
-.podio-nome  { @apply relative z-10 mb-0.5 truncate text-[13px] font-semibold; }
-.podio-meta  { @apply relative z-10 mb-2 text-[11px] text-text-muted; }
-.podio-pts   { @apply relative z-10 text-xl font-bold tabular-nums text-accent; }
-.podio-pos-1 .podio-pts {
-  @apply text-2xl text-transparent;
-  background-image: linear-gradient(180deg, #f9e08c 0%, #d4af37 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
+.podio-nome  { @apply relative z-10 mb-0.5 truncate text-[13px] font-bold; color: #1b160c; }
+.podio-meta  { @apply relative z-10 mb-2 text-[11px] font-medium; color: rgba(0,0,0,0.55); }
+.podio-pts   {
+  @apply relative z-10 text-xl font-extrabold tabular-nums;
+  color: #14110a; text-shadow: 0 1px 0 rgba(255,255,255,0.35);
 }
-.podio-pts-label { @apply relative z-10 text-[10px] text-text-muted; }
+.podio-pos-1 .podio-pts { @apply text-2xl; }
+.podio-pts-label { @apply relative z-10 text-[10px] font-medium; color: rgba(0,0,0,0.5); }
 
 /* Estado vazio */
 .ranking-empty {
