@@ -21,7 +21,13 @@ const ITEMS: NavItem[] = [
   { label: 'Afiliados', icon: Handshake, href: '/admin/afiliados' },
 ]
 
-export function AdminSidebar({ className }: { className?: string }) {
+export function AdminSidebar({
+  className,
+  onItemClick,
+}: {
+  className?: string
+  onItemClick?: () => void
+}) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -32,6 +38,7 @@ export function AdminSidebar({ className }: { className?: string }) {
       toast.error('Erro ao sair. Tenta de novo.')
       return
     }
+    onItemClick?.()
     router.push('/login')
     router.refresh()
   }
@@ -69,6 +76,7 @@ export function AdminSidebar({ className }: { className?: string }) {
             <Link
               key={item.label}
               href={item.href as Route}
+              {...(onItemClick ? { onClick: onItemClick } : {})}
               className={cn('sidebar-item', active && 'sidebar-item-active')}
               aria-current={active ? 'page' : undefined}
             >
