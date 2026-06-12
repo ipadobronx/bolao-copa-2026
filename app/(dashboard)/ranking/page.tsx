@@ -76,23 +76,40 @@ export default async function RankingPage() {
   if (periodo && periodo.jogoIds.length > 0) {
     const { data: palpitesData } = await supabase
       .from('palpites')
-      .select('bilhete_id, pontos_calculados, bilhetes!inner(user_id, status_pagamento)')
+      .select('bilhete_id, pontos_calculados, bilhetes!inner(status_pagamento)')
       .in('jogo_id', periodo.jogoIds)
       .eq('bilhetes.status_pagamento', 'confirmado')
 
-    const pontosPorUser = new Map<string, number>()
+    // Soma os pontos da rodada POR BILHETE (não por usuário).
+    const pontosPorBilhete = new Map<string, number>()
     for (const p of palpitesData ?? []) {
-      const bilheteRaw = (p as { bilhetes: unknown }).bilhetes
-      const bilheteRow = Array.isArray(bilheteRaw) ? bilheteRaw[0] : bilheteRaw
-      const uid: string =
-        (bilheteRow as { user_id?: string } | null)?.user_id ?? ''
-      if (!uid) continue
-      pontosPorUser.set(uid, (pontosPorUser.get(uid) ?? 0) + (p.pontos_calculados ?? 0))
+      pontosPorBilhete.set(
+        p.bilhete_id,
+        (pontosPorBilhete.get(p.bilhete_id) ?? 0) + (p.pontos_calculados ?? 0),
+      )
     }
 
+    // Cada usuário é representado pelo seu MELHOR bilhete (o que aparece no Geral).
+    // A Rodada mostra quanto ESSE bilhete pontuou no período — não a soma de todas
+    // as tabelas do usuário.
+    const melhorBilhetePorUser = new Map<string, string>(
+      (rankingData ?? [])
+        .filter(
+          (r): r is typeof r & { user_id: string; melhor_bilhete_id: string } =>
+            Boolean(r.user_id) && Boolean(r.melhor_bilhete_id),
+        )
+        .map((r) => [r.user_id, r.melhor_bilhete_id]),
+    )
+
     periodoRows = geral
-      .filter((r) => pontosPorUser.has(r.userId))
-      .map((r) => ({ ...r, pontosTotais: pontosPorUser.get(r.userId) ?? 0 }))
+      .filter((r) => {
+        const bid = melhorBilhetePorUser.get(r.userId)
+        return bid !== undefined && pontosPorBilhete.has(bid)
+      })
+      .map((r) => ({
+        ...r,
+        pontosTotais: pontosPorBilhete.get(melhorBilhetePorUser.get(r.userId)!) ?? 0,
+      }))
       .sort((a, b) => b.pontosTotais - a.pontosTotais)
       .map((r, i) => ({ ...r, posicao: i + 1, tendencia: null }))
   }
