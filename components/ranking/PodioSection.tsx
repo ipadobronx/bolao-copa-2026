@@ -1,4 +1,5 @@
 import { PodioCard } from './PodioCard'
+import { ConfettiBurst } from './ConfettiBurst'
 
 export type PodioEntry = {
   userId: string
@@ -17,6 +18,7 @@ export function PodioSection({ entries }: { entries: PodioEntry[] }) {
     .filter((e): e is PodioEntry => e !== undefined)
   return (
     <div className="podio-section">
+      <ConfettiBurst triggerKey={ordered.map((e) => e.userId).join('-')} />
       {ordered.map((e) => (
         <PodioCard key={e.userId} entry={e} />
       ))}
