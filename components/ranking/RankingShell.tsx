@@ -5,6 +5,7 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/browser'
 import { RankingTabGeral } from './RankingTabGeral'
 import { RankingTabRodada } from './RankingTabRodada'
 import type { RankingRowData } from './RankingRow'
+import { PerfilModal } from './PerfilModal'
 
 export type RankingShellProps = {
   initialRows: RankingRowData[]
@@ -22,6 +23,7 @@ export function RankingShell({
   const [tab, setTab] = useState<'geral' | 'rodada'>('geral')
   const [rows, setRows] = useState(initialRows)
   const [periodoRows, setPeriodoRows] = useState(initialPeriodoRows)
+  const [perfil, setPerfil] = useState<RankingRowData | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>()
 
   const fetchRanking = useCallback(async () => {
@@ -87,10 +89,11 @@ export function RankingShell({
       </div>
 
       {tab === 'geral' ? (
-        <RankingTabGeral rows={rows} />
+        <RankingTabGeral rows={rows} onAbrirPerfil={setPerfil} />
       ) : (
-        <RankingTabRodada label={periodoLabel} rows={periodoRows} />
+        <RankingTabRodada label={periodoLabel} rows={periodoRows} onAbrirPerfil={setPerfil} />
       )}
+      <PerfilModal entry={perfil} total={totalApostadores} onClose={() => setPerfil(null)} />
     </div>
   )
 }
