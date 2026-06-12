@@ -1,24 +1,21 @@
 const ESCUDOS: Record<string, { nome: string; file: string }> = {
   nautico: { nome: 'Náutico', file: 'nautico.png' },
-  corinthians: { nome: 'Corinthians', file: 'corinthians.jpg' },
+  corinthians: { nome: 'Corinthians', file: 'corinthians.png' },
 }
 
 export function EscudoImg({ slug, size = 20 }: { slug: string | null | undefined; size?: number }) {
   const escudo = slug ? ESCUDOS[slug] : undefined
   if (!escudo) return null
-  // Chip branco redondo de tamanho fixo: uniformiza tamanho entre clubes e faz
-  // o fundo (branco) das imagens não-transparentes parecer proposital.
+  // PNGs transparentes; tamanho fixo (size×size) + object-contain mantém todos
+  // os escudos do mesmo tamanho, sem fundo.
   return (
-    <span
-      className="ml-1 inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-white align-middle ring-1 ring-black/10"
-      style={{ width: size, height: size }}
+    <img
+      src={`/escudos/${escudo.file}`}
+      alt={escudo.nome}
       title={escudo.nome}
-    >
-      <img
-        src={`/escudos/${escudo.file}`}
-        alt={escudo.nome}
-        className="h-full w-full object-contain p-px"
-      />
-    </span>
+      width={size}
+      height={size}
+      className="ml-1 inline-block shrink-0 object-contain align-middle"
+    />
   )
 }
