@@ -138,7 +138,7 @@ export function PerfilModal({
                         )}
                       </span>
                       <span className="font-mono text-text-muted">
-                        <strong className="text-text-primary">{t.pontos}</strong> pts · {t.posicao}ª
+                        <strong className="text-text-primary">{t.pontos}</strong> pts · {t.posicao}ª de {data.totalTabelas}
                       </span>
                     </div>
                   ))}
