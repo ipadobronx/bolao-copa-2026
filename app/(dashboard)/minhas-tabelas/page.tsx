@@ -30,6 +30,24 @@ export default async function MinhasTabelasPage() {
     countMap.set(p.bilhete_id, (countMap.get(p.bilhete_id) ?? 0) + 1);
   }
 
+  const { data: rankingRows } = bilheteIds.length
+    ? await supabase
+        .from('ranking')
+        .select('bilhete_id, pontos_totais, posicao')
+        .eq('user_id', user.id)
+    : { data: [] };
+
+  const pontosMap = new Map<string, { pontos: number; posicao: number }>();
+  for (const r of rankingRows ?? []) {
+    if (r.bilhete_id) {
+      pontosMap.set(r.bilhete_id, { pontos: r.pontos_totais ?? 0, posicao: r.posicao ?? 0 });
+    }
+  }
+
+  const { count: totalTabelas } = await supabase
+    .from('ranking')
+    .select('*', { count: 'exact', head: true });
+
   const cashbackIds = bilhetesData
     .map((b) => b.selecao_cashback_id)
     .filter((id): id is number => id !== null);
@@ -70,16 +88,22 @@ export default async function MinhasTabelasPage() {
         {bilhetesData.length !== 1 ? 's' : ''}
       </p>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {bilhetesData.map((b) => (
-          <TabelaCard
-            key={b.id}
-            bilhete={b as BilheteResumo}
-            palpitesCount={countMap.get(b.id) ?? 0}
-            selecaoCashback={
-              b.selecao_cashback_id ? (selecaoMap.get(b.selecao_cashback_id) ?? null) : null
-            }
-          />
-        ))}
+        {bilhetesData.map((b) => {
+          const pts = pontosMap.get(b.id);
+          return (
+            <TabelaCard
+              key={b.id}
+              bilhete={b as BilheteResumo}
+              palpitesCount={countMap.get(b.id) ?? 0}
+              selecaoCashback={
+                b.selecao_cashback_id ? (selecaoMap.get(b.selecao_cashback_id) ?? null) : null
+              }
+              pontos={pts?.pontos ?? null}
+              posicao={pts?.posicao ?? null}
+              totalTabelas={totalTabelas ?? null}
+            />
+          );
+        })}
       </div>
     </div>
   );

@@ -5,11 +5,21 @@ type Props = {
   bilhete: BilheteResumo;
   palpitesCount: number;
   selecaoCashback: SelecaoBasica | null;
+  pontos?: number | null;
+  posicao?: number | null;
+  totalTabelas?: number | null;
 };
 
 const TOTAL_JOGOS = 104;
 
-export function TabelaCard({ bilhete, palpitesCount, selecaoCashback }: Props) {
+export function TabelaCard({
+  bilhete,
+  palpitesCount,
+  selecaoCashback,
+  pontos = null,
+  posicao = null,
+  totalTabelas = null,
+}: Props) {
   const confirmado = bilhete.status_pagamento === 'confirmado';
   const pct = Math.round((palpitesCount / TOTAL_JOGOS) * 100);
 
@@ -47,6 +57,15 @@ export function TabelaCard({ bilhete, palpitesCount, selecaoCashback }: Props) {
           <span className="text-text-muted">Sem cashback</span>
         )}
       </div>
+
+      {confirmado && pontos != null && (
+        <div className="border-border mt-3 flex items-baseline gap-2 border-t pt-3">
+          <span className="text-accent text-lg font-bold tabular-nums">{pontos}</span>
+          <span className="text-text-muted text-xs">
+            pts{posicao != null && totalTabelas != null ? ` · ${posicao}ª de ${totalTabelas}` : ''}
+          </span>
+        </div>
+      )}
 
       <div className="mt-4">
         {confirmado ? (

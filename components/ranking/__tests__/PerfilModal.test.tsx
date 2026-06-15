@@ -5,14 +5,18 @@ import type { RankingRowData } from '../RankingRow'
 
 const entry: RankingRowData = {
   userId: 'u1', nome: 'Fulano da Silva', posicao: 1, pontosTotais: 30,
-  acertosExatos: 2, acertosParciais: 0, totalBilhetes: 1, tendencia: null,
+  acertosExatos: 2, acertosParciais: 0, totalBilhetes: 3, tendencia: null,
   isCurrentUser: false, melhorBilheteId: 'b1', forma: ['verde', 'cinza'],
 }
 
-beforeEach(() => {
+function mockFetch(payload: unknown) {
   vi.stubGlobal('fetch', vi.fn(() =>
-    Promise.resolve({ ok: true, json: () => Promise.resolve({ campeao: null, artilheiro: null }) }),
+    Promise.resolve({ ok: true, json: () => Promise.resolve(payload) }),
   ) as unknown as typeof fetch)
+}
+
+beforeEach(() => {
+  mockFetch({ campeao: null, artilheiro: null, tabelas: [], totalTabelas: 0 })
 })
 
 describe('<PerfilModal />', () => {
@@ -24,5 +28,18 @@ describe('<PerfilModal />', () => {
   it('não renderiza conteúdo quando entry é null', () => {
     render(<PerfilModal entry={null} total={100} onClose={() => {}} />)
     expect(screen.queryByText('Bruxo')).toBeNull()
+  })
+  it('lista pontuação por tabela quando há 2+ tabelas', async () => {
+    mockFetch({
+      campeao: null, artilheiro: null, totalTabelas: 148,
+      tabelas: [
+        { bilheteId: 'b1', numero: 117, pontos: 50, posicao: 12 },
+        { bilheteId: 'b2', numero: 130, pontos: 20, posicao: 80 },
+      ],
+    })
+    render(<PerfilModal entry={entry} total={100} onClose={() => {}} />)
+    expect(await screen.findByText('Pontuação por tabela')).toBeInTheDocument()
+    expect(screen.getByText('Tabela nº117')).toBeInTheDocument()
+    expect(screen.getByText('Tabela nº130')).toBeInTheDocument()
   })
 })
