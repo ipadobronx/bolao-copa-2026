@@ -8,9 +8,12 @@ import { FormaDots } from '@/components/ranking/FormaDots'
 import { tituloDesempenho } from '@/lib/ranking/titulo'
 import type { RankingRowData } from './RankingRow'
 
-type Bonus = {
+type Tabela = { bilheteId: string; numero: number; pontos: number; posicao: number }
+type PerfilData = {
   campeao: { nome: string; bandeira: string } | null
   artilheiro: string | null
+  tabelas: Tabela[]
+  totalTabelas: number
 }
 
 export function PerfilModal({
@@ -22,25 +25,25 @@ export function PerfilModal({
   total: number
   onClose: () => void
 }) {
-  const [bonus, setBonus] = useState<Bonus | null>(null)
+  const [data, setData] = useState<PerfilData | null>(null)
   const [loading, setLoading] = useState(false)
   const bilheteId = entry?.melhorBilheteId ?? null
 
   useEffect(() => {
     if (!bilheteId) {
-      setBonus(null)
+      setData(null)
       return
     }
     let cancel = false
     setLoading(true)
-    setBonus(null)
+    setData(null)
     fetch(`/api/perfil/${bilheteId}`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((data: Bonus | null) => {
-        if (!cancel) setBonus(data)
+      .then((d: PerfilData | null) => {
+        if (!cancel) setData(d)
       })
       .catch(() => {
-        if (!cancel) setBonus(null)
+        if (!cancel) setData(null)
       })
       .finally(() => {
         if (!cancel) setLoading(false)
@@ -104,10 +107,10 @@ export function PerfilModal({
                   <>
                     <div className="flex items-center gap-2 text-sm">
                       <span aria-hidden="true">🏆</span>
-                      {bonus?.campeao ? (
+                      {data?.campeao ? (
                         <>
-                          <BandeiraImg emoji={bonus.campeao.bandeira} nome={bonus.campeao.nome} size={18} />
-                          <strong>{bonus.campeao.nome}</strong>
+                          <BandeiraImg emoji={data.campeao.bandeira} nome={data.campeao.nome} size={18} />
+                          <strong>{data.campeao.nome}</strong>
                         </>
                       ) : (
                         <span className="text-text-muted">—</span>
@@ -115,11 +118,32 @@ export function PerfilModal({
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <span aria-hidden="true">⚽</span>
-                      {bonus?.artilheiro ? <strong>{bonus.artilheiro}</strong> : <span className="text-text-muted">—</span>}
+                      {data?.artilheiro ? <strong>{data.artilheiro}</strong> : <span className="text-text-muted">—</span>}
                     </div>
                   </>
                 )}
               </div>
+
+              {data && data.tabelas.length > 1 && (
+                <div className="mt-4 space-y-1.5">
+                  <div className="text-[10px] uppercase tracking-wider text-text-muted">Pontuação por tabela</div>
+                  {data.tabelas.map((t) => (
+                    <div key={t.bilheteId} className="flex items-center justify-between text-sm">
+                      <span className="flex items-center gap-1.5">
+                        <span>Tabela nº{t.numero}</span>
+                        {t.bilheteId === entry.melhorBilheteId && (
+                          <span className="rounded-full bg-accent/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase text-accent">
+                            ★ ranking
+                          </span>
+                        )}
+                      </span>
+                      <span className="font-mono text-text-muted">
+                        <strong className="text-text-primary">{t.pontos}</strong> pts · {t.posicao}ª
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <Dialog.Close className="mt-5 w-full rounded-lg bg-bg-elevated py-2 text-sm font-semibold text-text-muted hover:text-text-primary">
                 Fechar
