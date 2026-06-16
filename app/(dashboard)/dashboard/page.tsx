@@ -10,6 +10,8 @@ import { CardPontos } from '@/components/dashboard/CardPontos'
 import { CardPosicao } from '@/components/dashboard/CardPosicao'
 import { CardProgresso } from '@/components/dashboard/CardProgresso'
 import { CardCountdown } from '@/components/dashboard/CardCountdown'
+import { PalpitesDoJogoPanel } from '@/components/dashboard/PalpitesDoJogoPanel'
+import { montarPalpitesDoJogo } from '@/lib/dashboard/palpites-do-jogo'
 import {
   determinarEstadoDashboard,
   type BilheteEstadoInput,
@@ -141,6 +143,9 @@ export default async function DashboardPage() {
     })
   }
 
+  const palpitesJogo =
+    estado.kind === 'em-andamento' ? await montarPalpitesDoJogo() : null
+
   // Próximos jogos (mesmo shape do dashboard atual) pros estados B/C/D
   const jogos: JogoRowData[] = (jogosFutRes.data ?? []).map((j) => ({
     id: j.id,
@@ -226,6 +231,9 @@ export default async function DashboardPage() {
               totalBilhetes={estado.progresso.totalBilhetes}
             />
           </div>
+          {palpitesJogo && (
+            <PalpitesDoJogoPanel atual={palpitesJogo.atual} proximo={palpitesJogo.proximo} />
+          )}
           <ProximosJogosPanel jogos={jogos} errored={jogosErrored} />
           <div className="mt-4 flex flex-wrap gap-4">
             <Link href={'/ranking' as Route} className="text-accent inline-flex items-center gap-1 text-sm hover:underline">
