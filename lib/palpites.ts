@@ -111,3 +111,12 @@ export function groupGamesByGrupo(jogos: JogoComSelecoes[]): Map<string, JogoCom
 
   return new Map([...map.entries()].sort((a, b) => a[0].localeCompare(b[0])));
 }
+
+/** Aba inicial da tela de palpites: o jogo-alvo (sua fase) tem prioridade; senão ?tab=bonus, senão grupos. */
+export type AbaPalpite = FaseJogo | 'bonus'
+
+export function abaInicial(targetFase: FaseJogo | null, tabParam: string | null): AbaPalpite {
+  if (targetFase) return targetFase
+  if (tabParam === 'bonus') return 'bonus'
+  return 'grupos'
+}
