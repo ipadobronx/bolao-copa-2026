@@ -96,7 +96,7 @@ export function JogoResumoCard({ jogo, proximo }: { jogo: JogoResumo; proximo: b
       </div>
 
       {proximo ? (
-        <div className="mt-3 flex items-center gap-2 rounded-xl border border-dashed border-border bg-bg-elevated px-3 py-2.5 text-xs text-text-muted">
+        <div className="mt-3 flex items-center gap-2 rounded-xl border border-dashed border-white/[0.06] bg-white/[0.04] px-3 py-2.5 text-xs text-text-muted">
           🔒 O palpite de cada um aparece quando o jogo travar.
         </div>
       ) : (
@@ -104,7 +104,7 @@ export function JogoResumoCard({ jogo, proximo }: { jogo: JogoResumo; proximo: b
           <div className="mt-3 text-[10px] uppercase tracking-wider text-text-muted">👥 Palpite de cada um</div>
           <div className="mt-1 space-y-1.5">
             {visiveis.map((p) => (
-              <div key={p.userId} className="bg-bg-elevated border-border flex items-center gap-2 rounded-xl border px-2.5 py-2">
+              <div key={p.userId} className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.04] px-2.5 py-2">
                 <span
                   className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-bg-dark"
                   style={{ background: avatarColor(p.userId) }}
