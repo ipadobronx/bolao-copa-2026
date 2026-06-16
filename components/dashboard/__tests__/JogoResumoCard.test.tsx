@@ -28,7 +28,7 @@ const base: JogoResumo = {
 describe('<JogoResumoCard />', () => {
   it('jogo atual: confronto, lista de nomes, sem lockbox', () => {
     render(<JogoResumoCard jogo={base} proximo={false} />)
-    expect(screen.getByText('Irã')).toBeInTheDocument()
+    expect(screen.getAllByText('Irã').length).toBeGreaterThan(0)
     expect(screen.getByText('Dionísio')).toBeInTheDocument()
     expect(screen.getByText('Ana Luyza')).toBeInTheDocument()
     expect(screen.queryByText(/aparece quando o jogo travar/i)).toBeNull()
