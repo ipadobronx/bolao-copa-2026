@@ -191,6 +191,7 @@ export function PerfilModal({
                     <button
                       type="button"
                       onClick={() => setVerTodos((v) => !v)}
+                      aria-expanded={verTodos}
                       className="w-full rounded-lg border border-white/10 py-1.5 text-xs font-semibold text-text-muted hover:text-text-primary"
                     >
                       {verTodos ? 'Ver menos' : `Ver todos os palpites (+${escondidos})`}
