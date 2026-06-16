@@ -16,7 +16,7 @@ function mockFetch(payload: unknown) {
 }
 
 beforeEach(() => {
-  mockFetch({ campeao: null, artilheiro: null, tabelas: [], totalTabelas: 0 })
+  mockFetch({ campeao: null, artilheiro: null, tabelas: [], totalTabelas: 0, palpites: [] })
 })
 
 describe('<PerfilModal />', () => {
@@ -31,7 +31,7 @@ describe('<PerfilModal />', () => {
   })
   it('lista pontuação por tabela quando há 2+ tabelas', async () => {
     mockFetch({
-      campeao: null, artilheiro: null, totalTabelas: 148,
+      campeao: null, artilheiro: null, totalTabelas: 148, palpites: [],
       tabelas: [
         { bilheteId: 'b1', numero: 117, pontos: 50, posicao: 12 },
         { bilheteId: 'b2', numero: 130, pontos: 20, posicao: 80 },
@@ -41,5 +41,19 @@ describe('<PerfilModal />', () => {
     expect(await screen.findByText('Pontuação por tabela')).toBeInTheDocument()
     expect(screen.getByText('Tabela nº117')).toBeInTheDocument()
     expect(screen.getByText('Tabela nº130')).toBeInTheDocument()
+  })
+
+  it('mostra a seção de palpites nos jogos (finalizado + em andamento)', async () => {
+    mockFetch({
+      campeao: null, artilheiro: null, tabelas: [], totalTabelas: 0,
+      palpites: [
+        { numeroJogo: 7, dataHora: '2026-06-13T22:00:00Z', casa: 'Brasil', fora: 'Marrocos', bandeiraCasa: null, bandeiraFora: null, palpiteCasa: 2, palpiteFora: 1, realCasa: 1, realFora: 1, finalizado: true, pontos: 2 },
+        { numeroJogo: 15, dataHora: '2026-06-15T22:00:00Z', casa: 'Arábia Saudita', fora: 'Uruguai', bandeiraCasa: null, bandeiraFora: null, palpiteCasa: 1, palpiteFora: 1, realCasa: null, realFora: null, finalizado: false, pontos: null },
+      ],
+    })
+    render(<PerfilModal entry={entry} total={100} onClose={() => {}} />)
+    expect(await screen.findByText('Palpites nos jogos')).toBeInTheDocument()
+    expect(screen.getByText('Brasil')).toBeInTheDocument()
+    expect(screen.getByText('em andamento')).toBeInTheDocument()
   })
 })

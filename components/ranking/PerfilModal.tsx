@@ -6,6 +6,7 @@ import { avatarColor, avatarInitials } from '@/lib/format/avatar-color'
 import { BandeiraImg } from '@/components/ui/BandeiraImg'
 import { FormaDots } from '@/components/ranking/FormaDots'
 import { tituloDesempenho } from '@/lib/ranking/titulo'
+import { agruparPorDia, type PalpiteJogo } from '@/lib/ranking/agruparPorDia'
 import type { RankingRowData } from './RankingRow'
 
 type Tabela = { bilheteId: string; numero: number; pontos: number; posicao: number }
@@ -14,6 +15,7 @@ type PerfilData = {
   artilheiro: string | null
   tabelas: Tabela[]
   totalTabelas: number
+  palpites: PalpiteJogo[]
 }
 
 export function PerfilModal({
@@ -59,7 +61,7 @@ export function PerfilModal({
     <Dialog.Root open={entry !== null} onOpenChange={(o) => { if (!o) onClose() }}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[90vw] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-[#1f1f23] bg-[#0c0c0e] p-5 text-text-primary outline-none">
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw] max-w-sm -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border border-[#1f1f23] bg-[#0c0c0e] p-5 text-text-primary outline-none">
           {entry && selo && (
             <>
               <Dialog.Title className="sr-only">Perfil de {entry.nome}</Dialog.Title>
@@ -140,6 +142,44 @@ export function PerfilModal({
                       <span className="font-mono text-text-muted">
                         <strong className="text-text-primary">{t.pontos}</strong> pts · {t.posicao}ª de {data.totalTabelas}
                       </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {data && data.palpites.length > 0 && (
+                <div className="mt-4 space-y-3">
+                  <div className="text-[10px] uppercase tracking-wider text-text-muted">Palpites nos jogos</div>
+                  {agruparPorDia(data.palpites).map((grupo) => (
+                    <div key={grupo.dia} className="space-y-1">
+                      <div className="font-mono text-[10px] text-text-muted">{grupo.label}</div>
+                      {grupo.jogos.map((j) => (
+                        <div key={j.numeroJogo} className="flex items-center justify-between gap-2 text-xs">
+                          <span className="flex min-w-0 items-center gap-1">
+                            <BandeiraImg emoji={j.bandeiraCasa} nome={j.casa} size={14} />
+                            <span className="truncate">{j.casa}</span>
+                            {j.palpiteCasa != null && j.palpiteFora != null ? (
+                              <strong className="px-1 tabular-nums">{j.palpiteCasa}×{j.palpiteFora}</strong>
+                            ) : (
+                              <span className="px-1 text-text-muted">— sem palpite</span>
+                            )}
+                            <span className="truncate">{j.fora}</span>
+                            <BandeiraImg emoji={j.bandeiraFora} nome={j.fora} size={14} />
+                          </span>
+                          <span className="shrink-0 font-mono text-text-muted">
+                            {j.finalizado ? (
+                              <>
+                                real {j.realCasa}×{j.realFora}
+                                {j.palpiteCasa != null && (
+                                  <strong className="text-accent"> · +{j.pontos ?? 0}</strong>
+                                )}
+                              </>
+                            ) : (
+                              'em andamento'
+                            )}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   ))}
                 </div>
