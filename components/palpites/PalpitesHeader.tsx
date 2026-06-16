@@ -1,3 +1,6 @@
+import Link from 'next/link';
+import type { Route } from 'next';
+
 type Props = {
   numeroBilhete: number;
   palpitesCount: number;
@@ -12,21 +15,29 @@ export function PalpitesHeader({ numeroBilhete, palpitesCount, primeiroJogoDataH
   const timeStr = deadline.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
-      <div>
-        <h1 className="font-display text-3xl">
-          Meus <span className="text-accent">palpites</span>
-        </h1>
-        <p className="font-mono text-text-muted mt-1 text-[12px]">
-          Tabela #{numeroBilhete} · Copa até {dateStr} às {timeStr}
-        </p>
-      </div>
-      <div className="text-right">
-        <div className="font-mono text-accent text-[22px] font-bold leading-none">
-          {palpitesCount}
-          <span className="text-text-muted text-sm font-normal">/{TOTAL}</span>
+    <div className="mb-5">
+      <Link
+        href={'/dashboard' as Route}
+        className="text-text-muted hover:text-text-primary mb-2 inline-flex items-center gap-1 text-xs"
+      >
+        ← Dashboard
+      </Link>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl">
+            Meus <span className="text-accent">palpites</span>
+          </h1>
+          <p className="font-mono text-text-muted mt-1 text-[12px]">
+            Tabela #{numeroBilhete} · Copa até {dateStr} às {timeStr}
+          </p>
         </div>
-        <div className="text-text-muted text-[11px]">preenchidos</div>
+        <div className="text-right">
+          <div className="font-mono text-accent text-[22px] font-bold leading-none">
+            {palpitesCount}
+            <span className="text-text-muted text-sm font-normal">/{TOTAL}</span>
+          </div>
+          <div className="text-text-muted text-[11px]">preenchidos</div>
+        </div>
       </div>
     </div>
   );

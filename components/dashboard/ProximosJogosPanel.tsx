@@ -10,7 +10,7 @@ export type ProximosJogosPanelProps = {
 
 export function ProximosJogosPanel({ jogos, errored = false, agora, tabelas = [] }: ProximosJogosPanelProps) {
   return (
-    <section className="panel">
+    <section className="panel border-[#1b1b1e] bg-[#08080a]">
       <header className="panel-header">
         <div className="flex items-center gap-2.5 text-base font-bold">
           <span aria-hidden="true" className="bg-success animate-pulse-dot size-2 rounded-full" />

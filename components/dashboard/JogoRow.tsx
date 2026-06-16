@@ -21,56 +21,44 @@ export type JogoRowProps = {
   tabelas?: TabelaPalpite[];
 };
 
-const FASE_LABEL: Record<FaseEnum, string> = {
-  grupos: 'Grupos',
-  '16avos': '16-avos',
-  oitavas: 'Oitavas',
-  quartas: 'Quartas',
-  semis: 'Semis',
-  disputa_terceiro: 'Disputa de 3º',
-  final: 'Final',
-};
-
 export function JogoRow({ jogo, agora = new Date(), tabelas = [] }: JogoRowProps) {
   const { date, hour } = formatDataRelativa({ data: new Date(jogo.data_hora), agora });
   const tbd = !jogo.casa || !jogo.fora;
 
   return (
-    <li className="border-border grid grid-cols-1 items-center gap-3 border-b px-6 py-5 text-center last:border-b-0 md:grid-cols-[120px_1fr_auto_1fr_120px] md:text-left">
-      <div className="font-mono text-xs">
+    <li className="border-border flex items-center gap-3 border-b px-4 py-3 last:border-b-0">
+      <div className="w-14 shrink-0 font-mono text-[11px] leading-tight">
         <div className="text-text-primary font-semibold">{date}</div>
         <div className="text-text-muted">{hour}</div>
       </div>
 
-      <div className="flex items-center justify-center gap-3 font-semibold md:justify-start">
+      <div className="flex min-w-0 flex-1 items-center justify-center gap-1.5 text-sm font-semibold">
         {jogo.casa ? (
           <>
-            <BandeiraImg emoji={jogo.casa.bandeira_emoji} nome={jogo.casa.nome} size={28} />
-            <span>{jogo.casa.nome}</span>
+            <BandeiraImg emoji={jogo.casa.bandeira_emoji} nome={jogo.casa.nome} size={20} />
+            <span className="truncate">{jogo.casa.nome}</span>
           </>
         ) : (
-          <span className="text-text-muted font-mono text-sm">
+          <span className="text-text-muted truncate font-mono text-xs">
             {jogo.placeholder_casa ?? 'TBD'}
           </span>
         )}
-      </div>
 
-      <div className="text-text-muted text-base">×</div>
+        <span className="text-text-muted shrink-0 px-0.5">×</span>
 
-      <div className="flex items-center justify-center gap-3 font-semibold md:justify-end md:text-right">
         {jogo.fora ? (
           <>
-            <span>{jogo.fora.nome}</span>
-            <BandeiraImg emoji={jogo.fora.bandeira_emoji} nome={jogo.fora.nome} size={28} />
+            <span className="truncate">{jogo.fora.nome}</span>
+            <BandeiraImg emoji={jogo.fora.bandeira_emoji} nome={jogo.fora.nome} size={20} />
           </>
         ) : (
-          <span className="text-text-muted font-mono text-sm">
+          <span className="text-text-muted truncate font-mono text-xs">
             {jogo.placeholder_fora ?? 'TBD'}
           </span>
         )}
       </div>
 
-      <div className="flex items-center justify-center gap-2 md:justify-end">
+      <div className="shrink-0">
         {tbd ? (
           <span
             aria-disabled="true"
@@ -82,9 +70,6 @@ export function JogoRow({ jogo, agora = new Date(), tabelas = [] }: JogoRowProps
         ) : (
           <PalpitarButton jogoId={jogo.id} tabelas={tabelas} />
         )}
-        <span className="text-text-muted hidden font-mono text-[10px] tracking-wider uppercase md:inline">
-          {FASE_LABEL[jogo.fase]}
-        </span>
       </div>
     </li>
   );

@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { ProximosJogosPanel } from './ProximosJogosPanel';
 import type { JogoRowData } from './JogoRow';
@@ -81,9 +81,4 @@ describe('<ProximosJogosPanel/>', () => {
     expect(screen.getByText(/Não foi possível carregar/i)).toBeInTheDocument();
   });
 
-  it('mostra label da fase em desktop apenas (a classe md:inline cobre isso; markup contém o texto)', () => {
-    render(<ProximosJogosPanel agora={AGORA} jogos={[jogo({ id: 1, fase: 'final' })]} />);
-    const item = screen.getByRole('listitem');
-    expect(within(item).getByText(/^final$/i)).toBeInTheDocument();
-  });
 });
