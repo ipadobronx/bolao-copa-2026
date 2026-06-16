@@ -113,6 +113,7 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
 
   return (
     <div
+      id={`jogo-${jogo.id}`}
       className={cn(
         'bg-bg-card border-border rounded-xl border p-3.5 transition-colors',
         estado === 'open' && saveState === 'saved' && 'border-green-500/25',

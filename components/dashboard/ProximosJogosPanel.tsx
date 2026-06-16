@@ -1,12 +1,14 @@
 import { JogoRow, type JogoRowData } from '@/components/dashboard/JogoRow';
+import type { TabelaPalpite } from '@/components/dashboard/PalpitarButton';
 
 export type ProximosJogosPanelProps = {
   jogos: JogoRowData[];
   errored?: boolean;
   agora?: Date;
+  tabelas?: TabelaPalpite[];
 };
 
-export function ProximosJogosPanel({ jogos, errored = false, agora }: ProximosJogosPanelProps) {
+export function ProximosJogosPanel({ jogos, errored = false, agora, tabelas = [] }: ProximosJogosPanelProps) {
   return (
     <section className="panel">
       <header className="panel-header">
@@ -28,7 +30,7 @@ export function ProximosJogosPanel({ jogos, errored = false, agora }: ProximosJo
       ) : (
         <ul>
           {jogos.map((jogo) => (
-            <JogoRow key={jogo.id} jogo={jogo} agora={agora} />
+            <JogoRow key={jogo.id} jogo={jogo} agora={agora} tabelas={tabelas} />
           ))}
         </ul>
       )}

@@ -1,8 +1,7 @@
-import Link from 'next/link';
-import type { Route } from 'next';
 import { formatDataRelativa } from '@/lib/format/data-relativa';
 import type { Database } from '@/lib/supabase/types';
 import { BandeiraImg } from '@/components/ui/BandeiraImg';
+import { PalpitarButton, type TabelaPalpite } from '@/components/dashboard/PalpitarButton';
 
 type FaseEnum = Database['public']['Enums']['fase_jogo'];
 
@@ -19,6 +18,7 @@ export type JogoRowData = {
 export type JogoRowProps = {
   jogo: JogoRowData;
   agora?: Date | undefined; // override pra testes; default = new Date()
+  tabelas?: TabelaPalpite[];
 };
 
 const FASE_LABEL: Record<FaseEnum, string> = {
@@ -31,7 +31,7 @@ const FASE_LABEL: Record<FaseEnum, string> = {
   final: 'Final',
 };
 
-export function JogoRow({ jogo, agora = new Date() }: JogoRowProps) {
+export function JogoRow({ jogo, agora = new Date(), tabelas = [] }: JogoRowProps) {
   const { date, hour } = formatDataRelativa({ data: new Date(jogo.data_hora), agora });
   const tbd = !jogo.casa || !jogo.fora;
 
@@ -80,9 +80,7 @@ export function JogoRow({ jogo, agora = new Date() }: JogoRowProps) {
             Palpitar
           </span>
         ) : (
-          <Link href={`/palpites/${jogo.id}` as Route} className="btn-sm">
-            Palpitar
-          </Link>
+          <PalpitarButton jogoId={jogo.id} tabelas={tabelas} />
         )}
         <span className="text-text-muted hidden font-mono text-[10px] tracking-wider uppercase md:inline">
           {FASE_LABEL[jogo.fase]}
