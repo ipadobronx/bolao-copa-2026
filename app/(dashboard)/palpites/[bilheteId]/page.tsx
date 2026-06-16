@@ -16,10 +16,11 @@ export default async function PalpitesBilhetePage({
   searchParams,
 }: {
   params: Promise<{ bilheteId: string }>;
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; jogo?: string }>;
 }) {
   const { bilheteId } = await params;
-  const { tab } = await searchParams;
+  const { tab, jogo } = await searchParams;
+  const targetJogoId = jogo && /^\d+$/.test(jogo) ? Number(jogo) : null;
 
   const supabase = await createSupabaseServerClient();
   const {
@@ -101,6 +102,7 @@ export default async function PalpitesBilhetePage({
       bonusSalvos={(bonusRaw ?? []) as BonusSalvo[]}
       selecoes={(selecoesRaw ?? []) as SelecaoBasica[]}
       initialTab={tab ?? null}
+      targetJogoId={targetJogoId}
     />
   );
 }

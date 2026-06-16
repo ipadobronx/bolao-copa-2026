@@ -10,12 +10,17 @@ type Props = {
   bilheteId: string;
   jogos: JogoComSelecoes[];
   palpitesSalvos: PalpiteSalvo[];
+  targetJogoId?: number | null;
 };
 
-export function GruposTab({ bilheteId, jogos, palpitesSalvos }: Props) {
+export function GruposTab({ bilheteId, jogos, palpitesSalvos, targetJogoId }: Props) {
   const byGrupo = groupGamesByGrupo(jogos);
   const grupos = [...byGrupo.keys()];
-  const [activeGrupo, setActiveGrupo] = useState(grupos[0] ?? 'A');
+  const grupoAlvo =
+    targetJogoId != null
+      ? grupos.find((g) => (byGrupo.get(g) ?? []).some((j) => j.id === targetJogoId))
+      : undefined;
+  const [activeGrupo, setActiveGrupo] = useState(grupoAlvo ?? grupos[0] ?? 'A');
 
   const jogosGrupo = byGrupo.get(activeGrupo) ?? [];
 
