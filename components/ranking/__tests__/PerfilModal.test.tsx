@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { PerfilModal } from '../PerfilModal'
 import type { RankingRowData } from '../RankingRow'
@@ -43,7 +43,7 @@ describe('<PerfilModal />', () => {
     expect(screen.getByText('Tabela nº130')).toBeInTheDocument()
   })
 
-  it('mostra a seção de palpites nos jogos (finalizado + em andamento)', async () => {
+  it('mostra só o dia mais recente e revela o resto no "Ver todos"', async () => {
     mockFetch({
       campeao: null, artilheiro: null, tabelas: [], totalTabelas: 0,
       palpites: [
@@ -52,8 +52,10 @@ describe('<PerfilModal />', () => {
       ],
     })
     render(<PerfilModal entry={entry} total={100} onClose={() => {}} />)
-    expect(await screen.findByText('Palpites nos jogos')).toBeInTheDocument()
-    expect(screen.getByText('Brasil')).toBeInTheDocument()
+    expect(await screen.findByText('Arábia Saudita')).toBeInTheDocument()
     expect(screen.getByText('em andamento')).toBeInTheDocument()
+    expect(screen.queryByText('Brasil')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /ver todos os palpites/i }))
+    expect(screen.getByText('Brasil')).toBeInTheDocument()
   })
 })

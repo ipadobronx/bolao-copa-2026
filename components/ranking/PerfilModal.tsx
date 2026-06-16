@@ -29,9 +29,11 @@ export function PerfilModal({
 }) {
   const [data, setData] = useState<PerfilData | null>(null)
   const [loading, setLoading] = useState(false)
+  const [verTodos, setVerTodos] = useState(false)
   const bilheteId = entry?.melhorBilheteId ?? null
 
   useEffect(() => {
+    setVerTodos(false)
     if (!bilheteId) {
       setData(null)
       return
@@ -56,12 +58,15 @@ export function PerfilModal({
   }, [bilheteId])
 
   const selo = entry ? tituloDesempenho(entry.posicao, total) : null
+  const grupos = data ? agruparPorDia(data.palpites) : []
+  const gruposVisiveis = verTodos ? grupos : grupos.slice(0, 1)
+  const escondidos = grupos.slice(1).reduce((n, g) => n + g.jogos.length, 0)
 
   return (
     <Dialog.Root open={entry !== null} onOpenChange={(o) => { if (!o) onClose() }}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw] max-w-sm -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border border-[#1f1f23] bg-[#0c0c0e] p-5 text-text-primary outline-none">
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw] max-w-sm -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border border-white/10 bg-[#0c0c0e]/70 p-5 text-text-primary shadow-2xl shadow-black/50 outline-none backdrop-blur-2xl scrollbar-glass">
           {entry && selo && (
             <>
               <Dialog.Title className="sr-only">Perfil de {entry.nome}</Dialog.Title>
@@ -147,10 +152,10 @@ export function PerfilModal({
                 </div>
               )}
 
-              {data && data.palpites.length > 0 && (
+              {grupos.length > 0 && (
                 <div className="mt-4 space-y-3">
                   <div className="text-[10px] uppercase tracking-wider text-text-muted">Palpites nos jogos</div>
-                  {agruparPorDia(data.palpites).map((grupo) => (
+                  {gruposVisiveis.map((grupo) => (
                     <div key={grupo.dia} className="space-y-1">
                       <div className="font-mono text-[10px] text-text-muted">{grupo.label}</div>
                       {grupo.jogos.map((j) => (
@@ -182,6 +187,16 @@ export function PerfilModal({
                       ))}
                     </div>
                   ))}
+                  {grupos.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setVerTodos((v) => !v)}
+                      aria-expanded={verTodos}
+                      className="w-full rounded-lg border border-white/10 py-1.5 text-xs font-semibold text-text-muted hover:text-text-primary"
+                    >
+                      {verTodos ? 'Ver menos' : `Ver todos os palpites (+${escondidos})`}
+                    </button>
+                  )}
                 </div>
               )}
 
