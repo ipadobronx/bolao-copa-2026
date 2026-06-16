@@ -44,7 +44,7 @@ export function JogoResumoCard({ jogo, proximo }: { jogo: JogoResumo; proximo: b
   const visiveis = verTodos ? lista : lista.slice(0, VISIVEIS)
 
   return (
-    <div className="bg-bg-card border-border rounded-2xl border p-4">
+    <div className="rounded-2xl border border-[#1b1b1e] bg-[#08080a] p-4">
       <div className="mb-1 flex items-center justify-between">
         <span
           className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide ${
