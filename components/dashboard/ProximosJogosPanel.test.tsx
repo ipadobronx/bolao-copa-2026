@@ -27,10 +27,23 @@ describe('<ProximosJogosPanel/>', () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(3);
   });
 
-  it('jogo definido renderiza link "Palpitar" pra /palpites/{id}', () => {
+  it('jogo definido sem tabelas: link Palpitar vai pra /comprar', () => {
     render(<ProximosJogosPanel agora={AGORA} jogos={[jogo({ id: 42 })]} />);
-    const link = screen.getByRole('link', { name: /palpitar/i });
-    expect(link).toHaveAttribute('href', '/palpites/42');
+    expect(screen.getByRole('link', { name: /palpitar/i })).toHaveAttribute('href', '/comprar');
+  });
+
+  it('jogo definido com 1 tabela: link vai pro deep-link ?jogo=', () => {
+    render(
+      <ProximosJogosPanel
+        agora={AGORA}
+        jogos={[jogo({ id: 42 })]}
+        tabelas={[{ id: 'b1', numero: 1, pontos: 0 }]}
+      />,
+    );
+    expect(screen.getByRole('link', { name: /palpitar/i })).toHaveAttribute(
+      'href',
+      '/palpites/b1?jogo=42',
+    );
   });
 
   it('jogo TBD (sem seleção) desabilita o CTA', () => {
