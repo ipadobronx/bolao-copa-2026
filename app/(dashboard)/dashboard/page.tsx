@@ -107,6 +107,19 @@ export default async function DashboardPage() {
   const totalBilhetesConfirmados = bilhetesRaw.filter(
     (b) => b.effective_status === 'confirmado',
   ).length
+  const idsConfirmados = (bilhetesRes.data ?? [])
+    .filter((b) => b.effective_status === 'confirmado')
+    .map((b) => b.id)
+  const { data: tabelaPontosRows } = idsConfirmados.length
+    ? await supabase
+        .from('ranking')
+        .select('bilhete_id, numero_bilhete, pontos_totais')
+        .in('bilhete_id', idsConfirmados)
+    : { data: [] }
+  const tabelasUsuario = (tabelaPontosRows ?? [])
+    .filter((r): r is typeof r & { bilhete_id: string } => r.bilhete_id !== null)
+    .map((r) => ({ id: r.bilhete_id, numero: r.numero_bilhete ?? 0, pontos: r.pontos_totais ?? 0 }))
+    .sort((a, b) => a.numero - b.numero)
 
   // Determinar estado preliminar pra decidir se precisamos de fase 2
   const estadoBase = determinarEstadoDashboard({
@@ -177,7 +190,7 @@ export default async function DashboardPage() {
       {estado.kind === 'pendente-puro' && (
         <>
           <DashboardPendentePix pendente={estado.pendente} variant="hero" />
-          <ProximosJogosPanel jogos={jogos} errored={jogosErrored} />
+          <ProximosJogosPanel jogos={jogos} errored={jogosErrored} tabelas={tabelasUsuario} />
         </>
       )}
 
@@ -195,7 +208,7 @@ export default async function DashboardPage() {
               totalBilhetes={estado.progresso.totalBilhetes}
             />
           </div>
-          <ProximosJogosPanel jogos={jogos} errored={jogosErrored} />
+          <ProximosJogosPanel jogos={jogos} errored={jogosErrored} tabelas={tabelasUsuario} />
           {estado.progresso.porcentagem < 100 && (
             <Link
               href={'/palpites' as Route}
@@ -234,7 +247,7 @@ export default async function DashboardPage() {
           {palpitesJogo && (
             <PalpitesDoJogoPanel atual={palpitesJogo.atual} proximo={palpitesJogo.proximo} />
           )}
-          <ProximosJogosPanel jogos={jogos} errored={jogosErrored} />
+          <ProximosJogosPanel jogos={jogos} errored={jogosErrored} tabelas={tabelasUsuario} />
           <div className="mt-4 flex flex-wrap gap-4">
             <Link href={'/ranking' as Route} className="text-accent inline-flex items-center gap-1 text-sm hover:underline">
               Ver ranking completo <ArrowRight className="size-3" />
