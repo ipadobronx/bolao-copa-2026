@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { createSupabaseAdminClient } from '@/lib/supabase/admin'
+import { calcularForma } from '@/lib/ranking/badges'
 
-type Tabela = { bilheteId: string; numero: number; pontos: number; posicao: number }
+type Tabela = { bilheteId: string; numero: number; pontos: number; posicao: number; exatos: number }
+type BonusSel = { nome: string; bandeira: string } | null
 
 export async function GET(
   _req: Request,
@@ -13,36 +16,48 @@ export async function GET(
   } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
 
-  // bônus do bilhete (RLS: visível pós-início)
+  // bônus (6 tipos) — RLS já libera pós-início
   const { data: bonus } = await supabase
     .from('palpites_bonus')
     .select('tipo, jogador_nome, selecao:selecoes!selecao_id(nome, bandeira_emoji)')
     .eq('bilhete_id', params.bilheteId)
-    .in('tipo', ['campeao', 'artilheiro'])
+    .in('tipo', ['campeao', 'vice', 'terceiro', 'quarto', 'artilheiro', 'revelacao'])
 
-  let campeao: { nome: string; bandeira: string } | null = null
+  const selOf = (b: { selecao: unknown }): BonusSel => {
+    const s = (Array.isArray(b.selecao) ? b.selecao[0] : b.selecao) as
+      | { nome: string; bandeira_emoji: string }
+      | null
+      | undefined
+    return s ? { nome: s.nome, bandeira: s.bandeira_emoji } : null
+  }
+  let campeao: BonusSel = null
+  let vice: BonusSel = null
+  let terceiro: BonusSel = null
+  let quarto: BonusSel = null
+  let revelacao: BonusSel = null
   let artilheiro: string | null = null
   for (const b of bonus ?? []) {
-    if (b.tipo === 'campeao') {
-      const sel = Array.isArray(b.selecao) ? b.selecao[0] : b.selecao
-      if (sel) campeao = { nome: sel.nome, bandeira: sel.bandeira_emoji }
-    } else if (b.tipo === 'artilheiro') {
-      artilheiro = b.jogador_nome ?? null
-    }
+    if (b.tipo === 'campeao') campeao = selOf(b)
+    else if (b.tipo === 'vice') vice = selOf(b)
+    else if (b.tipo === 'terceiro') terceiro = selOf(b)
+    else if (b.tipo === 'quarto') quarto = selOf(b)
+    else if (b.tipo === 'revelacao') revelacao = selOf(b)
+    else if (b.tipo === 'artilheiro') artilheiro = b.jogador_nome ?? null
   }
 
-  // tabelas do dono — user_id vem da própria view `ranking` (legível p/ autenticado,
-  // evita o RLS de `bilhetes` que bloquearia ler bilhete de outro usuário)
+  // tabelas + stats — via view `ranking` (user_id do dono vem da própria view)
   let tabelas: Tabela[] = []
+  let donoUserId: string | null = null
   const { data: donoRow } = await supabase
     .from('ranking')
     .select('user_id')
     .eq('bilhete_id', params.bilheteId)
     .maybeSingle()
   if (donoRow?.user_id) {
+    donoUserId = donoRow.user_id
     const { data: rows } = await supabase
       .from('ranking')
-      .select('bilhete_id, numero_bilhete, pontos_totais, posicao')
+      .select('bilhete_id, numero_bilhete, pontos_totais, posicao, acertos_exatos')
       .eq('user_id', donoRow.user_id)
       .order('numero_bilhete', { ascending: true })
     tabelas = (rows ?? [])
@@ -52,15 +67,24 @@ export async function GET(
         numero: r.numero_bilhete ?? 0,
         pontos: r.pontos_totais ?? 0,
         posicao: r.posicao ?? 0,
+        exatos: r.acertos_exatos ?? 0,
       }))
   }
+  const self = tabelas.find((t) => t.bilheteId === params.bilheteId) ?? null
 
-  const { count } = await supabase
-    .from('ranking')
-    .select('*', { count: 'exact', head: true })
+  const { count } = await supabase.from('ranking').select('*', { count: 'exact', head: true })
 
-  // palpites por jogo TRAVADO (RLS `palpites_select_own_or_started` já libera só os iniciados).
-  // Lista todos os jogos já iniciados; anexa o palpite da melhor tabela (bilheteId) ou null.
+  // forma (últimos 5) da tabela pedida — via admin (jogos finalizados, públicos)
+  let forma: string[] = []
+  if (donoUserId) {
+    const admin = createSupabaseAdminClient()
+    const formaMap = await calcularForma(admin, [
+      { userId: donoUserId, melhorBilheteId: params.bilheteId },
+    ])
+    forma = formaMap.get(donoUserId) ?? []
+  }
+
+  // palpites por jogo TRAVADO (RLS já libera só os iniciados)
   const agoraIso = new Date().toISOString()
   const { data: jogosTravados } = await supabase
     .from('jogos')
@@ -93,7 +117,7 @@ export async function GET(
     selecao_casa: { nome: string; bandeira_emoji: string } | { nome: string; bandeira_emoji: string }[] | null
     selecao_fora: { nome: string; bandeira_emoji: string } | { nome: string; bandeira_emoji: string }[] | null
   }
-  const palpites = (jogosTravados as unknown as JogoTravado[] ?? []).map((j) => {
+  const palpites = ((jogosTravados as unknown as JogoTravado[]) ?? []).map((j) => {
     const c = Array.isArray(j.selecao_casa) ? j.selecao_casa[0] : j.selecao_casa
     const f = Array.isArray(j.selecao_fora) ? j.selecao_fora[0] : j.selecao_fora
     const meu = palpMap.get(j.id)
@@ -113,5 +137,20 @@ export async function GET(
     }
   })
 
-  return NextResponse.json({ campeao, artilheiro, tabelas, totalTabelas: count ?? 0, palpites })
+  return NextResponse.json({
+    campeao,
+    vice,
+    terceiro,
+    quarto,
+    revelacao,
+    artilheiro,
+    numero: self?.numero ?? 0,
+    pontos: self?.pontos ?? 0,
+    posicao: self?.posicao ?? 0,
+    exatos: self?.exatos ?? 0,
+    forma,
+    tabelas,
+    totalTabelas: count ?? 0,
+    palpites,
+  })
 }
