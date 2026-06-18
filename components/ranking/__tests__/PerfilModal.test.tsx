@@ -16,7 +16,11 @@ function mockFetch(payload: unknown) {
 }
 
 beforeEach(() => {
-  mockFetch({ campeao: null, artilheiro: null, tabelas: [], totalTabelas: 0, palpites: [] })
+  mockFetch({
+    campeao: null, vice: null, terceiro: null, quarto: null, revelacao: null, artilheiro: null,
+    numero: 117, pontos: 30, posicao: 1, exatos: 2, forma: [],
+    tabelas: [], totalTabelas: 0, palpites: [],
+  })
 })
 
 describe('<PerfilModal />', () => {
@@ -31,7 +35,9 @@ describe('<PerfilModal />', () => {
   })
   it('lista pontuação por tabela quando há 2+ tabelas', async () => {
     mockFetch({
-      campeao: null, artilheiro: null, totalTabelas: 148, palpites: [],
+      campeao: null, vice: null, terceiro: null, quarto: null, revelacao: null,
+      artilheiro: null, totalTabelas: 148, palpites: [],
+      numero: 117, pontos: 50, posicao: 12, exatos: 0, forma: [],
       tabelas: [
         { bilheteId: 'b1', numero: 117, pontos: 50, posicao: 12 },
         { bilheteId: 'b2', numero: 130, pontos: 20, posicao: 80 },
@@ -45,7 +51,9 @@ describe('<PerfilModal />', () => {
 
   it('mostra só o dia mais recente e revela o resto no "Ver todos"', async () => {
     mockFetch({
-      campeao: null, artilheiro: null, tabelas: [], totalTabelas: 0,
+      campeao: null, vice: null, terceiro: null, quarto: null, revelacao: null,
+      artilheiro: null, tabelas: [], totalTabelas: 0,
+      numero: 117, pontos: 30, posicao: 1, exatos: 2, forma: [],
       palpites: [
         { numeroJogo: 7, dataHora: '2026-06-13T22:00:00Z', casa: 'Brasil', fora: 'Marrocos', bandeiraCasa: null, bandeiraFora: null, palpiteCasa: 2, palpiteFora: 1, realCasa: 1, realFora: 1, finalizado: true, pontos: 2 },
         { numeroJogo: 15, dataHora: '2026-06-15T22:00:00Z', casa: 'Arábia Saudita', fora: 'Uruguai', bandeiraCasa: null, bandeiraFora: null, palpiteCasa: 1, palpiteFora: 1, realCasa: null, realFora: null, finalizado: false, pontos: null },
@@ -57,5 +65,29 @@ describe('<PerfilModal />', () => {
     expect(screen.queryByText('Brasil')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: /ver todos os palpites/i }))
     expect(screen.getByText('Brasil')).toBeInTheDocument()
+  })
+
+  it('mostra os 6 rótulos de bônus', async () => {
+    render(<PerfilModal entry={entry} total={100} onClose={() => {}} />)
+    for (const label of ['Campeão', 'Vice', '3º lugar', '4º lugar', 'Artilheiro', 'Revelação']) {
+      expect(await screen.findByText(label)).toBeInTheDocument()
+    }
+  })
+
+  it('trocar de tabela mostra "Voltar"; voltar limpa', async () => {
+    mockFetch({
+      campeao: null, vice: null, terceiro: null, quarto: null, revelacao: null, artilheiro: null,
+      numero: 117, pontos: 50, posicao: 12, exatos: 2, forma: [], totalTabelas: 148, palpites: [],
+      tabelas: [
+        { bilheteId: 'b1', numero: 117, pontos: 50, posicao: 12 },
+        { bilheteId: 'b2', numero: 130, pontos: 20, posicao: 80 },
+      ],
+    })
+    render(<PerfilModal entry={entry} total={100} onClose={() => {}} />)
+    fireEvent.click(await screen.findByText('Tabela nº130'))
+    const voltar = await screen.findByText(/voltar/i)
+    expect(voltar).toBeInTheDocument()
+    fireEvent.click(voltar)
+    expect(screen.queryByText(/voltar/i)).toBeNull()
   })
 })
