@@ -245,7 +245,7 @@ export default async function DashboardPage() {
             />
           </div>
           {palpitesJogo && (
-            <PalpitesDoJogoPanel atual={palpitesJogo.atual} proximo={palpitesJogo.proximo} />
+            <PalpitesDoJogoPanel atuais={palpitesJogo.atuais} proximos={palpitesJogo.proximos} />
           )}
           <ProximosJogosPanel jogos={jogos} errored={jogosErrored} tabelas={tabelasUsuario} />
           <div className="mt-4 flex flex-wrap gap-4">

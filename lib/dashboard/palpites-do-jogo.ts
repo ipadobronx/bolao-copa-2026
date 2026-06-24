@@ -82,17 +82,22 @@ async function buildJogo(
   }
 }
 
-/** Acha o jogo travado mais recente (atual) e o próximo; agrega sobre o melhor bilhete de cada pessoa. */
+/**
+ * Agrega os palpites do "slot" de jogo atual e do próximo slot. Cada slot é o
+ * conjunto de jogos que compartilham o mesmo horário (ex.: 2 jogos simultâneos
+ * às 16h viram 2 cards). Agrega sobre o melhor bilhete de cada pessoa.
+ */
 export async function montarPalpitesDoJogo(): Promise<{
-  atual: JogoResumo | null
-  proximo: JogoResumo | null
+  atuais: JogoResumo[]
+  proximos: JogoResumo[]
 }> {
   const admin = createSupabaseAdminClient()
   const agora = new Date().toISOString()
 
-  const [atualRes, proxRes, rankRes] = await Promise.all([
-    admin.from('jogos').select(JOGO_COLS).lte('data_hora', agora).order('data_hora', { ascending: false }).limit(1).maybeSingle(),
-    admin.from('jogos').select(JOGO_COLS).gt('data_hora', agora).order('data_hora', { ascending: true }).limit(1).maybeSingle(),
+  // 1) Descobre o horário do slot atual (jogo travado mais recente) e do próximo.
+  const [slotAtualRes, slotProxRes, rankRes] = await Promise.all([
+    admin.from('jogos').select('data_hora').lte('data_hora', agora).order('data_hora', { ascending: false }).limit(1).maybeSingle(),
+    admin.from('jogos').select('data_hora').gt('data_hora', agora).order('data_hora', { ascending: true }).limit(1).maybeSingle(),
     admin.from('ranking_usuarios').select('user_id, nome, melhor_bilhete_id, posicao'),
   ])
 
@@ -105,10 +110,23 @@ export async function montarPalpitesDoJogo(): Promise<{
       posicao: r.posicao ?? 0,
     }))
 
-  const atualRow = atualRes.data as unknown as JogoRow | null
-  const proxRow = proxRes.data as unknown as JogoRow | null
+  const tAtual = slotAtualRes.data?.data_hora ?? null
+  const tProximo = slotProxRes.data?.data_hora ?? null
 
-  const atual = atualRow ? await buildJogo(admin, atualRow, melhores, true) : null
-  const proximo = proxRow ? await buildJogo(admin, proxRow, melhores, false) : null
-  return { atual, proximo }
+  // 2) Busca todos os jogos de cada slot (mesmo horário exato).
+  const [atuaisRes, proxRes] = await Promise.all([
+    tAtual
+      ? admin.from('jogos').select(JOGO_COLS).eq('data_hora', tAtual).order('numero_jogo')
+      : Promise.resolve({ data: [] as JogoRow[] }),
+    tProximo
+      ? admin.from('jogos').select(JOGO_COLS).eq('data_hora', tProximo).order('numero_jogo')
+      : Promise.resolve({ data: [] as JogoRow[] }),
+  ])
+
+  const atuaisRows = (atuaisRes.data ?? []) as unknown as JogoRow[]
+  const proxRows = (proxRes.data ?? []) as unknown as JogoRow[]
+
+  const atuais = await Promise.all(atuaisRows.map((j) => buildJogo(admin, j, melhores, true)))
+  const proximos = await Promise.all(proxRows.map((j) => buildJogo(admin, j, melhores, false)))
+  return { atuais, proximos }
 }
