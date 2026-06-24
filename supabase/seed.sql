@@ -180,10 +180,10 @@ INSERT INTO jogos (numero_jogo, fase, data_hora, selecao_casa_id, selecao_fora_i
   -- FASE DE GRUPOS — Rodada 3 (24-27 jun) — jogos simultâneos por grupo
   -- ---------------------------------------------------------------------------
   -- Grupos A e B: 24 jun
-  (49, 'grupos', '2026-06-24 16:00:00-04',  4,  1, NULL, NULL), -- R. Tcheca x México (A)
-  (50, 'grupos', '2026-06-24 16:00:00-04',  2,  3, NULL, NULL), -- África do Sul x Coreia (A)
-  (51, 'grupos', '2026-06-24 21:00:00-04',  8,  5, NULL, NULL), -- Suíça x Canadá (B)
-  (52, 'grupos', '2026-06-24 21:00:00-04',  7,  6, NULL, NULL), -- Catar x Bósnia (B)
+  (49, 'grupos', '2026-06-24 21:00:00-04',  4,  1, NULL, NULL), -- R. Tcheca x México (A) — 22h BRT
+  (50, 'grupos', '2026-06-24 21:00:00-04',  2,  3, NULL, NULL), -- África do Sul x Coreia (A) — 22h BRT
+  (51, 'grupos', '2026-06-24 15:00:00-04',  8,  5, NULL, NULL), -- Suíça x Canadá (B) — 16h BRT
+  (52, 'grupos', '2026-06-24 15:00:00-04',  7,  6, NULL, NULL), -- Catar x Bósnia (B) — 16h BRT
   -- Grupos C e D: 24-25 jun
   (53, 'grupos', '2026-06-24 18:00:00-04', 12,  9, NULL, NULL), -- Escócia x Brasil (C)
   (54, 'grupos', '2026-06-24 18:00:00-04', 10, 11, NULL, NULL), -- Marrocos x Haiti (C)
