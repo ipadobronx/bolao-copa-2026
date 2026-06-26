@@ -195,13 +195,13 @@ INSERT INTO jogos (numero_jogo, fase, data_hora, selecao_casa_id, selecao_fora_i
   (59, 'grupos', '2026-06-25 19:00:00-04', 22, 23, NULL, NULL), -- Japão x Suécia (F)
   (60, 'grupos', '2026-06-25 19:00:00-04', 24, 21, NULL, NULL), -- Tunísia x Países Baixos (F)
   -- Grupos G e H: 26 jun
-  (61, 'grupos', '2026-06-26 16:00:00-04', 30, 31, NULL, NULL), -- Cabo Verde x Arábia Saudita (H)
-  (62, 'grupos', '2026-06-26 16:00:00-04', 32, 29, NULL, NULL), -- Uruguai x Espanha (H) -- TODO confirmar pareamento
+  (61, 'grupos', '2026-06-26 20:00:00-04', 30, 31, NULL, NULL), -- Cabo Verde x Arábia Saudita (H) — 21h BRT
+  (62, 'grupos', '2026-06-26 20:00:00-04', 32, 29, NULL, NULL), -- Uruguai x Espanha (H) — 21h BRT -- TODO confirmar pareamento
   (63, 'grupos', '2026-06-26 21:00:00-04', 26, 27, NULL, NULL), -- Egito x Irã (G)
   (64, 'grupos', '2026-06-26 21:00:00-04', 28, 25, NULL, NULL), -- Nova Zelândia x Bélgica (G)
   -- Grupo I: 26 jun
-  (65, 'grupos', '2026-06-26 13:00:00-04', 36, 33, NULL, NULL), -- Noruega x França (I)
-  (66, 'grupos', '2026-06-26 13:00:00-04', 34, 35, NULL, NULL), -- Senegal x Iraque (I)
+  (65, 'grupos', '2026-06-26 15:00:00-04', 36, 33, NULL, NULL), -- Noruega x França (I) — 16h BRT
+  (66, 'grupos', '2026-06-26 15:00:00-04', 34, 35, NULL, NULL), -- Senegal x Iraque (I) — 16h BRT
   -- Grupos J, K e L: 27 jun
   (67, 'grupos', '2026-06-27 17:00:00-04', 38, 39, NULL, NULL), -- Argélia x Áustria (J)
   (68, 'grupos', '2026-06-27 17:00:00-04', 40, 37, NULL, NULL), -- Jordânia x Argentina (J)
