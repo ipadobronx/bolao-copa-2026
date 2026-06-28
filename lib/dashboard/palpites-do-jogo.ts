@@ -112,19 +112,11 @@ export async function montarPalpitesDoJogo(): Promise<{
 
   const tProximo = slotProxRes.data?.data_hora ?? null
 
-  // Só tratamos como "jogo atual" o slot travado mais recente se ele for de HOJE
-  // (Brasília). Senão o painel ficaria mostrando jogos já encerrados de um dia
-  // anterior no topo, escondendo os de hoje. Entre rodadas, atuais fica vazio e
-  // só aparecem os próximos.
-  const diaBRT = (iso: string) =>
-    new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'America/Sao_Paulo',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).format(new Date(iso))
-  const tAtualRaw = slotAtualRes.data?.data_hora ?? null
-  const tAtual = tAtualRaw && diaBRT(tAtualRaw) === diaBRT(agora) ? tAtualRaw : null
+  // "Jogo atual" = slot travado mais recente, e ele fica visível até o próximo
+  // jogo começar (o apito do próximo o substitui como slot mais recente).
+  // Atravessa a virada de dia de propósito: um jogo das 23h segue no painel de
+  // madrugada até o próximo apito, em vez de sumir à meia-noite.
+  const tAtual = slotAtualRes.data?.data_hora ?? null
 
   // 2) Busca todos os jogos de cada slot (mesmo horário exato).
   const [atuaisRes, proxRes] = await Promise.all([
