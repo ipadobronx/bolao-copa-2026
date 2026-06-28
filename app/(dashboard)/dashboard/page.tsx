@@ -11,7 +11,10 @@ import { CardPosicao } from '@/components/dashboard/CardPosicao'
 import { CardProgresso } from '@/components/dashboard/CardProgresso'
 import { CardCountdown } from '@/components/dashboard/CardCountdown'
 import { PalpitesDoJogoPanel } from '@/components/dashboard/PalpitesDoJogoPanel'
+import { CardFaseDestaque } from '@/components/dashboard/CardFaseDestaque'
 import { montarPalpitesDoJogo } from '@/lib/dashboard/palpites-do-jogo'
+import { faseDestaque } from '@/lib/dashboard/fase-destaque'
+import { determinarPeriodoAtual, type JogoParaPeriodo } from '@/lib/ranking'
 import {
   determinarEstadoDashboard,
   type BilheteEstadoInput,
@@ -73,7 +76,8 @@ export default async function DashboardPage() {
 
   // Fase 1: 5 queries paralelas
   const agora = new Date()
-  const [bilhetesRes, rankingRes, palpitesCountRes, jogosFutRes, jogoFinRes] = await Promise.all([
+  const [bilhetesRes, rankingRes, palpitesCountRes, jogosFutRes, jogoFinRes, jogosTodosRes] =
+    await Promise.all([
     supabase
       .from('bilhetes_view')
       .select('id, numero_bilhete, valor_pago, effective_status, created_at')
@@ -97,6 +101,7 @@ export default async function DashboardPage() {
       .order('data_hora', { ascending: true })
       .limit(5),
     supabase.from('jogos').select('id', { head: true, count: 'exact' }).eq('finalizado', true),
+    supabase.from('jogos').select('id, fase, data_hora, finalizado'),
   ])
 
   const bilhetesRaw = (bilhetesRes.data ?? []) as BilheteEstadoInput[]
@@ -158,6 +163,11 @@ export default async function DashboardPage() {
 
   const palpitesJogo =
     estado.kind === 'em-andamento' ? await montarPalpitesDoJogo() : null
+
+  // Destaque de fase: só aparece no mata-mata (multiplicador > 1). Reusa a
+  // detecção de fase ativa do ranking; faseDestaque retorna null em grupos.
+  const periodo = determinarPeriodoAtual((jogosTodosRes.data ?? []) as JogoParaPeriodo[])
+  const destaque = periodo ? faseDestaque(periodo.periodoKey) : null
 
   // Próximos jogos (mesmo shape do dashboard atual) pros estados B/C/D
   const jogos: JogoRowData[] = (jogosFutRes.data ?? []).map((j) => ({
@@ -225,6 +235,7 @@ export default async function DashboardPage() {
           {estado.pendente && (
             <DashboardPendentePix pendente={estado.pendente} variant="banner" />
           )}
+          {destaque && <CardFaseDestaque {...destaque} />}
           <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-3">
             <CardPontos
               pontos={estado.rankingUsuario.pontos_totais}
