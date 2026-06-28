@@ -213,22 +213,26 @@ INSERT INTO jogos (numero_jogo, fase, data_hora, selecao_casa_id, selecao_fora_i
   -- ---------------------------------------------------------------------------
   -- 16AVOS DE FINAL (28 jun - 3 jul) — 16 jogos
   -- ---------------------------------------------------------------------------
-  (73, '16avos', '2026-06-28 16:00:00-04', NULL, NULL, '2A', '2B'),
-  (74, '16avos', '2026-06-29 13:00:00-04', NULL, NULL, '1E', '3 A/B/C/D/F'),
-  (75, '16avos', '2026-06-29 16:00:00-04', NULL, NULL, '1F', '2C'),
-  (76, '16avos', '2026-06-29 21:00:00-04', NULL, NULL, '1C', '2F'),
-  (77, '16avos', '2026-06-30 13:00:00-04', NULL, NULL, '1I', '3 C/D/F/G/H'),
-  (78, '16avos', '2026-06-30 16:00:00-04', NULL, NULL, '2E', '2I'),
-  (79, '16avos', '2026-06-30 21:00:00-04', NULL, NULL, '1A', '3 C/E/F/H/I'),
-  (80, '16avos', '2026-07-01 16:00:00-04', NULL, NULL, '1L', '3 E/H/I/J/K'),
-  (81, '16avos', '2026-07-01 19:00:00-04', NULL, NULL, '1D', '3 B/E/F/I/J'),
-  (82, '16avos', '2026-07-01 22:00:00-04', NULL, NULL, '1G', '3 A/E/H/I/J'),
-  (83, '16avos', '2026-07-02 16:00:00-04', NULL, NULL, '2K', '2L'),
-  (84, '16avos', '2026-07-02 19:00:00-04', NULL, NULL, '1H', '2J'),
-  (85, '16avos', '2026-07-02 22:00:00-04', NULL, NULL, '1B', '3 E/F/G/I/J'),
-  (86, '16avos', '2026-07-03 16:00:00-04', NULL, NULL, '1J', '2H'),
-  (87, '16avos', '2026-07-03 19:00:00-04', NULL, NULL, '1K', '3 D/E/I/J/L'),
-  (88, '16avos', '2026-07-03 22:00:00-04', NULL, NULL, '2D', '2G'),
+  -- Times e horários preenchidos em 28/06/2026, quando os 16-avos foram definidos.
+  -- Horários em BRT (offset -03, igual ao banco ao vivo); confrontos validados
+  -- contra o calendário oficial FIFA 2026 + classificação real dos grupos.
+  -- (slot de chaveamento original entre parênteses no comentário). Oitavas+ seguem placeholders.
+  (73, '16avos', '2026-06-28 16:00:00-03',  2,  5, NULL, NULL), -- África do Sul x Canadá (2A x 2B)
+  (74, '16avos', '2026-06-29 17:30:00-03', 17, 14, NULL, NULL), -- Alemanha x Paraguai (1E x 3D)
+  (75, '16avos', '2026-06-29 22:00:00-03', 21, 10, NULL, NULL), -- Países Baixos x Marrocos (1F x 2C)
+  (76, '16avos', '2026-06-29 14:00:00-03',  9, 22, NULL, NULL), -- Brasil x Japão (1C x 2F)
+  (77, '16avos', '2026-06-30 18:00:00-03', 33, 23, NULL, NULL), -- França x Suécia (1I x 3F)
+  (78, '16avos', '2026-06-30 14:00:00-03', 19, 36, NULL, NULL), -- Costa do Marfim x Noruega (2E x 2I)
+  (79, '16avos', '2026-06-30 22:00:00-03',  1, 20, NULL, NULL), -- México x Equador (1A x 3E)
+  (80, '16avos', '2026-07-01 13:00:00-03', 45, 42, NULL, NULL), -- Inglaterra x R. D. do Congo (1L x 3K)
+  (81, '16avos', '2026-07-01 21:00:00-03', 13,  6, NULL, NULL), -- Estados Unidos x Bósnia e Herzegovina (1D x 3B)
+  (82, '16avos', '2026-07-01 17:00:00-03', 25, 34, NULL, NULL), -- Bélgica x Senegal (1G x 3I)
+  (83, '16avos', '2026-07-02 20:00:00-03', 41, 46, NULL, NULL), -- Portugal x Croácia (2K x 2L)
+  (84, '16avos', '2026-07-02 16:00:00-03', 29, 39, NULL, NULL), -- Espanha x Áustria (1H x 2J)
+  (85, '16avos', '2026-07-03 00:00:00-03',  8, 38, NULL, NULL), -- Suíça x Argélia (1B x 3J)
+  (86, '16avos', '2026-07-03 19:00:00-03', 37, 30, NULL, NULL), -- Argentina x Cabo Verde (1J x 2H)
+  (87, '16avos', '2026-07-03 22:30:00-03', 44, 47, NULL, NULL), -- Colômbia x Gana (1K x 3L)
+  (88, '16avos', '2026-07-03 15:00:00-03', 15, 26, NULL, NULL), -- Austrália x Egito (2D x 2G)
 
   -- ---------------------------------------------------------------------------
   -- OITAVAS DE FINAL (4-7 jul) — 8 jogos
