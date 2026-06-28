@@ -164,3 +164,34 @@ describe('MatchRow — estado finalized', () => {
     expect(screen.getByText(/7 pts/i)).toBeInTheDocument();
   });
 });
+
+describe('MatchRow — countdown por jogo (mata-mata)', () => {
+  const AGORA = new Date('2026-06-28T12:00:00Z');
+  const jogoEm = (horas: number): JogoComSelecoes => ({
+    ...JOGO_ABERTO,
+    data_hora: new Date(AGORA.getTime() + horas * 3600 * 1000).toISOString(),
+  });
+
+  beforeEach(() => vi.setSystemTime(AGORA));
+
+  it('mostra faixa laranja "fecha em" quando aberto, showCountdown e <24h', () => {
+    render(<MatchRow bilheteId="abc" jogo={jogoEm(8)} palpiteSalvo={null} showCountdown />);
+    expect(screen.getByText(/fecha em/i)).toBeInTheDocument();
+  });
+
+  it('NÃO mostra countdown quando aberto mas falta >24h', () => {
+    render(<MatchRow bilheteId="abc" jogo={jogoEm(48)} palpiteSalvo={null} showCountdown />);
+    expect(screen.queryByText(/fecha em/i)).not.toBeInTheDocument();
+  });
+
+  it('NÃO mostra countdown sem showCountdown (default, ex.: grupos)', () => {
+    render(<MatchRow bilheteId="abc" jogo={jogoEm(8)} palpiteSalvo={null} />);
+    expect(screen.queryByText(/fecha em/i)).not.toBeInTheDocument();
+  });
+
+  it('NÃO mostra countdown quando o jogo já travou', () => {
+    render(<MatchRow bilheteId="abc" jogo={jogoEm(-2)} palpiteSalvo={null} showCountdown />);
+    expect(screen.queryByText(/fecha em/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/fechado/i)).toBeInTheDocument();
+  });
+});

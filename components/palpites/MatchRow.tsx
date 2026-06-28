@@ -7,6 +7,7 @@ import { computeMatchEstado } from '@/lib/palpites';
 import type { JogoComSelecoes, PalpiteSalvo } from '@/lib/palpites';
 import { cn } from '@/lib/utils';
 import { BandeiraImg } from '@/components/ui/BandeiraImg';
+import { useCountdown } from './useCountdown';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
@@ -14,9 +15,12 @@ type Props = {
   bilheteId: string;
   jogo: JogoComSelecoes;
   palpiteSalvo: PalpiteSalvo | null;
+  /** Mostra a faixa de contagem regressiva por jogo (<24h). Usado no mata-mata,
+   *  onde não há o countdown por rodada do RodadaHeader. */
+  showCountdown?: boolean;
 };
 
-export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
+export function MatchRow({ bilheteId, jogo, palpiteSalvo, showCountdown = false }: Props) {
   const estado = computeMatchEstado(jogo, new Date());
 
   const [golsCasa, setGolsCasa] = useState<string>(
@@ -121,6 +125,8 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
         estado === 'locked' && 'opacity-70',
       )}
     >
+      {showCountdown && estado === 'open' && <MatchCountdownFaixa deadline={jogo.data_hora} />}
+
       {/* Header: meta + chip lado-a-lado (sempre visível) */}
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="font-mono text-text-muted text-[10px] leading-relaxed">
@@ -173,6 +179,19 @@ export function MatchRow({ bilheteId, jogo, palpiteSalvo }: Props) {
           <BandeiraImg emoji={flagEmojiFora} nome={nomeFora} />
         </div>
       </div>
+    </div>
+  );
+}
+
+function MatchCountdownFaixa({ deadline }: { deadline: string }) {
+  const { state, parts } = useCountdown(deadline);
+  if (state !== 'urgent') return null;
+  return (
+    <div className="-mx-3.5 -mt-3.5 mb-2.5 flex items-center justify-center gap-1.5 rounded-t-xl border-b border-orange-500/40 bg-orange-500/10 px-3 py-1.5 font-mono text-[11px] font-bold text-orange-400">
+      <span>⚡ fecha em</span>
+      <span className="tabular-nums">
+        {parts.h}h {parts.m}m {parts.s}s
+      </span>
     </div>
   );
 }

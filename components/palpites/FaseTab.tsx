@@ -38,6 +38,7 @@ export function FaseTab({ bilheteId, fase, jogos, palpitesSalvos }: Props) {
             bilheteId={bilheteId}
             jogo={jogo}
             palpiteSalvo={salvoMap.get(jogo.id) ?? null}
+            showCountdown
           />
         ))
       )}

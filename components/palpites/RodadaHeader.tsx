@@ -1,49 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useCountdown } from './useCountdown';
 
 type Props = {
   numero: 1 | 2 | 3;
   deadline: string;
 };
 
-type BannerState = 'normal' | 'urgent' | 'closed';
-
-function diffMs(deadline: string): number {
-  return new Date(deadline).getTime() - Date.now();
-}
-
-function formatCountdown(ms: number): { h: string; m: string; s: string } {
-  const total = Math.max(0, Math.floor(ms / 1000));
-  const h = Math.floor(total / 3600);
-  const m = Math.floor((total % 3600) / 60);
-  const s = total % 60;
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return { h: pad(h), m: pad(m), s: pad(s) };
-}
-
-function getBannerState(ms: number): BannerState {
-  if (ms <= 0) return 'closed';
-  if (ms <= 24 * 3600 * 1000) return 'urgent';
-  return 'normal';
-}
-
 export function RodadaHeader({ numero, deadline }: Props) {
-  const [remainingMs, setRemainingMs] = useState(() => diffMs(deadline));
-
-  useEffect(() => {
-    setRemainingMs(diffMs(deadline));
-    const id = setInterval(() => {
-      const ms = diffMs(deadline);
-      setRemainingMs(ms);
-      if (ms <= 0) clearInterval(id);
-    }, 1000);
-    return () => clearInterval(id);
-  }, [deadline]);
-
-  const state = getBannerState(remainingMs);
-  const countdown = formatCountdown(remainingMs);
+  const { state, parts: countdown } = useCountdown(deadline);
 
   const deadlineDate = new Date(deadline);
   const dateLabel = deadlineDate.toLocaleDateString('pt-BR', {
