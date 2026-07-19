@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { calcularForma } from '@/lib/ranking/badges'
+import { pontosBonusExibicao, type CopaResultadosOficial } from '@/lib/ranking/pontosBonus'
 
 type Tabela = { bilheteId: string; numero: number; pontos: number; posicao: number; exatos: number }
-type BonusSel = { nome: string; bandeira: string } | null
+type BonusSel = { nome: string; bandeira: string; pontos: number | null } | null
 
 export async function GET(
   _req: Request,
@@ -19,30 +20,52 @@ export async function GET(
   // bônus (6 tipos) — RLS já libera pós-início
   const { data: bonus } = await supabase
     .from('palpites_bonus')
-    .select('tipo, jogador_nome, selecao:selecoes!selecao_id(nome, bandeira_emoji)')
+    .select(
+      'tipo, jogador_nome, pontos_calculados, selecao:selecoes!selecao_id(nome, bandeira_emoji)',
+    )
     .eq('bilhete_id', params.bilheteId)
     .in('tipo', ['campeao', 'vice', 'terceiro', 'quarto', 'artilheiro', 'revelacao'])
 
-  const selOf = (b: { selecao: unknown }): BonusSel => {
+  // resultados oficiais — decide se o badge de pontos aparece (RLS: select liberado)
+  const { data: oficial } = await supabase
+    .from('copa_resultados')
+    .select('campeao_id, vice_id, terceiro_id, quarto_id, artilheiro_nome, revelacao_id')
+    .eq('id', 1)
+    .maybeSingle<CopaResultadosOficial>()
+
+  const selOf = (b: { selecao: unknown; pontos_calculados: number | null; tipo: string }): BonusSel => {
     const s = (Array.isArray(b.selecao) ? b.selecao[0] : b.selecao) as
       | { nome: string; bandeira_emoji: string }
       | null
       | undefined
-    return s ? { nome: s.nome, bandeira: s.bandeira_emoji } : null
+    if (!s) return null
+    return {
+      nome: s.nome,
+      bandeira: s.bandeira_emoji,
+      pontos: pontosBonusExibicao(
+        b.tipo as Parameters<typeof pontosBonusExibicao>[0],
+        b.pontos_calculados,
+        oficial ?? null,
+      ),
+    }
   }
   let campeao: BonusSel = null
   let vice: BonusSel = null
   let terceiro: BonusSel = null
   let quarto: BonusSel = null
   let revelacao: BonusSel = null
-  let artilheiro: string | null = null
+  let artilheiro: { nome: string; pontos: number | null } | null = null
   for (const b of bonus ?? []) {
     if (b.tipo === 'campeao') campeao = selOf(b)
     else if (b.tipo === 'vice') vice = selOf(b)
     else if (b.tipo === 'terceiro') terceiro = selOf(b)
     else if (b.tipo === 'quarto') quarto = selOf(b)
     else if (b.tipo === 'revelacao') revelacao = selOf(b)
-    else if (b.tipo === 'artilheiro') artilheiro = b.jogador_nome ?? null
+    else if (b.tipo === 'artilheiro' && b.jogador_nome != null)
+      artilheiro = {
+        nome: b.jogador_nome,
+        pontos: pontosBonusExibicao('artilheiro', b.pontos_calculados, oficial ?? null),
+      }
   }
 
   // tabelas + stats — via view `ranking` (user_id do dono vem da própria view)
