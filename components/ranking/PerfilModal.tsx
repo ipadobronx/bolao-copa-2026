@@ -9,7 +9,7 @@ import { tituloDesempenho } from '@/lib/ranking/titulo'
 import { agruparPorDia, type PalpiteJogo } from '@/lib/ranking/agruparPorDia'
 import type { RankingRowData } from './RankingRow'
 
-type BonusSel = { nome: string; bandeira: string } | null
+type BonusSel = { nome: string; bandeira: string; pontos: number | null } | null
 type Tabela = { bilheteId: string; numero: number; pontos: number; posicao: number }
 type PerfilData = {
   campeao: BonusSel
@@ -17,7 +17,7 @@ type PerfilData = {
   terceiro: BonusSel
   quarto: BonusSel
   revelacao: BonusSel
-  artilheiro: string | null
+  artilheiro: { nome: string; pontos: number | null } | null
   numero: number
   pontos: number
   posicao: number
@@ -26,6 +26,19 @@ type PerfilData = {
   tabelas: Tabela[]
   totalTabelas: number
   palpites: PalpiteJogo[]
+}
+
+function BadgePontos({ pontos }: { pontos: number | null }) {
+  if (pontos == null) return null
+  return (
+    <span
+      className={`ml-auto shrink-0 font-mono text-xs ${
+        pontos > 0 ? 'font-bold text-accent' : 'text-text-muted'
+      }`}
+    >
+      +{pontos}
+    </span>
+  )
 }
 
 export function PerfilModal({
@@ -176,6 +189,7 @@ export function PerfilModal({
                           <>
                             <BandeiraImg emoji={sel.bandeira} nome={sel.nome} size={16} />
                             <strong className="truncate">{sel.nome}</strong>
+                            <BadgePontos pontos={sel.pontos} />
                           </>
                         ) : (
                           <span className="text-text-muted">—</span>
@@ -186,7 +200,10 @@ export function PerfilModal({
                       <span aria-hidden="true">⚽</span>
                       <span className="w-20 shrink-0 text-xs text-text-muted">Artilheiro</span>
                       {data?.artilheiro ? (
-                        <strong className="truncate">{data.artilheiro}</strong>
+                        <>
+                          <strong className="truncate">{data.artilheiro.nome}</strong>
+                          <BadgePontos pontos={data.artilheiro.pontos} />
+                        </>
                       ) : (
                         <span className="text-text-muted">—</span>
                       )}
@@ -198,6 +215,7 @@ export function PerfilModal({
                         <>
                           <BandeiraImg emoji={data.revelacao.bandeira} nome={data.revelacao.nome} size={16} />
                           <strong className="truncate">{data.revelacao.nome}</strong>
+                          <BadgePontos pontos={data.revelacao.pontos} />
                         </>
                       ) : (
                         <span className="text-text-muted">—</span>

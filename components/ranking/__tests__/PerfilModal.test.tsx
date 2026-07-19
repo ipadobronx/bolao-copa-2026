@@ -74,6 +74,31 @@ describe('<PerfilModal />', () => {
     }
   })
 
+  it('mostra pontos dos bônus: acerto amarelo, erro cinza, pendente sem badge', async () => {
+    mockFetch({
+      campeao: { nome: 'Espanha', bandeira: '🇪🇸', pontos: 50 },
+      vice: { nome: 'França', bandeira: '🇫🇷', pontos: 0 },
+      terceiro: null,
+      quarto: null,
+      revelacao: { nome: 'Noruega', bandeira: '🇳🇴', pontos: null },
+      artilheiro: { nome: 'Mbappe', pontos: 25 },
+      numero: 118, pontos: 681, posicao: 1, exatos: 14, forma: [],
+      tabelas: [], totalTabelas: 0, palpites: [],
+    })
+    render(<PerfilModal entry={entry} total={100} onClose={() => {}} />)
+    expect(await screen.findByText('Espanha')).toBeInTheDocument()
+    // acertos em amarelo
+    expect(screen.getByText('+50').className).toContain('text-accent')
+    expect(screen.getByText('+25').className).toContain('text-accent')
+    // erro em cinza
+    expect(screen.getByText('+0').className).toContain('text-text-muted')
+    // revelação pendente: nome aparece, badge não — total de badges = 3 (+50, +0, +25)
+    expect(screen.getByText('Noruega')).toBeInTheDocument()
+    expect(screen.getAllByText(/^\+\d+$/)).toHaveLength(3)
+    // artilheiro (agora objeto) renderiza o nome
+    expect(screen.getByText('Mbappe')).toBeInTheDocument()
+  })
+
   it('trocar de tabela mostra "Voltar"; voltar limpa', async () => {
     mockFetch({
       campeao: null, vice: null, terceiro: null, quarto: null, revelacao: null, artilheiro: null,
